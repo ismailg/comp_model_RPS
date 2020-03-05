@@ -1,0 +1,74 @@
+---
+title: "comparing models"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### fit MS models using DEoptim and compre to IG models using optim  
+```{r}
+
+
+pool_de_optim <- data.frame()
+for(id in unique(dat_exp2$human_id)) {
+pool_de_optim <- rbind(pool_de_optim,
+                       data.frame(
+                         "ID" = id,
+                         "condition" = dat_exp2[dat_exp2$human_id==id,"condition"][1],
+                         "Random_BIC" = -2*(180*log(1/3)),
+
+                         # Bayesian updating with between and within game transfer
+                         "Btwn_TR_BIC" = exp2_BT[[id]]$value + 2*log(180),
+                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$optim$bestval + 2*log(180),
+                         
+                         # # Bayesian updating with within but no btwn game transfer
+                         "No_Btwn_Tr_BIC" = exp2_NO_BT[[id]]$value+ 2*log(180),
+                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$optim$bestval + 2*log(180),
+                         # 
+                         # # No within or between game transfer
+                         "No_Tr_BIC" = exp2_NO_Tr[[id]]$value+ 2*log(180),
+                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$optim$bestval + 2*log(180),
+                         # 
+                         # # No distinction between players, transfer within and between
+                         "Naive_BIC" = exp2_Naive[[id]]$value+ 2*log(180),
+                         "Bayes_same_game" = Bayes_same_game[[id]]$optim$bestval + 2*log(180)
+                       ))
+}
+
+write.csv(pool_de_optim,file="pool_de_optim.csv",row.names = FALSE)
+                         
+```
+
+
+# Fit both MS and IG models using optim 
+```{r}
+pool_optim <- data.frame()
+for(id in unique(dat_exp2$human_id)) {
+pool_optim <- rbind(pool_optim,
+                       data.frame(
+                         "ID" = id,
+                         "condition" = dat_exp2[dat_exp2$human_id==id,"condition"][1],
+                         "Random_BIC" = -2*(180*log(1/3)),
+
+                         # Bayesian updating with between and within game transfer
+                         "Btwn_TR_BIC" = exp2_BT[[id]]$value + 2*log(180),
+                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$value + 2*log(180),
+                         
+                         # # Bayesian updating with within but no btwn game transfer
+                         "No_Btwn_Tr_BIC" = exp2_NO_BT[[id]]$value+ 2*log(180),
+                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$value + 2*log(180),
+                         # 
+                         # # No within or between game transfer
+                         "No_Tr_BIC" = exp2_NO_Tr[[id]]$value+ 2*log(180),
+                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$value + 2*log(180),
+                         # 
+                         # # No distinction between players, transfer within and between
+                         "Naive_BIC" = exp2_Naive[[id]]$value+ 2*log(180),
+                         "Bayes_same_game" = Bayes_same_game[[id]]$value + 2*log(180)
+                       ))
+}
+
+write.csv(pool_optim,file="pool_optim.csv",row.names = FALSE)
+```
+

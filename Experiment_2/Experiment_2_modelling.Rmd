@@ -248,7 +248,7 @@ TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer
   # theta = parameter, probability computer will play its best response to what it thinks human is. Truth = 90%. in [0,1].
   # eps: parameter controlling noise in human choice. Probability human will DEVIATE from its best response. In [0,1].
   theta <- par[1]
-  eps <- par[2]
+  # eps <- par[2]
   
   num_strat = length(opp_strategy_vec) 
   
@@ -284,7 +284,7 @@ TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer
       ## KEY CODE FOR LEARNING TRANSFER !! #####
       #Naive 
       if (Naive) {
-        # pass. no update to prior vector throughout all rounds and games
+        # pass. no update to prior vector throughout all stages and games
       } else {
         #abc
         #def
@@ -383,10 +383,12 @@ TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer
       # THEN likelihood of current human action is just prior on opponent vec (haven't updated priors with curr opp act yet)
       # if action is not predicted by any level-k OM, assume human chooses randomly with prob eps
       if(length(indices) == 0){
-        lik_hum[t] <- eps/nopts
+        #lik_hum[t] <- eps/nopts
+        lik_hum[t] <- 1/nopts
       # if same br action for multiple possible ai opponents, add probabilities 
       } else {
-        lik_hum[t] <- sum(opp_prior_vec[indices])*(1-eps) + eps/nopts
+        #lik_hum[t] <- sum(opp_prior_vec[indices])*(1-eps) + eps/nopts
+        lik_hum[t] <- sum(opp_prior_vec[indices])/length(indices)
       }
     }  
       # Standardising the probabilities and updating prior
@@ -416,7 +418,7 @@ TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer
 
 ```{r}
 
-TOM_model(c(0.8,0.1),test_data,c("level0","level1","level2"),"-2loglik", within_transfer = FALSE, btwn_transfer = FALSE, Naive = TRUE)
+TOM_model(c(0.00001),test_data,c("level0","level1","level2"),"-2loglik", within_transfer = TRUE, btwn_transfer = TRUE, Naive = FALSE)
 ```
 ## Fitting Bayesian model with between game transfer (as well as within)  
 ```{r, cache=TRUE}
