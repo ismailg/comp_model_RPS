@@ -1009,8 +1009,6 @@ save(MBM_modelling, file="MBM_modelling.RData")
 
 ## Putting results together 
 ```{r}
-load("exp1_ToM_TR.RData")
-load("exp1_ToM_NT.RData")
 load("QL_modelling.RData")
 load("QL_states_modelling.RData")
 load("EWA_modelling.RData")
@@ -1028,16 +1026,13 @@ for(id in unique(dat$human_id)) {
                          "Random_BIC" = -2*(100*log(1/3) + 50*log(1/5)),
                          
                          # Bayesian updating with/without transfer
-                         "Bayes_Tr_BIC" = exp1_ToM_TR[[id]]$value + 2*log(150),
-                         "Bayes_No_Tr_BIC" = exp1_ToM_NT[[id]]$value + 2*log(150),
+                         "Bayes_Tr_BIC" = exp1_Bayes_game_Tr[[id]]$optim$bestval+ 1*log(150),
+                         "Bayes_No_Tr_BIC" = exp1_Bayes_no_Tr[[id]]$optim$bestval + 1*log(150),
                          # Theta is the parameter governing AI stochasticity. Truth is 0.9
-                         "theta_transfer" = exp1_ToM_TR[[id]]$par[1],
-                         "theta_no_transfer" = exp1_ToM_NT[[id]]$par[1],
-                         # Epsilone is parameter showing cases where human deviates from predictions about opponent (lower better)
-                         "eps_transfer" = exp1_ToM_TR[[id]]$par[2],
-                         "eps_no_transfer" = exp1_ToM_NT[[id]]$par[2],
+                         "theta_transfer" = exp1_Bayes_game_Tr[[id]]$optim$bestmem[[1]],
+                         "theta_no_transfer" = exp1_Bayes_no_Tr[[id]]$optim$bestmem[[1]],
                          
-                         
+                                                                                    
                          # Q-Learning
                          "QL_BIC" = QL_modelling[[id]]$value + 2*log(150),
                          # beta ->  inverse temperature parameter in softmax choice function
@@ -1080,13 +1075,6 @@ for(id in unique(dat$human_id)) {
                          "EWA_states_BIC" = EWA_states_modelling[[id]]$optim$bestval + 1*log(150),
                          "EWA_states_Lambda" = EWA_states_modelling[[id]]$optim$bestmem[1]
                          
-                         # 
-                         # # MBM 
-                         #  # MBM BIC
-                         # "MBM_BIC" = MBM_modelling[[id]]$optim$bestval + 2*log(150),
-                         #  # BEta parameter inverse temp in softmax 
-                         # "MBM_beta" = MBM_modelling[[id]]$optim$bestmem[1],
-                         # "MBM_alpha" = MBM_modelling[[id]]$optim$bestmem[2]
 
                          ))
 }
@@ -1096,13 +1084,28 @@ write.csv(All_results,file="All_results.csv",row.names = FALSE)
 ```
 
 
+## Calucalting BIC weights
+```{r}
+
+comp_BICs <- All_results[c("ID","Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC","EWA_states_BIC")]
+
+BIC_weights <- comp_BICs["ID"]
+BIC_weights[,2:ncol(comp_BICs)] <- t(apply(comp_BICs[,2:ncol(comp_BICs)], 1, function(i) exp(-0.5*(i-min(i)) )))
+colnames(BIC_weights) <-colnames(comp_BICs)
+
+BIC_weights[,2:ncol(BIC_weights)] <- t(apply(BIC_weights[,-1], 1, function(i) round(i/sum(i),2)))
+                     
+                     
+```
+
 ## Building table of best model per participant
 ```{r}
+
 Table_results <- table(All_results[, "condition"],c("random","ToM_BT","ToM_NBT","QL", "QL_states","EWA","S_EWA","EWA_states")[apply(All_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC","EWA_states_BIC")],1,which.min)])
 
  write.csv(Table_results,file="Table_results.csv",row.names = TRUE)
- #kable(Table_results)
- barplot(Table_results)
+ kable(Table_results)
+ #barplot(Table_results)
  
 ```
 ##### Looks like most participants behavior can be explained by QL_states. Bayesian models best explain a few more behaviors, while the others are consistent with random behavior, and only 1 with QL and 1 with S_EWA. 
@@ -1120,13 +1123,13 @@ for(id in unique(dat$human_id)) {
   tdat <- subset(dat,human_id == id)
   tot_score <- sum(tdat$score)
   tot_time <- sum(tdat$human_rt)
-  early_dat <- subset(tdat,between(tdat$round,2,11) & (game =="fwg"))
-  #early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg" | game =="numbers") )
+  #early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg"))
+  early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg" | game =="numbers") )
   tr_score <- sum(early_dat$score)
   id_results <- subset(All_results, ID == id)
   min_BIC <- apply(id_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC")],1,min)
   
-  best_model <- c("random","ToM_BT","Bayes NT","QL", "QL_states","EWA","S_EWA")[apply(id_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC")],1,which.min)]
+  best_model <- c("random","ToM_Game_Tr","ToM_No_Tr","QL", "QL_states","EWA","S_EWA", "EWA_states")[apply(id_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC","EWA_states_BIC")],1,which.min)]
   # 
   exp1_model_comp <- rbind(exp1_model_comp,
                        data.frame(

@@ -89,7 +89,7 @@ Still, one of the commonalities in studies of how humans adapt to computerised o
 
 In this study, we propose to explore opponent modelling and its transfer with the use of computer agents possessing human-like theory of mind abilities with limited degrees of iterated reasoning. The agents will have a fixed strategy played stochastically and will either be level-1 or level-2 behavioral rule, mimicking human theory of mind abilities and the limited recursion depth they exhibit @goodie2012levels. 
 
-Our choice of using computer oponents sinstead of matching groups of participants makes it easier to disentangle the process of learning about the opponent from that of learning about the game structure and payoffs. When playing against other human opponents, players are learning about the game and the strategy of the opponent simultaneously. Thus, it is harder to focus on an individual and how her strategies are changing and adapting to the opponent's play if we cannot experimentally control the behaviour of the opponent. The use of computer opponents to elicit learning behavior has been explored in the literature with encouraging results.  For instance, @spiliopoulos2013strategic made humans play constant sum games against 3 computer opponents programmed to take advantage of known patterns in human play such as imperfect randomization and heuristics use and found that human participants do adapt to the opponent they are facing. @shachat2004we made human participants face computer opponents playing various mixed strategies in a zero-sum asymmetric matching pennies game. They found that the players changed their strategies towards exploiting the deviations from the Mixed Strategy Nash Equilibrium (MSNE), and that this exploitation was very likely if the deviation from the MSNE play was high.
+Our choice of using computer oponents instead of matching groups of participants makes it easier to disentangle the process of learning about the opponent from that of learning about the game structure and payoffs. When playing against other human opponents, players are learning about the game and the strategy of the opponent simultaneously. Thus, it is harder to focus on an individual and how her strategies are changing and adapting to the opponent's play if we cannot experimentally control the behaviour of the opponent. The use of computer opponents to elicit learning behavior has been explored in the literature with encouraging results.  For instance, @spiliopoulos2013strategic made humans play constant sum games against 3 computer opponents programmed to take advantage of known patterns in human play such as imperfect randomization and heuristics use and found that human participants do adapt to the opponent they are facing. @shachat2004we made human participants face computer opponents playing various mixed strategies in a zero-sum asymmetric matching pennies game. They found that the players changed their strategies towards exploiting the deviations from the Mixed Strategy Nash Equilibrium (MSNE), and that this exploitation was very likely if the deviation from the MSNE play was high.
 
 We chose to use a set of purely competitive zero-sum games that incentivise reasoning about the opponent without introducing social confounding factors. We avoid social dilemma and coordination games that crystallise the conflict between competing with others out of self-interest or cooperating to reach a socially optimal outcome. Playing these games repeatedly implicates important social constructs such as reputation building, trust and other individual psychological attributes such as cooperativeness and inequity aversion. Coordination games also test the ability of choosing the safe self-interested choice compared to the risky cooperative choice and may depend on similar latent factors. As such, these confounding factors may impede teasing out the process of learning an opponent model and that of whether/how these models are transferred. By contrast, purely competitive settings and zero sum games in particular would be more appropriate. They do not incentivize any cooperation, since one player's gain is necessarily the opponent's loss, and are agnostic to trust mechanisms or reputation building. Also choosing games with no pure strategy Nash Equilibrium shift the focus away from learning a normatively optimal action to that of reasoning dynamically about the opponent which is more amenable to modelling learning. Games with unique mixed strategy Nash equilibrium leading to nil average rewards facilitate inferring whether participants have learned to exploit the non-random play of the opponent.
 
@@ -167,7 +167,7 @@ Looking at the aggregate scores (See Figure\ \@ref(fig:exp1-avg-scores-game) ), 
 
 To analyse within and between game learning, we used a 2 (condition: level-1, level-2) by 3 (game: RPS, FWG, NUMBERS) by 2 (block: first half, second half) repeated measures ANOVA with the first factor varying between participants. There was a main effect of Game ( F(2,100) = 8.54, $\eta^{2}$  = 0.05,  p < 0.001), showing that average scores varied significantly over the games. Post-hoc pairwise comparisons showed that performance in the FWG game was significantly higher than in the RPS game ( t(100) =3.78, p = 0.0008 ), and the performance in NUMBERS was significantly lower than FWG game ( t(100) = -3.32 , p = 0.0024). The score in RPS was not significantly different from the score in NUMBERS however ( t(100) = 0.45 , p = 0.65). The main effect of Block ( F(1,50) = 22.51 , p < .001, $\eta^{2}$ = 0.03) shows that the average score in the first half of games (M = 0.29)  was significantly lower than in the second half  of the games played (M = 0.40), which translates to within-game learning. As players interact more with the agent, they learn how to win more often. The main effect of Condition (F(1,50) = 5.44, p = .024, $\eta^{2}$ = 0.05) indicates that scores were higher against the level-1 player (M = 0.43) than against the level-2 player (M = 0.27). This means that it was harder for participants, on average, to learn the strategy of the more sophisticated opponent (level-2) compared to that of the comparatively less sophisticated agent (level-1).
 
-```{r exp1-3factor-plot, fig.cap = "Avergae scores by game, block and condition", fig.align = "center"}
+```{r exp1-3factor-plot, fig.cap = "Average scores by game, block and condition", fig.align = "center"}
 
 # Plot results by game and block (for all 3 games, learning is happening) 
 p <- ggboxplot(dat2, x = "game", y = "block_score", palette = c("#00AFBB", "#E7B800"),order = c("rps", "fwg","numbers"), fill="block",ylab = "Percentage score", xlab = "Games")
@@ -217,15 +217,6 @@ p2 + facet_grid(. ~ condition)
 
 <!-- Table\ \@ref(tab:table-early-scores) shows the scores on rounds 2-6 for both type of opponents in each game. We also report the t-stats and p-values to test the null hypothesis that scores on these early rounds are equal to 0.  Rejecting the null hypothesis means that prior learning has been used to beat the opponent in these early rounds.  -->
 
-game.f condition lsmean     SE  df lower.CL upper.CL t.ratio p.value
- RPS    Level1    0.0292 0.0768 150  -0.1226    0.181 0.380   0.7048 
- FWG    Level1    0.3042 0.0768 150   0.1524    0.456 3.960   0.0001 
- NUM    Level1    0.2875 0.0768 150   0.1357    0.439 3.743   0.0003 
- RPS    Level2    0.0815 0.0732 148  -0.0631    0.226 1.114   0.2671 
- FWG    Level2    0.1815 0.0732 148   0.0369    0.326 2.480   0.0143 
- NUM    Level2    0.0315 0.0732 148  -0.1131    0.176 0.431   0.6672 
- 
- 
 For level-1 facing players, there is evidence of learning transfer from RPS to both FWG ( t(150) = 3.96, p < 0.001) and NUMBERS (t(150) = 3.74, p < 0.001) . For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player ( t(150) = 2.48, p = 0.01) but not to the dissimilar game of NUMBERS. 
 
 ```{r ANOVA early exp1, include = FALSE, warning=FALSE}
@@ -242,12 +233,12 @@ trans26 <- summary(means.int2, infer = c(TRUE,TRUE),level = .95, adjust = "holm"
 
 ```
   
-```{r table-early-scores, results = "asis"}
+```{r table-early-scores, include = FALSE, results = "asis"}
 # apa_table(trans26, caption = "Average early round scores by game and condition in first experiment")
 ```
 
 
-Our results when averaging across conditions (previous section) showed that there was indeed evidence for transfer to the more dissimilar game (NUMBERS). We can see from splitting the participants by opponent faced that this transfer is exclusively driven by level-1 facing players, as average early round scores of level-2 facing players are close to nil in the NUMBERS game. Therefore, both partiicpants facing level-1 and level-2 agents can transfer learning to the similar game, but only those facing the less sophisticated opponent are able to generalise to the less similar game. 
+Our results when averaging across conditions (previous section) showed that there was indeed evidence for transfer to the more dissimilar game (NUMBERS). We can see from splitting the participants by opponent faced that this transfer is exclusively driven by level-1 facing players, as average early round scores of level-2 facing players are close to nil in the NUMBERS game. Therefore, both participants facing level-1 and level-2 agents can transfer learning to the similar game, but only those facing the less sophisticated opponent are able to generalise to the less similar game. 
 
 
 
@@ -373,7 +364,7 @@ In Figure\ \@ref(fig:exp2-early-scores), we show the average score across partic
 
 # Computational modelling
 
-To gain more insight into how participants played the games against the computer opponents, we compared multiple models of strategies the players may have been using to learn how to beat the opponent.  As a base model, we assume play is random, and each potential action is chosen with equal probability. Note that this corresponds to the Nash equilibrium strategy. In this sectionn, we will go through the various models we have used and explain how they update what they learn about the game or the opponent 
+To gain more insight into how participants played the games against the computer opponents, we compared multiple models of strategies the players may have been using to learn how to beat the opponent.  As a base model, we assume play is random, and each potential action is chosen with equal probability. Note that this corresponds to the Nash equilibrium strategy. In this section, we will go through the various models we have used and explain how they update what they learn about the game or the opponent 
 
 ## Reinforcement Learning 
 
@@ -540,7 +531,9 @@ p5+ labs(color = "Best fitting model", x = "Round Number", y="Accumulated score"
 ```{r, include = FALSE}
 
 exp2_comp_results <- read.csv(file="../Experiment_2/exp2_results.csv")
-exp2_comp_table <- table(exp2_comp_results[, "condition"],c("Random","ToM_BT","ToM_NBT", "ToM_NT", "ToM_Naive","QL_states", "QLS_within","S_EWA","MBM")[apply(exp2_comp_results[,c("Random_BIC","Btwn_TR_BIC","No_Btwn_Tr_BIC","No_Tr_BIC","Naive_BIC","QL_states_BIC","QLS_within_Tr_BIC","EWA_self_BIC","MBM2_BIC")],1,which.min)])
+# exp2_comp_table <- table(exp2_comp_results[, "condition"],c("Random","ToM_BT","ToM_NBT", "ToM_NT", "ToM_Naive","QL_states", "QLS_within","S_EWA","MBM")[apply(exp2_comp_results[,c("Random_BIC","Btwn_TR_BIC","No_Btwn_Tr_BIC","No_Tr_BIC","Naive_BIC","QL_states_BIC","QLS_within_Tr_BIC","EWA_self_BIC","MBM2_BIC")],1,which.min)])
+
+exp2_comp_table <- table(exp2_comp_results[, "condition"],c("Random","ToM_BT","ToM_NBT", "ToM_NT", "ToM_Naive","QL_states", "QLS_within","S_EWA","MBM")[apply(exp2_comp_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","Bayes_same_game","QL_states_BIC","QLS_within_Tr_BIC","EWA_self_BIC","MBM2_BIC")],1,which.min)])
 
  # write.csv(exp2_table_results,file="exp2_table_results.csv",row.names = TRUE)
  kable(exp2_comp_table)
@@ -567,7 +560,7 @@ barplot(exp2_comp_table,
 
 ```
 
-In experiment 2, we can see from Figure\ \@ref(fig:exp2-comp-models) that Q-learning with the aforementioned state-space wasn't as successful as the bayesian approached in fitting player's action choices. In experiment 2 when participants faced both level-1 and level-2 agents sequentially, the bayesian models (with or without transfer) were by far the most successful. 
+In experiment 2, we can see from Figure\ \@ref(fig:exp2-comp-models) that Q-learning with the aforementioned state-space was again more successful than the bayesian models in fitting player's action choices. In experiment 2 when participants faced both level-1 and level-2 agents sequentially, the bayesian models (with or without transfer) did not fit players observed data as well.
 
 
 ```{r, include=FALSE}
@@ -660,7 +653,6 @@ The second explanation of learning transfer is that it is driven by a group of p
 Our second experimental design allows us to test whether the first explanation holds. Since there is a simple transferable heuristic that works agaisnt level-2 players, and since as far as we know, there are no similar ones against level-1 players, if indeed participants were using this, they would perform better and transfer learning more easily when facing level-2 opponents. Because level-2 opponents use a higher level of strategic reasoning, they should in fact be harder to play against and in the absence of such a heuristic, performance and learning transfer should be worse.
 
 Our results show that in fact, it was harder to transfer learning when facing level-2 opponents, both comparing first intractions across games and using early rounds analysis. Based on our assumptions, we conclude that the most likely explanation is that participants who are able to beat the opponent and transfer learning are likely to be explicitly modelling the opponent strategy using level-k reasoning, compared to using simple learning rules they uncovered during the ourse of learning. 
-
 
 
 \newpage

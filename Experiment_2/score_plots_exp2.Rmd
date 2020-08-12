@@ -1,0 +1,59 @@
+---
+title: "Score_plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggpubr)
+
+```
+
+
+```{r}
+
+exp2_dat = read.csv("data_exp2.csv")
+exp2_model_comp = read.csv("exp2_model_comp.csv")
+
+datalist = list()
+i = 0
+new_dat <- setNames(data.frame(matrix(ncol = ncol(exp2_dat), nrow = 0)), colnames(exp2_dat))
+for(id in unique(exp2_dat$human_id)) {
+  i <- i+1
+  tdat <- subset(exp2_dat,human_id == id)
+  tdat$part_num <- i
+  tdat <- within(tdat, acc_sum <- cumsum(tdat$score))
+  datalist[[i]] <- tdat
+}
+
+# Merge all datasets into one 
+new_dat <- dplyr::bind_rows(datalist)
+# or new_dat <- data.table::rbindlist(datalist)
+
+# Add column for time t
+new_dat <- new_dat %>% group_by(exp2_dat$human_id) %>% mutate(t = row_number())
+
+# Participant number as a factor 
+# tdat$part_num <- as.factor(tdat$part_num)
+
+# Add best fitting model per participant
+new_dat <- merge(new_dat, exp2_model_comp[, c("human_id", "Best_model_2")], by="human_id")
+```
+
+
+```{r}
+ggplot(data = new_dat, aes(x = t, y=acc_sum, group = part_num)) + 
+  geom_line(aes(color= Best_model_2))
+```
+
+
+```{r}
+temp <- new_dat[,c("t","acc_sum","Best_model_2","condition","part_num")]
+dat_by_model <- temp %>% group_by(Best_model_2,t) %>% 
+  summarize(model_acc_sum = mean(acc_sum))
+
+ggplot(data = dat_by_model, aes(x = t, y=model_acc_sum, group = Best_model_2)) + 
+   geom_line(aes(color= Best_model_2))
+```
