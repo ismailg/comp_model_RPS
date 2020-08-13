@@ -511,7 +511,7 @@ barplot(exp1_comp_table,
 ```
 
 
-Next we compared the performance of players whose actions are consistent with each of our hypothesized models. Figure\ \@ref(fig:exp1-cumScores) shows the average cumulative performance of players across games, for participants grouped by which model best fits their behavior in experiment 1. We can see that participants whose actions are most consistent with learning a ToM opponent model in a Bayesian way had the best overall performance (both with and witout transfer), followed by Q-learning conditional on last round play. EWA, QL and random players had, understandably the lowest performance.
+Next we compared the performance of players whose actions are best fit by each of our hypothesized models. Figure\ \@ref(fig:exp1-cumScores) shows the average cumulative performance of players across games, for participants grouped by which model best fits their behavior in experiment 1. We can see that participants whose actions are most consistent with learning a ToM opponent model in a Bayesian way had the best overall performance (witout transfer), followed by Q-learning conditional on last round play. EWA, QL and random players had, understandably the lowest performance.
 
 ```{r exp1-cumScores, fig.cap = "Average cumulative scores of participants in experiment 1 by best fitting model", fig.align='center'}
 p5 <- ggplot(data = dat_by_model, aes(x = t, y=model_acc_sum, group = Best_model)) + 

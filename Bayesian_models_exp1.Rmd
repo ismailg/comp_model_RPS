@@ -10,13 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 
-library(dplyr)
 
 dat <- read.csv("data20180719.csv")
 
 ####### test data 
 
-# dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
+dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
 
 
 
@@ -139,7 +138,8 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 
 # if human generalizes over games, we can run update the prior generally
 # if human does not generalize, we need to reset the prior at the start of each ?stage?
-exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no")) {
+exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_value = "-2loglik") {
+   # return_value=c("-2loglik","likelihood_by_trial")
   # data is a subset for a single participant
   generalize <- match.arg(generalize)
   alpha <- par[1] # probability that ai opponent plays according to strategy
@@ -254,18 +254,23 @@ exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no")) {
   #cat(as.character(exp(dat$loglik)), "\n", "\n")
   
   ret <- -2*sum(dat$loglik)
-  if(is.infinite(ret) || is.nan(ret)) {
+  if(return_value == "-2loglik") {
+    if(is.infinite(ret) || is.nan(ret)) {
     return(1e+300)
-  } else {
-    return(ret)
+    } else {
+      return(ret)
+    } 
+  } else if ((return_value == "likelihood_by_trial")) {
+    return(exp(dat$loglik))
   }
-  # return(-2*sum(dat$loglik))
+    
+
 }
 
 ```
 
 ```{r}
-# exp1_Bayes_model_LL(0.4,data = dat, generalize = "game")
+exp1_Bayes_model_LL(0.4,data = dat, generalize = "no", "likelihood_by_trial")
 ```
 
 ```{r}

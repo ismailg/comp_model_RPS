@@ -1089,11 +1089,11 @@ write.csv(All_results,file="All_results.csv",row.names = FALSE)
 
 comp_BICs <- All_results[c("ID","Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC","EWA_states_BIC")]
 
-BIC_weights <- comp_BICs["ID"]
-BIC_weights[,2:ncol(comp_BICs)] <- t(apply(comp_BICs[,2:ncol(comp_BICs)], 1, function(i) exp(-0.5*(i-min(i)) )))
-colnames(BIC_weights) <-colnames(comp_BICs)
+exp1_BIC_weights <- comp_BICs["ID"]
+exp1_BIC_weights[,2:ncol(comp_BICs)] <- t(apply(comp_BICs[,2:ncol(comp_BICs)], 1, function(i) exp(-0.5*(i-min(i)) )))
+colnames(exp1_BIC_weights) <-colnames(comp_BICs)
 
-BIC_weights[,2:ncol(BIC_weights)] <- t(apply(BIC_weights[,-1], 1, function(i) round(i/sum(i),2)))
+exp1_BIC_weights[,2:ncol(exp1_BIC_weights)] <- t(apply(exp1_BIC_weights[,-1], 1, function(i) round(i/sum(i),2)))
                      
                      
 ```
