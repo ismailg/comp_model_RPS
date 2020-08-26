@@ -1,0 +1,149 @@
+---
+title: "exp2_lik_by_trial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+dat <- read.csv("data_exp2.csv")
+
+exp2_optim_results <- read.csv("exp2_results.csv")
+
+
+```
+
+```{r}
+
+# Preparing data for running functions to calculate likelihoods
+
+# dat <- as_tibble(dat) %>% group_by(human_id,game)
+  dat <- dat %>%
+   mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1))
+
+
+
+## level 0 predictions
+dat <- dat %>% mutate(pred_a1_level0 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "shootout" & ai_action_prev == "left" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level0 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "shootout" & ai_action_prev == "center" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level0 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "shootout" & ai_action_prev == "right" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+
+## level 1 predictions
+dat <- dat %>% mutate(pred_a1_level1 = case_when(
+  game == "rps" & human_action_prev == "scissors" ~ 1,
+  game == "fwg" & human_action_prev == "grass" ~ 1,
+  game == "shootout" & human_action_prev == "left" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level1 = case_when(
+  game == "rps" & human_action_prev == "rock" ~ 1,
+  game == "fwg" & human_action_prev == "fire" ~ 1,
+  game == "shootout" & human_action_prev == "center" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level1 = case_when(
+  game == "rps" & human_action_prev == "paper" ~ 1,
+  game == "fwg" & human_action_prev == "water" ~ 1,
+  game == "shootout" & ai_action_prev == "right" ~ 1,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+
+## level 2 predictions
+dat <- dat %>% mutate(pred_a1_level2 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "shootout" & (ai_action_prev == "center" | ai_action_prev == "right") ~ .5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level2 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "shootout" & (ai_action_prev == "left" | ai_action_prev == "right") ~ .5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level2 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "shootout" & (ai_action_prev == "left" | ai_action_prev == "center") ~ .5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+
+dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
+dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
+
+```
+
+```{r}
+
+lik_by_trial_2 <- data.frame()
+
+for(id in unique(dat$human_id)) {
+  
+  tdat <- dat %>% subset(human_id == id)
+
+  # QLS likelihoods 
+  pars_QLS <- unlist(filter(exp2_optim_results, ID == id)%>%select(QL_states_alpha,QL_states_Beta))
+  tdat$QLS_lik <-  exp2_QL_states(pars_QLS,tdat,"likelihood_by_trial",0.0, FALSE)
+  
+  # QLS within Transfer likelihoods 
+  pars_QLS_within <- unlist(filter(exp2_optim_results, ID == id)%>%select(QLS_within_Tr_alpha,QLS_within_Tr_Beta))
+  tdat$QLS_lik_within <-  exp2_QL_states(pars_QLS_within,tdat,"likelihood_by_trial",gamma = 0, TRUE)
+  #                
+  # 
+  # Bayes model no transfer likelihoods
+  theta_NT <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_no_tr))
+  tdat$Bayes_NT_lik <- Bayes_model_LL(theta_NT, tdat, distinct_opponent = TRUE, generalize = "no",return = "likelihood_by_trial")
+
+  # Bayes model with Transfer likelihood
+  theta_Tr <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_transfer))
+  tdat$Bayes_Tr_lik <- Bayes_model_LL(theta_Tr, tdat, distinct_opponent = TRUE, generalize = "game",return = "likelihood_by_trial")
+
+  lik_by_trial_2 <- rbind(lik_by_trial_2,tdat)
+}
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+
+mean_lik_2 <- lik_by_trial_2 %>%
+  select(human_id,game,stage,round_condition, round, QLS_lik, QLS_lik_within, Bayes_NT_lik, Bayes_Tr_lik) %>%
+  group_by(game,stage,round) %>%
+  summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
+            mean_QLS_within_lik = mean(QLS_lik_within, na.rm = TRUE),
+            mean_NT_lik = mean(Bayes_NT_lik, na.rm = TRUE),
+            mean_Tr_lik = mean(Bayes_Tr_lik, na.rm = TRUE))
+
+mean_lik$game <- factor(mean_lik$game,levels=c("rps","fwg","shootout"))
+
+data_long <- gather(mean_lik_2, strategy, probability, mean_QLS_lik:mean_Tr_lik, factor_key=TRUE)
+
+# make sure the different games are ordered in the way they were played
+data_long$game <- factor(data_long$game,levels=c("rps","fwg","shootout"))
+ggplot(data_long,aes(x=round,y=probability,colour=strategy)) + geom_line() + facet_grid(game~stage)
+
+```
+
+

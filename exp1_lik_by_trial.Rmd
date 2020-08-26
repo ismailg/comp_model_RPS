@@ -167,6 +167,8 @@ for(id in unique(dat$human_id)) {
 
 ```{r}
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 
 
 mean_lik <- lik_by_trial %>%

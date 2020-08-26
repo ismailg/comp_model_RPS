@@ -66,436 +66,6 @@ exp2_best_response <- function(game,ai_action){
 ```
 
 
-```{r}
-# Assumes within game transfer of opponent model between stages, but boolena for between game transfer. 
-# TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer, btwn_transfer) {
-#   
-#   # dat = data subset for one participant
-#   # opp_strategy_vec = vector of possible opponent strtegies, model assumes humans restrict opp strategy space to vector   c("level0","level1","level2")
-#   # return = -2logLik 
-#   # or "likelihood_by_trial" vector  (for later plotting, etc)
-#   # btwn_transfer is a boolean. True if distribution of opponent strategies is kept across games. False otherwise. 
-#   
-#   # theta = parameter, probability computer will play its best response to what it thinks human is. Truth = 90%. in [0,1].
-#   # eps: parameter controlling noise in human choice. Probability human will DEVIATE from its best response. In [0,1].
-#   theta <- par[1]
-#   eps <- par[2]
-#   
-#   num_strat = length(opp_strategy_vec) 
-#   
-#   # Load tables predicting oppponent movel
-#   
-#   rps_predict_opp <- read.csv("rps_predict_opp.csv")
-#   fwg_predict_opp <- read.csv("fwg_predict_opp.csv")
-#   shootout_predict_opp <- read.csv("shootout_predict_opp.csv")
-#   
-# 
-#   #lik_opp is a vector that holds and updates probability distribution of opp strategy given actions.
-#   lik_opp <- matrix(0.0,num_strat, nrow(data))
-#   
-#   # Initiate prior vectors for each opponent as uniform
-#   opp_prior_vec <- rep(1/num_strat, num_strat)
-#   opp1_prior_vec <-rep(1/num_strat, num_strat)
-#   opp2_prior_vec <-rep(1/num_strat, num_strat)
-#   
-#   lik_hum <- matrix(0.0,nrow(data))
-#   # br_hum is vector that stores best responses of human to actions taken by each level-k ai opponent at the round.
-#   br_hum <- rep(NA,num_strat)
-# 
-#   
-#   for(t in 1:nrow(data)) {
-#     t_game <- data[t,"game"]
-#     pred_file_opp <- switch(as.character(t_game),rps = rps_predict_opp,fwg = fwg_predict_opp, shootout = shootout_predict_opp)
-#     nopts <- 3
-#     if(data[t,"round"] == 1) {
-#       # first round is uniform prediction
-#       pred_opp <- NA
-#       lik_hum[t] <- 1/nopts
-#       
-#       ## KEY CODE FOR LEARNING TRANSFER !! (if no OM transfer reset prior to uniform)#####
-#       # Round 1 of stage 1 
-#       if (data[t,"stage"] == 1) {
-#         if (btwn_transfer){
-#           # if there is between game transfer, then the opp_prior_vec should have stored what was learned about the SECOND opponent 
-#           # ...from stage 4 of previous game (or uniform if it is first game of RPS). store that before proceeding
-#           opp2_prior_vec <- opp_prior_vec
-#           # if between game transfer use stored opp1 prior vector from previous game (or uniform if first game  RPS) 
-#           opp_prior_vec <- opp1_prior_vec
-# 
-#         } else { # <- No between game TRANSFER 
-#           opp_prior_vec <- rep(1/num_strat, num_strat)
-#         }
-#         
-#       # we are round 1 of stage 2, keep opp vector from round 20 of stage 1  for stage 3
-#         } else if (data[t,"stage"] == 2) {
-#           if (within_transfer){
-#             # hold the probs vector of Opp type learned in stage 1 in memory and save to temp.
-#             opp1_prior_temp <- opp_prior_vec
-#           if (btwn_transfer){
-#             # If  between games transfer get prior from opp2 prior saved from last stage of last game 
-#             opp_prior_vec <- opp2_prior_vec
-#           } else { # if no between transfer start of first interaction with secnd opp should be reset
-#             opp_prior_vec <- rep(1/num_strat, num_strat)
-#           }
-#           
-#         } else { # Assume no between game transfer if no within. reasonable. 
-#           opp_prior_vec <- rep(1/num_strat, num_strat)    
-#         }
-#         
-#       # we are round 1 of stage 3
-#       } else if (data[t,"stage"] == 3) {
-#         if (within_transfer) {
-#           # if within_transfer keep opp vector from round 20 of stage 2 for stage 4
-#           opp2_prior_temp <- opp_prior_vec
-#           # if within_transfer, use what we learned about opp1 in stage 1 as new prior.  
-#           opp_prior_vec <- opp1_prior_temp
-#           
-#         } else { # No within transfer, dont store anything and reset priors
-#           opp_prior_vec <- rep(1/num_strat, num_strat)    
-#         }
-# 
-#       
-#       # We are in round 1 of stage 4,
-#       }  else if (data[t,"stage"] == 4) {
-#         if (within_transfer) {
-#           if (btwn_transfer) {
-#             # Store what was learned about opponent 1 for nxt game...
-#            opp1_prior_vec <- opp_prior_vec
-#           } 
-#           # Use what was learned about opponent 2 from stage 2.
-#           opp_prior_vec <- opp2_prior_temp
-#           
-#         } else {
-#           opp_prior_vec <- rep(1/num_strat, num_strat)
-#         }
-#         
-#       }
-#       
-#     # Rounds 2 to End of stage
-#     } else {
-#       cat("stage", data[t,"stage"], " opps ",  opp_prior_vec, "\n")
-#       # get prediction of opponent action from CSV files
-#       for (strategy in opp_strategy_vec) {
-#         k = match(strategy,opp_strategy_vec)
-#         pred_opp <- as.character(filter(pred_file_opp, pred_file_opp$human_previous == as.character(data[t-1,"h_action"]) & pred_file_opp$computer_previous == as.character(data[t-1,"a_action"]))[[strategy]])
-#         
-#         # Given opponent action predicted, what would be human action best response for each opp strat
-#         br_hum[[k]] <- exp2_best_response(t_game,as.character(pred_opp))
-#         
-#         # First we deal with easy case of unique predicted action ( multiple possible preds in shoot are separated by "/" sign)
-#         if (!grepl("/",pred_opp,fixed = TRUE)) {
-#            # Multiply prior by likelihood of observation to get posterior. Done here ot take advantage of For loop. 
-#           if(as.character(data[t,"a_action"]) == pred_opp) {
-#             lik_opp[k,t] <- (theta + (1-theta)/nopts)*opp_prior_vec[k]
-#           } else {
-#             lik_opp[k,t] <- ((1-theta)/nopts)*opp_prior_vec[k]
-#           }
-#         # Here we are in shootout and opponent predicted action is a vector of two possible moves (e.g "left/center")  
-#         } else {
-#           if(grepl(as.character(data[t,"a_action"]), pred_opp,fixed = TRUE)) {
-#             # Assume each action has likelihood of 50%
-#              lik_opp[k,t] <- 0.5*(theta + (1-theta)/nopts)*opp_prior_vec[k]
-#           } else {
-#             #the 2 is to standardise the theta dependent probs: P(ai plays pred | opp is level k)
-#             lik_opp[k,t] <- 2*((1-theta)/nopts)*opp_prior_vec[k]
-#           }
-#         }
-#         
-#       # Get which opponent strategy human current actn maps to (i.e, if index = 0 then human current action is best response to level-0 comp_strat...)
-#       indices <- which(grepl(as.character(data[t,"h_action"]),br_hum,fixed = TRUE))
-# 
-#       # THEN likelihood of current human action is just prior on opponent vec (haven't updated priors with curr opp act yet)
-#       # if action is not predicted by any level-k OM, assume human chooses randomly with prob eps
-#       if(length(indices) == 0){
-#         lik_hum[t] <- eps/nopts
-#       # if same br action for multiple possible ai opponents, add probabilities 
-#       } else {
-#         lik_hum[t] <- sum(opp_prior_vec[indices])*(1-eps) + eps/nopts
-#       }
-#     }  
-#       # Standardising the probabilities and updating prior
-#       lik_opp[,t] <- lik_opp[,t]/sum(lik_opp[,t])
-#       opp_prior_vec <- lik_opp[,t]
-#     }
-#   # for debugging uncomment the line below
-#   #cat(as.character(pred_opp),as.character(data[t,"a_action"]),lik_opp[,t],"/n")
-#   }
-#   
-#   if(return_value == "-2loglik") {
-#     ret <- -2*sum(log(lik_hum))
-#     if(is.infinite(ret) || is.nan(ret)) {
-#       return(1e+300)
-#     } else {
-#       return(ret)
-#     }
-#   }
-#   if(return_value == "likelihood_by_trial") return(lik_hum)
-#   
-# }
-
-```
-
-```{r}
-# Assumes within game transfer of opponent model between stages, but boolena for between game transfer. 
-TOM_model <- function(par, data, opp_strategy_vec, return_value, within_transfer, btwn_transfer, Naive = FALSE) {
-  
-  # dat = data subset for one participant
-  # opp_strategy_vec = vector of possible opponent strategies, model assumes humans restrict opp strategy space to vector   c("level0","level1","level2")
-  # return = -2logLik 
-  # or "likelihood_by_trial" vector  (for later plotting, etc)
-  # btwn_transfer is a boolean. True if distribution of opponent strategies is kept across games. False otherwise. 
-  
-  # theta = parameter, probability computer will play its best response to what it thinks human is. Truth = 90%. in [0,1].
-  theta <- par[1]
-  
-  num_strat = length(opp_strategy_vec) 
-  
-  # Load tables predicting oppponent model
-  
-  rps_predict_opp <- read.csv("rps_predict_opp.csv")
-  fwg_predict_opp <- read.csv("fwg_predict_opp.csv")
-  shootout_predict_opp <- read.csv("shootout_predict_opp.csv")
-  
-
-  #lik_opp is a vector that holds and updates probability distribution of opp strategy given actions.
-  lik_opp <- matrix(0.0,num_strat, nrow(data))
-  
-  # Initiate prior vectors for each opponent as uniform
-  opp_prior_vec <- rep(1/num_strat, num_strat)
-  opp1_prior_vec <-rep(1/num_strat, num_strat)
-  opp2_prior_vec <-rep(1/num_strat, num_strat)
-  
-  lik_hum <- matrix(0.0,nrow(data))
-  # br_hum is vector that stores best responses of human to actions taken by each level-k ai opponent at the round.
-  br_hum <- rep(NA,num_strat)
-
-  
-  for(t in 1:nrow(data)) {
-    t_game <- data[t,"game"]
-    pred_file_opp <- switch(as.character(t_game),rps = rps_predict_opp,fwg = fwg_predict_opp, shootout = shootout_predict_opp)
-    nopts <- 3
-    if(data[t,"round"] == 1) {
-      # first round is uniform prediction
-      pred_opp <- NA
-      lik_hum[t] <- 1/nopts
-      
-      ## KEY CODE FOR LEARNING TRANSFER !! #####
-      #Naive 
-      if (Naive) {
-        # pass. no update to prior vector throughout all stages and games
-      } else {
-        #abc
-        #def
-        # Round 1 of stage 1 
-        if (data[t,"stage"] == 1) {
-          if (btwn_transfer){
-            # if there is between game transfer, then the opp_prior_vec should have stored what was learned about the SECOND opponent 
-            # ...from stage 4 of previous game (or uniform if it is first game of RPS). store that before proceeding
-            opp2_prior_vec <- opp_prior_vec
-            # if between game transfer use stored opp1 prior vector from previous game (or uniform if first game  RPS) 
-            opp_prior_vec <- opp1_prior_vec
-          } else { # <- No between game TRANSFER 
-            opp_prior_vec <- rep(1/num_strat, num_strat)
-          }
-          
-        # we are round 1 of stage 2, keep opp vector from round 20 of stage 1  for stage 3
-        } else if (data[t,"stage"] == 2) {
-            if (within_transfer){
-              # hold the probs vector of opponent type learned in stage 1 in memory and save to temp.
-              opp1_prior_temp <- opp_prior_vec
-              
-              if (btwn_transfer){
-              # If  between games transfer get prior from opp2 prior saved from last stage of last game 
-                opp_prior_vec <- opp2_prior_vec
-              } else { # if no between transfer start of first interaction with secnd opp should be reset
-              opp_prior_vec <- rep(1/num_strat, num_strat)
-              }
-            
-            } else { # Assume no between game transfer if no within. reasonable. 
-            opp_prior_vec <- rep(1/num_strat, num_strat)    
-            }
-          
-        # we are round 1 of stage 3
-        } else if (data[t,"stage"] == 3) {
-          if (within_transfer) {
-            # if within_transfer keep opp vector from round 20 of stage 2 for stage 4
-            opp2_prior_temp <- opp_prior_vec
-            # if within_transfer, use what we learned about opp1 in stage 1 as new prior.  
-            opp_prior_vec <- opp1_prior_temp
-            
-          } else { # No within transfer, dont store anything and reset priors
-            opp_prior_vec <- rep(1/num_strat, num_strat)    
-          }
-  
-        
-        # We are in round 1 of stage 4,
-        }  else if (data[t,"stage"] == 4) {
-          if (within_transfer) {
-            if (btwn_transfer) {
-              # Store what was learned about opponent 1 for nxt game...
-              opp1_prior_vec <- opp_prior_vec
-            } 
-            # Use what was learned about opponent 2 from stage 2.
-            opp_prior_vec <- opp2_prior_temp
-            
-          } else {
-            opp_prior_vec <- rep(1/num_strat, num_strat)
-          }
-          
-        }
-        
-      lik_opp[,t] <- opp_prior_vec
-      
-      } #End of no naive condition 
-
-    # Rounds 2 to End of stage
-    } else {
-      #cat("stage", data[t,"stage"], " opps ",  opp_prior_vec, "\n")
-      # get prediction of opponent action from CSV files
-      for (strategy in opp_strategy_vec) {
-        k = match(strategy,opp_strategy_vec)
-        pred_opp <- as.character(filter(pred_file_opp, pred_file_opp$human_previous == as.character(data[t-1,"h_action"]) & pred_file_opp$computer_previous == as.character(data[t-1,"a_action"]))[[strategy]])
-        
-        # Given opponent action predicted, what would be human action best response for each opp strat
-        br_hum[[k]] <- as.character(exp2_best_response(t_game,as.character(pred_opp)))
-        
-        # First we deal with easy case of unique predicted action ( multiple preds in shoot are separated by "/" sign)
-        if (!grepl("/",pred_opp,fixed = TRUE)) {
-           # Multiply prior by likelihood of observation to get posterior. Done here ot take advantage of For loop. 
-          if(as.character(data[t,"a_action"]) == pred_opp) {
-            lik_opp[k,t] <- (theta + (1-theta)/nopts)*opp_prior_vec[k]
-          } else {
-            lik_opp[k,t] <- ((1-theta)/nopts)*opp_prior_vec[k]
-          }
-        # Here we are in shootout and opponent predicted action is a vector of two possible moves (e.g "left/center")  
-        } else {
-          if(grepl(as.character(data[t,"a_action"]), pred_opp,fixed = TRUE)) {
-            # Assume each action has likelihood of 50% 
-             lik_opp[k,t] <- (0.5*(theta + (1-theta)/nopts) + 0.5*((1-theta)/nopts)) *opp_prior_vec[k]
-          } else { 
-            lik_opp[k,t] <- ((1-theta)/nopts)*opp_prior_vec[k]
-          }
-        }
-      }  
-      # Get which opponent strategy human current actn maps to (i.e, if index = 0 then human current action is best response to level-0 comp_strat...)
-      indices <- which(grepl(as.character(data[t,"h_action"]),br_hum,fixed = TRUE))
-      not_pred_indx <- setdiff(c(1,2,3),indices)
-      # cat(as.character(indices), "\n")
-
-      # THEN likelihood of current human action is just sumproduct of priors and likelihood of each oppoennt action
-      if (!grepl("/",br_hum,fixed = TRUE)) {
-        lik_hum[t] <- sum(opp_prior_vec[indices])* (theta + (1-theta)/nopts) +    sum(opp_prior_vec[not_pred_indx])*(1-theta)/nopts
-      } else {
-        for (i in 1:3) {
-          temp <- 0
-          if (grepl("/",br_hum[i],fixed = TRUE)) {
-            temp <- temp + 0.5*(theta + (1-theta)/nopts)*opp_prior_vec[i]
-          } else{
-            temp <- temp + 
-          }
-        }
-        lik_hum[t] <- sum(opp_prior_vec[indices])* (theta + (1-theta)/nopts) +    sum(opp_prior_vec[not_pred_indx])*(1-theta)/nopts
-      }
-      
-
-      # Standardising the probabilities and updating prior
-      lik_opp[,t] <- lik_opp[,t]/sum(lik_opp[,t])
-      opp_prior_vec <- lik_opp[,t]
-    } # End of else ( from round 2 onwards)
-    
-    
-  # for debugging uncomment the line below
-  # cat(as.character(data[t,"a_action"]),lik_opp[,t],"\n")
-  cat(as.character(br_hum),as.character(data[t,"h_action"]),lik_hum[t],"\n","\n")
-  
-  
-  }
-  
-  if(return_value == "-2loglik") {
-    ret <- -2*sum(log(lik_hum))
-    if(is.infinite(ret) || is.nan(ret)) {
-      return(1e+300)
-    } else {
-      return(ret)
-    }
-  }
-  if(return_value == "likelihood_by_trial") return(lik_hum)
-  
-}
-
-```
-
-
-
-
-```{r}
-
-TOM_model(c(0.5),test_data,c("level0","level1","level2"),"-2loglik", within_transfer = TRUE, btwn_transfer = TRUE, Naive = FALSE)
-
-```
-## Fitting Bayesian model with between game transfer (as well as within)  
-```{r, cache=TRUE}
-exp2_BT <- list()
-for(id in unique(dat_exp2$human_id)) {
-  exp2_BT[[id]] <- list()
-  tdat <- subset(dat_exp2,human_id == id)
-  
-  # TR_bayes_modelling[[id]] <- DEoptim(fn=naive_bayes, lower = c(0,0), upper = c(1,1), data=tdat, opp_strategy_vec = c("level0","level1","level2") ,return_value = "-2loglik", btwn_transfer = TRUE, control=list(trace = FALSE, parallelType=1,parVar = c("best_response")))
-
-  exp2_BT[[id]] <- optim(c(0.1,0.1),fn=TOM_model,gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", within_transfer = TRUE, btwn_transfer = TRUE, Naive = FALSE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
-}
-save(exp2_BT, file="exp2_BT.RData")
-
-```
-
-## Fitting ToM model with NO Between transfer (but with transfer within games)
-```{r, cache=TRUE}
-
-exp2_NO_BT <- list()
-for(id in unique(dat_exp2$human_id)) {
-  exp2_NO_BT[[id]] <- list()
-  tdat <- subset(dat_exp2,human_id == id)
-  
-  # exp2_NO_BT[[id]] <- DEoptim(fn=naive_bayes, lower = c(0.0,0.0), upper = c(1.0,1.0), data=tdat, opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", opp_mod_transfer = FALSE, control=list(trace = FALSE, parallelType=0,parVar = c("best_response")))
-
-  exp2_NO_BT[[id]] <- optim(c(0.1,0.1),fn=TOM_model,gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", within_transfer = TRUE, btwn_transfer = FALSE, Naive = FALSE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
-}
-
-save(exp2_NO_BT,file="exp2_NO_BT.RData")
-```
-
-## Fitting Bayesian model with NO Between or within transfer
-```{r, cache=TRUE}
-
-exp2_NO_Tr <- list()
-for(id in unique(dat_exp2$human_id)) {
-  exp2_NO_Tr[[id]] <- list()
-  tdat <- subset(dat_exp2,human_id == id)
-  
-  # exp2_NO_Tr[[id]] <- DEoptim(fn=naive_bayes, lower = c(0.0,0.0), upper = c(1.0,1.0), data=tdat, opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", opp_mod_transfer = FALSE, control=list(trace = FALSE, parallelType=0,parVar = c("best_response")))
-
-  exp2_NO_Tr[[id]] <- optim(c(0.1,0.1),fn=TOM_model,gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", within_transfer = FALSE , btwn_transfer = FALSE, Naive =FALSE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
-}
-
-save(exp2_NO_Tr,file="exp2_NO_Tr.RData")
-```
-
-#Fitting model where player does not distinguish between opponents 
-```{r, cache=TRUE}
-
-exp2_Naive <- list()
-for(id in unique(dat_exp2$human_id)) {
-  exp2_Naive[[id]] <- list()
-  tdat <- subset(dat_exp2,human_id == id)
-  
-  # exp2_Naive[[id]] <- DEoptim(fn=naive_bayes, lower = c(0.0,0.0), upper = c(1.0,1.0), data=tdat, opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", opp_mod_transfer = FALSE, control=list(trace = FALSE, parallelType=0,parVar = c("best_response")))
-
-  exp2_Naive[[id]] <- optim(c(0.1,0.1),fn=TOM_model,gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", within_transfer = FALSE , btwn_transfer = FALSE, Naive = TRUE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
-}
-
-save(exp2_Naive,file="exp2_Naive.RData")
-```
-
 ## Fitting Q_learning with state space of possible last round plays 
 ```{r, cache=TRUE}
 exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE){
@@ -605,12 +175,10 @@ exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE)
   
 }
 
-
-
 ```
 
 ```{r}
-exp2_QL_states(c(5,0.4),test_data, "-2loglik", 0.0, TRUE)
+exp2_QL_states(c(5,0.4),test_data, "likelihood_by_trial", 0.0, FALSE)
 ```
 
 ```{r, cache=TRUE}
@@ -892,6 +460,7 @@ save(MBM2_modelling, file="MBM2_modelling.RData")
 ## Putting all results together 
 ```{r}
 exp2_results <- data.frame()
+
 for(id in unique(dat_exp2$human_id)) {
 exp2_results <- rbind(exp2_results,
                        data.frame(
@@ -905,27 +474,34 @@ exp2_results <- rbind(exp2_results,
 #                          "No_Tr_BIC" = exp2_NO_Tr[[id]]$value+ 2*log(180),
 #                          "Naive_BIC" = exp2_Naive[[id]]$value+ 2*log(180),
                          
-                         # MS results for Bayesian models
-                         #  # Bayesian updating with between and within game transfer
-                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$value + 2*log(180),
+                         #MS results for Bayesian models
+                          # Bayesian updating with between and within game transfer
+                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$optim$bestval + 1*log(180),
+                         "theta_transfer" = Bayes_distinct_game[[id]]$optim$bestmem[1],
+
                           # Bayesian updating with within but no btwn game transfer
-                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$value + 2*log(180),
+                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$optim$bestval + 1*log(180),
+                         "theta_no_btw_tr" = Bayes_distinct_stage[[id]]$optim$bestmem[1],
+
                           #  No within or between game transfer
-                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$value + 2*log(180),
+                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$optim$bestval + 1*log(180),
+                         "theta_no_tr" =  Bayes_distinct_no[[id]]$optim$bestmem[1],
+
                           # No distinction between players, transfer within and between
-                         "Bayes_same_game" = Bayes_same_game[[id]]$value + 2*log(180),
+                         "Bayes_same_game" = Bayes_same_game[[id]]$optim$bestval + 1*log(180),
+                         "theta_naive" = Bayes_same_game[[id]]$optim$bestmem[1],
+                         # 
                          
-                         
-                         # Theta is the parameter governing AI stochasticity. Truth is 0.9
-                         "theta_transfer" = exp2_BT[[id]]$par[1],
-                         "theta_no_btw_tr" = exp2_NO_BT[[id]]$par[1],
-                         "theta_no_tr" =  exp2_NO_Tr[[id]]$par[1],
-                         "theta_naive" = exp2_Naive[[id]]$par[1],
-                         # Epsilone is parameter showing cases where human deviates from predictions about opponent (lower better)
-                         "eps_transfer" = exp2_BT[[id]]$par[2],
-                         "eps_no_btwn_tr" = exp2_NO_BT[[id]]$par[2],
-                         "eps_no_tr" = exp2_NO_Tr[[id]]$par[2],
-                         "eps_naive" = exp2_Naive[[id]]$par[2],
+                         # # Theta is the parameter governing AI stochasticity. Truth is 0.9
+                         # "theta_transfer" = exp2_BT[[id]]$par[1],
+                         # "theta_no_btw_tr" = exp2_NO_BT[[id]]$par[1],
+                         # "theta_no_tr" =  exp2_NO_Tr[[id]]$par[1],
+                         # "theta_naive" = exp2_Naive[[id]]$par[1],
+                         # # Epsilone is parameter showing cases where human deviates from predictions about opponent (lower better)
+                         # "eps_transfer" = exp2_BT[[id]]$par[2],
+                         # "eps_no_btwn_tr" = exp2_NO_BT[[id]]$par[2],
+                         # "eps_no_tr" = exp2_NO_Tr[[id]]$par[2],
+                         # "eps_naive" = exp2_Naive[[id]]$par[2],
 
 
                          # Q-learning with last round states (No within transfer)

@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(dplyr)
 
-dat <- read.csv("dat_exp2.csv")
+dat <- read.csv("data_exp2.csv")
 
 ####### test data 
 
@@ -110,7 +110,8 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 # if human generalizes over rounds but not games, we need to reset the prior at the start of a game
 # if human does not generalize, we need to reset the prior at the start of each ?stage?
 
-Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("game","stage","no")) {
+Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("game","stage","no"), return = "-2loglik"){
+  
   # data is a subset for a single participant
   generalize <- match.arg(generalize)
   alpha <- par[1] # probability that ai opponent plays according to strategy
@@ -134,7 +135,7 @@ Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("ga
     # start of stage should not be predictable
     dat[dat$round == 1,paste0(paste0("pred_",c("a1_","a2_","a3_")),rep(c("level0","level1","level2"),each=3))] <- 1/3
     # group also by opponent
-    dat <- group_by(dat,opp_type)
+    dat <- group_by(dat,round_condition)
   }
   
   if(generalize == "stage") {
@@ -210,30 +211,32 @@ Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("ga
     )
   
   #cat(as.character(exp(dat$loglik)), "\n", "\n")
-  
-  ret <- -2*sum(dat$loglik)
-  if(is.infinite(ret) || is.nan(ret)) {
-    return(1e+300)
-  } else {
+  if (return == "-2loglik") {
+    ret <- -2*sum(dat$loglik)
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
     return(ret) 
+    } 
+  } else if (return == "likelihood_by_trial") {
+    return(exp(dat$loglik))
   }
-  # return(-2*sum(dat$loglik))
 }
 
 ```
 
 ```{r}
-#Bayes_model_LL(0.5,data = dat,distinct_opponent = TRUE, generalize = "game")
+Bayes_model_LL(0.5,data = dat,distinct_opponent = TRUE, generalize = "game", return = "likelihood_by_trial")
 
 #PLot likelihood for first participant as function of parameter 
-likelihoods <- list()
-for (t in 1:99) {
-  likelihoods[t] <- Bayes_model_LL(t/100,data = dat,distinct_opponent = TRUE, generalize = "game")
-}
-
-jpeg(file="vGnDPRowetREQVmwAADL.jpeg")
-plot(unlist(likelihoods))
-dev.off()
+# likelihoods <- list()
+# for (t in 1:99) {
+#   likelihoods[t] <- Bayes_model_LL(t/100,data = dat,distinct_opponent = TRUE, generalize = "game")
+# }
+# 
+# jpeg(file="vGnDPRowetREQVmwAADL.jpeg")
+# plot(unlist(likelihoods))
+# dev.off()
 
 
 ```
