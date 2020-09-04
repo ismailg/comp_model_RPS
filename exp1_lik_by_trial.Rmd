@@ -12,12 +12,12 @@ library(dplyr)
 ```{r}
 # Get Data for experiment 1, remove unecessary columns 
 
-dat <- read.csv("exp1_data.csv")
+dat <- read.csv("data20180719.csv")
 #####
 # dat <- subset(dat, human_id == "38VxtUSv_h6RR5-tAAA2")
 ####
 
-optim_results <- read.csv("All_results.csv")
+optim_results <- read.csv("exp1_all_results.csv")
 
 ```
 
@@ -25,7 +25,19 @@ optim_results <- read.csv("All_results.csv")
 
 #preparing data for functions to claculate likelihood
 
-# dat <- as_tibble(dat) %>% group_by(human_id,game)
+# transform 'winner' variable in numeric score
+dat$score <- recode(dat$winner, human = 1, tie = 0, ai = -1)
+# create a new variable 'block' with round 1...25 = block 1 and round 26...50 as block 2
+dat$block <- as.numeric(cut(dat$round,2))
+
+# recode actions to make them equal to the codes in these files
+dat$h_action <- recode(dat$human_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+dat$a_action <- recode(dat$ai_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+
+
+
+# Prepping data for Bayesian code
+dat <- as_tibble(dat) %>% group_by(human_id,game)
 dat <- dat %>%
   mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1))
 
@@ -133,36 +145,47 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 
 
 ```{r}
-# All_results <- data.frame()
-# for(id in unique(dat$human_id)) {
-#   All_results <- rbind(All_results,
-#                        data.frame(
-#                          "ID" = id,
-#                          "condition" = dat[dat$human_id==id,"condition"][1],
-#                          "Random_BIC" = -2*(100*log(1/3) + 50*log(1/5)),
-                         
-                         
-lik_by_trial <- data.frame()
+
+dat <- as.data.frame(dat)                       
+exp1_lik_by_trial <- data.frame()
 
 for(id in unique(dat$human_id)) {
   
   tdat <- dat %>% subset(human_id == id)
-
+  
   # QLS likelihoods 
-  pars_QLS <- unlist(filter(optim_results, ID == id)%>%select(QL_states_alpha,QL_states_Beta))
-  tdat$QLS_lik <- Q_learn_states(pars_QLS,tdat,"likelihood_by_trial",gamma = 0)
+  pars_QLS <- unlist(filter(optim_results, ID == id)%>%select(QL_states_Beta,QL_states_alpha))
+  QLS_lik <- Q_learn_states(pars_QLS ,tdat,"likelihood_by_trial",gamma = 0)
   
   # Bayes model no transfer likelihoods
   theta_NT <- unlist(filter(optim_results, ID == id)%>%select(theta_no_transfer))
-  tdat$Bayes_NT_lik <- exp1_Bayes_model_LL(theta_NT ,data = tdat, generalize = "no", "likelihood_by_trial") 
+  Bayes_NT_lik <- exp1_Bayes_model_LL(theta_NT ,tdat, generalize = "no", "likelihood_by_trial") 
   
   # Bayes model with Transfer likelihood
   theta_Tr <- unlist(filter(optim_results, ID == id)%>%select(theta_transfer))
-  tdat$Bayes_Tr_lik <- exp1_Bayes_model_LL(theta_Tr ,data = tdat, generalize = "game", "likelihood_by_trial") 
+  Bayes_Tr_lik <- exp1_Bayes_model_LL(theta_Tr ,data = tdat, generalize = "game", "likelihood_by_trial") 
   
   
-  lik_by_trial <- rbind(lik_by_trial,tdat)
+  exp1_lik_by_trial <- rbind(exp1_lik_by_trial,
+                        data.frame(
+                          "human_id" = id,
+                          "condition" = dat$condition,
+                          "game" = dat$game,
+                          "round" = dat$round,
+                          "QLS_lik" = QLS_lik,
+                          "Bayes_NT_lik" = Bayes_NT_lik,
+                          "Bayes_Tr_lik" = Bayes_Tr_lik
+                          
+                        ))
 }
+
+```
+
+```{r}
+
+which(exp1_lik_by_trial$QLS_lik == 1.0 )
+
+
 ```
 
 ```{r}
@@ -171,7 +194,7 @@ library(dplyr)
 library(tidyr)
 
 
-mean_lik <- lik_by_trial %>%
+mean_lik <- exp1_lik_by_trial %>%
   select(human_id,condition,game, round,QLS_lik,Bayes_NT_lik,Bayes_Tr_lik) %>%
   group_by(condition,game,round) %>%
   summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
@@ -187,5 +210,5 @@ data_long$game <- factor(data_long$game,levels=c("rps","fwg","numbers"))
 ggplot(data_long,aes(x=round,y=probability,colour=strategy)) + geom_line() + facet_grid(game~condition)
 
 
-
 ```
+

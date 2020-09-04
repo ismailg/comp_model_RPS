@@ -68,6 +68,116 @@ exp2_best_response <- function(game,ai_action){
 
 ## Fitting Q_learning with state space of possible last round plays 
 ```{r, cache=TRUE}
+# exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE){
+#   # Par[1] -> beta= inverse temperature parameter in softmax choice function
+#   # Par[2] -> lambda = learning rate (one per game?)
+#   # data : participant and ai choice data.
+#   # return_value=c("-2loglik","likelihood_by_trial")
+#   # Gamma is discount factor for future rewards 
+#   # Returns Q-values per trial and predicts choice using softmax
+#   beta <- par[1]
+#   alpha <- par[2]
+# 
+#   #gamma <- 0.9 
+# 
+#   #Define matrix of state spaces for each game 
+#   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+#   states_RPS <- paste0(G1$Var1,G1$Var2)
+# 
+#   G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+#   states_FWG <- paste0(G2$Var1,G2$Var2)
+# 
+#   G3 <- expand.grid(c("left","center","right"), c("left","center","right"))
+#   states_SHOOT <- paste0(G3$Var1,G3$Var2)
+#   
+#   Q_vals_RPS = matrix(-0.5,9,3)
+#   dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
+# 
+#   Q_vals_FWG = matrix(-0.5,9,3)
+#   dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
+#   
+#   Q_vals_SHOOT = matrix(-0.5,9,3)
+#   dimnames(Q_vals_SHOOT) = list(states_SHOOT, c("left","center","right"))
+#  
+#   lik_hum <- matrix(0.0,nrow(data))
+# 
+#   for(t in 1:nrow(data)) {
+#     t_game <- data[t,"game"]
+#     nopts <- 3
+#     
+#     if(data[t,"round"] == 1) {
+#       
+#       # Within game transfer Code 
+#       if (!within_transfer){
+#               Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, shootout = Q_vals_SHOOT)
+#       } else {
+#         if (data[t,"stage"] == 1){
+#           Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, shootout = Q_vals_SHOOT)
+#         } else if (data[t,"stage"] == 2) {
+#           Q_vals_opp1 <- Q_vals
+#           Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, shootout = Q_vals_SHOOT)
+#         } else if (data[t,"stage"] == 3) {
+#           Q_vals_opp2 <- Q_vals 
+#           Q_vals <- Q_vals_opp1
+#         } else if (data[t,"stage"] == 4) {
+#           Q_vals <- Q_vals_opp2
+#         }
+#       }
+#    
+# 
+#       #cat(Q_vals,"\n") 
+#       state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, shootout = states_SHOOT)
+#       # first round is uniform prediction
+#       lik_hum[t] <- 1/nopts
+#       # Randomly select state and previous actions for first round
+#       curr_state <- sample(state_vec, size = 1)
+#       h_act <- sample(colnames(Q_vals), size =1)
+#       ai_act <- sample(colnames(Q_vals), size =1)
+#       reward <- 0 
+#       
+#     } else {
+#       # Get past human action and associated reward 
+#       h_act <- as.character(data[t-1,"h_action"])
+#       ai_act <- as.character(data[t-1,"a_action"])
+#       reward <- as.numeric(data[t-1,"score"])
+#     }
+#     
+#     
+#     # cat(curr_state, " This is the previous state", "\n")
+#     new_state <- paste0(h_act,ai_act)
+#     # cat(new_state,"This is new state","\n")
+#     
+#     # Q_learning: update rule (time  = t-1)
+#     Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act] )
+#     
+#     # Assume human chooses action probabilistically using softmax on Q values
+#     probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
+#     #if (data[t,"round"] == 1) { cat(probs,"\n") }
+#     
+#     # Get actual human action and compute likelihood
+#     h_act <- as.character(data[t,"h_action"])
+#     act_index <- match(h_act, colnames(Q_vals))
+#     lik_hum[t] <- probs[[act_index]]
+#       
+#     # Update state
+#     curr_state <- new_state 
+#     #}
+#   }
+#   if(return_value == "-2loglik") {
+#     ret <- -2*sum(log(lik_hum))
+#     if(is.infinite(ret) || is.nan(ret)) {
+#       return(1e+300)
+#     } else {
+#       return(ret)
+#     }
+#   }
+#   if(return_value == "likelihood_by_trial") return(lik_hum)
+#   
+# }
+
+```
+## Attempt 2 : QL with states and option to activate transfer 
+```{r, cache=TRUE}
 exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE){
   # Par[1] -> beta= inverse temperature parameter in softmax choice function
   # Par[2] -> lambda = learning rate (one per game?)
@@ -77,9 +187,8 @@ exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE)
   # Returns Q-values per trial and predicts choice using softmax
   beta <- par[1]
   alpha <- par[2]
-
-  #gamma <- 0.9 
-
+  nopts <- 3
+  
   #Define matrix of state spaces for each game 
   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
   states_RPS <- paste0(G1$Var1,G1$Var2)
@@ -103,8 +212,6 @@ exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE)
 
   for(t in 1:nrow(data)) {
     t_game <- data[t,"game"]
-    nopts <- 3
-    
     if(data[t,"round"] == 1) {
       
       # Within game transfer Code 
@@ -124,44 +231,32 @@ exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE)
         }
       }
    
-
       #cat(Q_vals,"\n") 
       state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, shootout = states_SHOOT)
       # first round is uniform prediction
       lik_hum[t] <- 1/nopts
-      # Randomly select state and previous actions for first round
-      curr_state <- sample(state_vec, size = 1)
-      h_act <- sample(colnames(Q_vals), size =1)
-      ai_act <- sample(colnames(Q_vals), size =1)
-      reward <- 0 
       
     } else {
       # Get past human action and associated reward 
-      h_act <- as.character(data[t-1,"h_action"])
-      ai_act <- as.character(data[t-1,"a_action"])
-      reward <- as.numeric(data[t-1,"score"])
+      h_act_prev <- as.character(data[t-1,"h_action"])
+      ai_act_prev <- as.character(data[t-1,"a_action"])
+      curr_state <- paste0(h_act_prev,ai_act_prev)
+      
+      h_act <- as.character(data[t,"h_action"])
+      ai_act <- as.character(data[t,"a_action"])
+      reward <- as.numeric(data[t,"score"])
+      new_state <- paste0(h_act,ai_act)
+      
+      # Assume human chooses action probabilistically using softmax on Q values
+      probs <- exp(Q_vals[curr_state,]/beta)/sum(exp(Q_vals[curr_state,]/beta))
+      # Get actual human next action and compute likelihood
+      act_index <- match(h_act, colnames(Q_vals))
+      lik_hum[t] <- probs[[act_index]]
+      
+      # Q_learning: update rule (time = t)
+      Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act])
     }
     
-    
-    # cat(curr_state, " This is the previous state", "\n")
-    new_state <- paste0(h_act,ai_act)
-    # cat(new_state,"This is new state","\n")
-    
-    # Q_learning: update rule (time  = t-1)
-    Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act] )
-    
-    # Assume human chooses action probabilistically using softmax on Q values
-    probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
-    #if (data[t,"round"] == 1) { cat(probs,"\n") }
-    
-    # Get actual human action and compute likelihood
-    h_act <- as.character(data[t,"h_action"])
-    act_index <- match(h_act, colnames(Q_vals))
-    lik_hum[t] <- probs[[act_index]]
-      
-    # Update state
-    curr_state <- new_state 
-    #}
   }
   if(return_value == "-2loglik") {
     ret <- -2*sum(log(lik_hum))
@@ -176,6 +271,7 @@ exp2_QL_states <- function(par,data,return_value,gamma, within_transfer = FALSE)
 }
 
 ```
+
 
 ```{r}
 exp2_QL_states(c(5,0.4),test_data, "likelihood_by_trial", 0.0, FALSE)

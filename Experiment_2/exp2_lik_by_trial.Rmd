@@ -22,8 +22,8 @@ exp2_optim_results <- read.csv("exp2_results.csv")
 
 # Preparing data for running functions to calculate likelihoods
 
-# dat <- as_tibble(dat) %>% group_by(human_id,game)
-  dat <- dat %>%
+dat <- as_tibble(dat) %>% group_by(human_id,game)
+dat <- dat %>%
    mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1))
 
 
@@ -95,6 +95,7 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 
 ```{r}
 
+dat <- as.data.frame(dat)   
 lik_by_trial_2 <- data.frame()
 
 for(id in unique(dat$human_id)) {
@@ -102,11 +103,11 @@ for(id in unique(dat$human_id)) {
   tdat <- dat %>% subset(human_id == id)
 
   # QLS likelihoods 
-  pars_QLS <- unlist(filter(exp2_optim_results, ID == id)%>%select(QL_states_alpha,QL_states_Beta))
+  pars_QLS <- unlist(filter(exp2_optim_results, ID == id)%>%select(QL_states_Beta, QL_states_alpha))
   tdat$QLS_lik <-  exp2_QL_states(pars_QLS,tdat,"likelihood_by_trial",0.0, FALSE)
   
   # QLS within Transfer likelihoods 
-  pars_QLS_within <- unlist(filter(exp2_optim_results, ID == id)%>%select(QLS_within_Tr_alpha,QLS_within_Tr_Beta))
+  pars_QLS_within <- unlist(filter(exp2_optim_results, ID == id)%>%select(QLS_within_Tr_Beta,QLS_within_Tr_alpha))
   tdat$QLS_lik_within <-  exp2_QL_states(pars_QLS_within,tdat,"likelihood_by_trial",gamma = 0, TRUE)
   #                
   # 

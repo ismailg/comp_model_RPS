@@ -15,7 +15,7 @@ dat <- read.csv("data20180719.csv")
 
 ####### test data 
 
-dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
+# dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
 
 
 
@@ -270,7 +270,7 @@ exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_va
 ```
 
 ```{r}
-exp1_Bayes_model_LL(0.4,data = dat, generalize = "no", "likelihood_by_trial")
+exp1_Bayes_model_LL(0.4,data = dat, generalize = "no", "likelihood_by_trial")[51]
 ```
 
 ```{r}
