@@ -1,0 +1,159 @@
+---
+title: "Hidden Markov strategy model"
+author: "Maarten Speekenbrink"
+date: "25/08/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(depmixS4)
+```
+
+```{r define-dummy-response}
+setClass("dummyResponse", contains="response")
+
+setGeneric("dummyResponse", function(y, pstart = NULL, fixed = NULL, ...) standardGeneric("dummyResponse"))
+
+setMethod("dummyResponse", 
+    signature(y="ANY"), 
+    function(y,pstart=NULL,fixed=NULL, ...) {
+      y <- matrix(y,length(y))
+  		x <- matrix(1)
+  		parameters <- list()
+  		npar <- 0
+      mod <- new("dummyResponse",parameters=parameters,fixed=logical(0),x=x,y=y,npar=npar)
+      mod
+	}
+)
+
+setMethod("show","dummyResponse",
+    function(object) {
+        cat("Dummy for fixed likelihood Model \n")
+    }
+)
+
+setMethod("dens","dummyResponse",
+  function(object,log=FALSE) {
+   if(log) log(as.numeric(object@y)) else as.numeric(object@y)
+  }
+)
+
+setMethod("getpars","dummyResponse",
+    function(object,which="pars",...) {
+        switch(which,
+            "pars" = {
+                pars <- numeric(0)
+            },
+            "fixed" = {
+                pars <- logical(0)
+            }
+        )
+        return(pars)
+    }
+)
+
+setMethod("setpars","dummyResponse",
+    function(object, values, which="pars", ...) {
+        npar <- npar(object)
+        if(length(values)!=npar) stop("length of 'values' must be",npar)
+        # determine whether parameters or fixed constraints are being set
+		nms <- ""
+		switch(which,
+		  "pars"= {
+		      },
+		  "fixed" = {
+		    }
+		  )
+      names(object@parameters) <- nms
+      return(object)
+    }
+)
+
+setMethod("fit","dummyResponse",
+    function(object,w) {
+		  return(object)
+	}
+)
+
+setMethod("predict","dummyResponse", 
+    function(object) {
+        ret <- object@y
+        return(ret)
+    }
+)
+```
+
+```{r}
+# we need to have "dat" available and lik_by_trial
+QLS_lik <- lik_by_trial_2$QLS_lik
+Bayes_NT_lik <- lik_by_trial_2$Bayes_NT_lik
+Bayes_Tr_lik <- lik_by_trial_2$Bayes_Tr_lik
+
+nsubject <- length(unique(lik_by_trial_2$human_id)) # number of participants
+ngame <- 12 # number of games
+#ntrial <- c(60,60,60)
+
+ntrial <- c(20,20,10,10,20,20,10,10,20,20,10,10) # number of trials in each game
+
+rModels <- list(
+  list(
+	  dummyResponse(QLS_lik)
+	),
+	list(
+		dummyResponse(Bayes_NT_lik)
+	),
+  list(
+    dummyResponse(Bayes_Tr_lik)
+  )
+)
+
+trstart <- matrix(c(0.8,0.1,0.1,0.1,0.8,0.1,.1,.1,.8),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+instart <- c(1/3,1/3,1/3)
+inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),data=data.frame(rep(1,nsubject*ngame)))
+
+mod <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod <- fit(mod, emcontrol=em.control(random.start=TRUE))
+
+summary(fmod,compact=FALSE)
+```
+
+```{r}
+
+# Create table for each trial and calc proportions of states 
+# Check book draft for weather prediction data 
+# p <- posterior(fmod)[60:66,1]
+# p
+
+forwardbackward(fmod)$gamma
+#check section called decoding 
+
+```
+
+```{r}
+
+# No switching. Force off diagonal initial elements of transtion matrix to 0
+trstart <- matrix(c(1,0,0,0,1,0,0,0,1),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+mod_noswitch <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod_noswitch <- fit(mod_noswitch, emcontrol=em.control(random.start=FALSE))
+
+# p-value for comparison between a model with strategy switches and one without:
+
+1-pchisq(-2*as.numeric(logLik(fmod_noswitch)) - (-2*as.numeric(logLik(fmod))),df=6)
+
+# Use bootstrapped likeihood ratio test....(see chapter 2) 
+
+```
+

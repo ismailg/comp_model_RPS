@@ -175,16 +175,21 @@ for(id in unique(dat$human_id)) {
                           "QLS_lik" = QLS_lik,
                           "Bayes_NT_lik" = Bayes_NT_lik,
                           "Bayes_Tr_lik" = Bayes_Tr_lik
-                          
                         ))
+  #cat(as.character(Bayes_Tr_lik[c(1,51,101)]))
 }
+
+write.csv(exp1_lik_by_trial,file="exp1_lik_by_trial.csv",row.names = FALSE)
 
 ```
 
 ```{r}
 
-which(exp1_lik_by_trial$QLS_lik == 1.0 )
+summary(exp1_lik_by_trial$QLS_lik == 1.0 )
+summary(exp1_lik_by_trial$QLS_lik == 0.0 )
+summary(is.na(exp1_lik_by_trial$QLS_lik))
 
+For 
 
 ```
 

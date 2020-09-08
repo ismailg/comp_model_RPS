@@ -1106,12 +1106,12 @@ save(MBM_modelling, file="MBM_modelling.RData")
 
 ## Putting results together 
 ```{r}
-load("QL_modelling.RData")
-load("QL_states_modelling.RData")
-load("EWA_modelling.RData")
-load("EWA_self_modelling.RData")
-load("MBM_modelling.RData")
-load("EWA_states_modelling.RData")
+# load("QL_modelling.RData")
+# load("QL_states_modelling.RData")
+# load("EWA_modelling.RData")
+# load("EWA_self_modelling.RData")
+# load("MBM_modelling.RData")
+# load("EWA_states_modelling.RData")
 
 
 All_results <- data.frame()

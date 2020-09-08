@@ -121,6 +121,8 @@ for(id in unique(dat$human_id)) {
 
   lik_by_trial_2 <- rbind(lik_by_trial_2,tdat)
 }
+
+write.csv(lik_by_trial_2,file="exp2_lik_by_trial.csv",row.names = FALSE)
 ```
 
 ```{r}
