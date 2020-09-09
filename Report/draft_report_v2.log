@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.17)  8 SEP 2020 11:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.17)  9 SEP 2020 18:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -904,16 +904,13 @@ Underfull \vbox (badness 4752) has occurred while \output is active []
 [5]
 Underfull \vbox (badness 4752) has occurred while \output is active []
 
-[6]
-Underfull \vbox (badness 4752) has occurred while \output is active []
-
-[7] [8] [9]
-<images/feedback_rps.png, id=153, 452.4102pt x 263.5446pt>
+[6] [7] [8] [9]
+<images/feedback_rps.png, id=161, 452.4102pt x 263.5446pt>
 File: images/feedback_rps.png Graphic file (type png)
 <use images/feedback_rps.png>
 Package pdftex.def Info: images/feedback_rps.png  used on input line 167.
 (pdftex.def)             Requested size: 452.40909pt x 263.54395pt.
-<draft_report_v2_files/figure-latex/exp1-avg-scores-game-1.pdf, id=155, 469.755
+<draft_report_v2_files/figure-latex/exp1-avg-scores-game-1.pdf, id=163, 469.755
 pt x 325.215pt>
 File: draft_report_v2_files/figure-latex/exp1-avg-scores-game-1.pdf Graphic fil
 e (type pdf)
@@ -925,7 +922,7 @@ e-1.pdf  used on input line 179.
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [11 <./images/feedback_rps.png>]
-<draft_report_v2_files/figure-latex/exp1-3factor-plot-1.pdf, id=173, 469.755pt 
+<draft_report_v2_files/figure-latex/exp1-3factor-plot-1.pdf, id=181, 469.755pt 
 x 325.215pt>
 File: draft_report_v2_files/figure-latex/exp1-3factor-plot-1.pdf Graphic file (
 type pdf)
@@ -937,7 +934,7 @@ Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-3factor-plot-1
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [13 <./draft_report_v2_files/figure-latex/exp1-3factor-plot-1.pdf>]
-<draft_report_v2_files/figure-latex/exp1-score-by-opp-1.pdf, id=196, 469.755pt 
+<draft_report_v2_files/figure-latex/exp1-score-by-opp-1.pdf, id=204, 469.755pt 
 x 325.215pt>
 File: draft_report_v2_files/figure-latex/exp1-score-by-opp-1.pdf Graphic file (
 type pdf)
@@ -945,234 +942,261 @@ type pdf)
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-score-by-opp-1
 .pdf  used on input line 212.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[14] [15 <./draft_report_v2_files/figure-latex/exp1-score-by-opp-1.pdf>] [16]
+[14] [15 <./draft_report_v2_files/figure-latex/exp1-score-by-opp-1.pdf>]
+<images/shootout.png, id=220, 1927.2pt x 1084.05pt>
+File: images/shootout.png Graphic file (type png)
+<use images/shootout.png>
+Package pdftex.def Info: images/shootout.png  used on input line 243.
+(pdftex.def)             Requested size: 469.7421pt x 264.22992pt.
+[16]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[17]
-<draft_report_v2_files/figure-latex/exp2-score-by-opp-1.pdf, id=224, 469.755pt 
+[17 <./images/shootout.png>] [18]
+<draft_report_v2_files/figure-latex/exp2-score-by-opp-1.pdf, id=239, 469.755pt 
 x 325.215pt>
 File: draft_report_v2_files/figure-latex/exp2-score-by-opp-1.pdf Graphic file (
 type pdf)
 <use draft_report_v2_files/figure-latex/exp2-score-by-opp-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-score-by-opp-1
-.pdf  used on input line 256.
+.pdf  used on input line 265.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[18]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 [19 <./draft_report_v2_files/figure-latex/exp2-score-by-opp-1.pdf>]
-<draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf, id=242, 469.755pt 
+<draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf, id=252, 469.755pt 
 x 325.215pt>
 File: draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf Graphic file (
 type pdf)
 <use draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-early-scores-1
-.pdf  used on input line 272.
+.pdf  used on input line 281.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[20 <./draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf>] [21] [22]
+[20] [21 <./draft_report_v2_files/figure-latex/exp2-early-scores-1.pdf>] [22]
 Underfull \vbox (badness 2384) has occurred while \output is active []
 
 [23] [24]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [25]
-<draft_report_v2_files/figure-latex/exp1-comp-models-1.pdf, id=287, 469.755pt x
+<draft_report_v2_files/figure-latex/exp1-comp-models-1.pdf, id=299, 469.755pt x
  325.215pt>
 File: draft_report_v2_files/figure-latex/exp1-comp-models-1.pdf Graphic file (t
 ype pdf)
 <use draft_report_v2_files/figure-latex/exp1-comp-models-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-comp-models-1.
-pdf  used on input line 341.
+pdf  used on input line 350.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [26 <./draft_report_v2_files/figure-latex/exp1-comp-models-1.pdf>]
-<draft_report_v2_files/figure-latex/exp1-cumScores-1.pdf, id=301, 469.755pt x 3
+<draft_report_v2_files/figure-latex/exp1-cumScores-1.pdf, id=312, 469.755pt x 3
 25.215pt>
 File: draft_report_v2_files/figure-latex/exp1-cumScores-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v2_files/figure-latex/exp1-cumScores-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-cumScores-1.pd
-f  used on input line 352.
+f  used on input line 361.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pdf, id=303, 469.755pt x 3
+<draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pdf, id=314, 469.755pt x 3
 25.215pt>
 File: draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pd
-f  used on input line 365.
+f  used on input line 374.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 1253) has occurred while \output is active []
 
 [27 <./draft_report_v2_files/figure-latex/exp1-cumScores-1.pdf>]
-<draft_report_v2_files/figure-latex/exp2-comp-models-1.pdf, id=315, 469.755pt x
+<draft_report_v2_files/figure-latex/exp2-comp-models-1.pdf, id=326, 469.755pt x
  325.215pt>
 File: draft_report_v2_files/figure-latex/exp2-comp-models-1.pdf Graphic file (t
 ype pdf)
 <use draft_report_v2_files/figure-latex/exp2-comp-models-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-comp-models-1.
-pdf  used on input line 377.
+pdf  used on input line 386.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<draft_report_v2_files/figure-latex/exp2-cumScores-1.pdf, id=317, 469.755pt x 3
+<draft_report_v2_files/figure-latex/exp2-cumScores-1.pdf, id=328, 469.755pt x 3
 25.215pt>
 File: draft_report_v2_files/figure-latex/exp2-cumScores-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v2_files/figure-latex/exp2-cumScores-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-cumScores-1.pd
-f  used on input line 388.
+f  used on input line 397.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [28 <./draft_report_v2_files/figure-latex/exp1-lik-by-tr-1.pdf>]
-<draft_report_v2_files/figure-latex/exp2-lik-by-tr-1.pdf, id=331, 469.755pt x 3
+<draft_report_v2_files/figure-latex/exp2-lik-by-tr-1.pdf, id=342, 469.755pt x 3
 25.215pt>
 File: draft_report_v2_files/figure-latex/exp2-lik-by-tr-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v2_files/figure-latex/exp2-lik-by-tr-1.pdf>
 Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-lik-by-tr-1.pd
-f  used on input line 401.
+f  used on input line 410.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [29 <./draft_report_v2_files/figure-latex/exp2-comp-models-1.pdf>] [30 <./draft
 _report_v2_files/figure-latex/exp2-cumScores-1.pdf>] [31 <./draft_report_v2_fil
-es/figure-latex/exp2-lik-by-tr-1.pdf>] [32] [33] [34] [35] [36] [37] [38] [39]p
-dfTeX warning (ext4): destination with the same identifier (name{ref-arad201211
-}) has been already used, duplicate ignored
+es/figure-latex/exp2-lik-by-tr-1.pdf>]
+<draft_report_v2_files/figure-latex/exp1-posteriors-plot-1.pdf, id=373, 469.755
+pt x 325.215pt>
+File: draft_report_v2_files/figure-latex/exp1-posteriors-plot-1.pdf Graphic fil
+e (type pdf)
+<use draft_report_v2_files/figure-latex/exp1-posteriors-plot-1.pdf>
+Package pdftex.def Info: draft_report_v2_files/figure-latex/exp1-posteriors-plo
+t-1.pdf  used on input line 431.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[32 <./draft_report_v2_files/figure-latex/exp1-posteriors-plot-1.pdf>]
+<draft_report_v2_files/figure-latex/exp2-posteriors-plot-1.pdf, id=386, 469.755
+pt x 325.215pt>
+File: draft_report_v2_files/figure-latex/exp2-posteriors-plot-1.pdf Graphic fil
+e (type pdf)
+<use draft_report_v2_files/figure-latex/exp2-posteriors-plot-1.pdf>
+Package pdftex.def Info: draft_report_v2_files/figure-latex/exp2-posteriors-plo
+t-1.pdf  used on input line 445.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[33 <./draft_report_v2_files/figure-latex/exp2-posteriors-plot-1.pdf>] [34] [35
+] [36] [37] [38] [39] [40] [41]pdfTeX warning (ext4): destination with the same
+ identifier (name{ref-arad201211}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.526 \leavevmode\hypertarget{ref-arad201211}{}
+l.569 \leavevmode\hypertarget{ref-arad201211}{}
                                                %pdfTeX warning (ext4): destinat
 ion with the same identifier (name{ref-baarslag2016learning}) has been already 
 used, duplicate ignored
 <to be read again> 
                    \relax 
-l.529 ...e\hypertarget{ref-baarslag2016learning}{}
+l.572 ...e\hypertarget{ref-baarslag2016learning}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-camerer1997experience}) has been alre
 ady used, duplicate ignored
 <to be read again> 
                    \relax 
-l.532 ...\hypertarget{ref-camerer1997experience}{}
+l.575 ...\hypertarget{ref-camerer1997experience}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-cheung1994learning}) has been already
  used, duplicate ignored
 <to be read again> 
                    \relax 
-l.535 ...ode\hypertarget{ref-cheung1994learning}{}
+l.578 ...ode\hypertarget{ref-cheung1994learning}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-cooper2003lessons}) has been already 
 used, duplicate ignored
 <to be read again> 
                    \relax 
-l.538 ...mode\hypertarget{ref-cooper2003lessons}{}
+l.581 ...mode\hypertarget{ref-cooper2003lessons}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-Cooper2008}) has been already used, d
 uplicate ignored
 <to be read again> 
                    \relax 
-l.541 \leavevmode\hypertarget{ref-Cooper2008}{}
-                                               %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-goodie2012levels}) has been already used
-, duplicate ignored
+l.584 \leavevmode\hypertarget{ref-Cooper2008}{}
+                                               % [42]pdfTeX warning (ext4): des
+tination with the same identifier (name{ref-goodie2012levels}) has been already
+ used, duplicate ignored
 <to be read again> 
                    \relax 
-l.544 ...vmode\hypertarget{ref-goodie2012levels}{}
+l.587 ...vmode\hypertarget{ref-goodie2012levels}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-Haruvy2012}) has been already used, d
 uplicate ignored
 <to be read again> 
                    \relax 
-l.547 \leavevmode\hypertarget{ref-Haruvy2012}{}
-                                               % [40]pdfTeX warning (ext4): des
-tination with the same identifier (name{ref-ho2004economics}) has been already 
-used, duplicate ignored
+l.590 \leavevmode\hypertarget{ref-Haruvy2012}{}
+                                               %pdfTeX warning (ext4): destinat
+ion with the same identifier (name{ref-ho2004economics}) has been already used,
+ duplicate ignored
 <to be read again> 
                    \relax 
-l.550 ...evmode\hypertarget{ref-ho2004economics}{}
+l.593 ...evmode\hypertarget{ref-ho2004economics}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-ho1998iterated}) has been already use
 d, duplicate ignored
 <to be read again> 
                    \relax 
-l.553 ...vevmode\hypertarget{ref-ho1998iterated}{}
+l.596 ...vevmode\hypertarget{ref-ho1998iterated}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-Juvina2013}) has been already used, d
 uplicate ignored
 <to be read again> 
                    \relax 
-l.556 \leavevmode\hypertarget{ref-Juvina2013}{}
+l.599 \leavevmode\hypertarget{ref-Juvina2013}{}
                                                %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-knez2000increasing}) has been already us
-ed, duplicate ignored
+ion with the same identifier (name{ref-Lake2017}) has been already used, duplic
+ate ignored
 <to be read again> 
                    \relax 
-l.559 ...ode\hypertarget{ref-knez2000increasing}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-Lake2017}) has been already used, dup
-licate ignored
-<to be read again> 
-                   \relax 
-l.562 \leavevmode\hypertarget{ref-Lake2017}{}
+l.602 \leavevmode\hypertarget{ref-Lake2017}{}
                                              %pdfTeX warning (ext4): destinatio
 n with the same identifier (name{ref-mertens1990repeated}) has been already use
 d, duplicate ignored
 <to be read again> 
                    \relax 
-l.565 ...de\hypertarget{ref-mertens1990repeated}{}
+l.605 ...de\hypertarget{ref-mertens1990repeated}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-shachat2004we}) has been already used
 , duplicate ignored
 <to be read again> 
                    \relax 
-l.568 \leavevmode\hypertarget{ref-shachat2004we}{}
+l.608 \leavevmode\hypertarget{ref-shachat2004we}{}
                                                   %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-simon1972theories}) has been already 
-used, duplicate ignored
+nation with the same identifier (name{ref-Simon_Daw_11}) has been already used,
+ duplicate ignored
 <to be read again> 
                    \relax 
-l.571 ...mode\hypertarget{ref-simon1972theories}{}
+l.611 \leavevmode\hypertarget{ref-Simon_Daw_11}{}
+                                                 % [43]pdfTeX warning (ext4): d
+estination with the same identifier (name{ref-simon1972theories}) has been alre
+ady used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.614 ...mode\hypertarget{ref-simon1972theories}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-spiliopoulos2013strategic}) has been 
 already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.574 ...ertarget{ref-spiliopoulos2013strategic}{}
-                                                  % [41]pdfTeX warning (ext4): 
-destination with the same identifier (name{ref-stahl1995players}) has been alre
-ady used, duplicate ignored
+l.617 ...ertarget{ref-spiliopoulos2013strategic}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-stahl1995players}) has been already u
+sed, duplicate ignored
 <to be read again> 
                    \relax 
-l.577 ...vmode\hypertarget{ref-stahl1995players}{}
+l.620 ...vmode\hypertarget{ref-stahl1995players}{}
                                                   %pdfTeX warning (ext4): desti
 nation with the same identifier (name{ref-watkins1992q}) has been already used,
  duplicate ignored
 <to be read again> 
                    \relax 
-l.580 \leavevmode\hypertarget{ref-watkins1992q}{}
+l.623 \leavevmode\hypertarget{ref-watkins1992q}{}
                                                  %pdfTeX warning (ext4): destin
 ation with the same identifier (name{ref-de2012higher}) has been already used, 
 duplicate ignored
 <to be read again> 
                    \relax 
-l.583 \leavevmode\hypertarget{ref-de2012higher}{}
+l.626 \leavevmode\hypertarget{ref-de2012higher}{}
                                                  %pdfTeX warning (ext4): destin
 ation with the same identifier (name{ref-Woodruff}) has been already used, dupl
 icate ignored
 <to be read again> 
                    \relax 
-l.586 \leavevmode\hypertarget{ref-Woodruff}{}
-                                             % AED endfloat: Processing end Fig
-ures and Tables [42]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 591.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 591.
+l.629 \leavevmode\hypertarget{ref-Woodruff}{}
+                                             %pdfTeX warning (ext4): destinatio
+n with the same identifier (name{ref-Kool_2011}) has been already used, duplica
+te ignored
+<to be read again> 
+                   \relax 
+l.632 \leavevmode\hypertarget{ref-Kool_2011}{}
+                                              % AED endfloat: Processing end Fi
+gures and Tables [44]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 637.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 637.
 (./draft_report_v2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 591.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 591.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 637.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 637.
 Package rerunfilecheck Info: File `draft_report_v2.out' has not changed.
-(rerunfilecheck)             Checksum: B57381599256D6611645833F4F164FC1;3345.
+(rerunfilecheck)             Checksum: 86C9929D4AB261C1B3B67CEEE27F0896;3607.
  ) 
 Here is how much of TeX's memory you used:
- 16590 strings out of 494107
- 249620 string characters out of 6170493
- 376439 words of memory out of 5000000
- 20183 multiletter control sequences out of 15000+600000
+ 16629 strings out of 494107
+ 250911 string characters out of 6170493
+ 376780 words of memory out of 5000000
+ 20209 multiletter control sequences out of 15000+600000
  50614 words of font info for 81 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  46i,11n,51p,2057b,451s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1191,10 +1215,10 @@ mr8.pfb></Users/mbp17/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.p
 fb></Users/mbp17/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb></U
 sers/mbp17/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/
 mbp17/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on draft_report_v2.pdf (42 pages, 400305 bytes).
+Output written on draft_report_v2.pdf (44 pages, 593087 bytes).
 PDF statistics:
- 515 PDF objects out of 1000 (max. 8388607)
- 431 compressed objects within 5 object streams
- 125 named destinations out of 1000 (max. 500000)
- 6405 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 558 PDF objects out of 1000 (max. 8388607)
+ 467 compressed objects within 5 object streams
+ 135 named destinations out of 1000 (max. 500000)
+ 6436 words of extra memory for PDF output out of 10000 (max. 10000000)
 

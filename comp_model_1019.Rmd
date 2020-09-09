@@ -308,6 +308,7 @@ Q_learn <- function(par,data,return_value=c("-2loglik","likelihood_by_trial")){
       # Get actual human action and compute likelihood
       h_act <- as.character(data[t,"h_action"])
       act_index <- match(h_act, names(Q_vals))
+      #cat(as.character(act_index))
       lik_hum[t] <- probs[[act_index]]
     }
   }
@@ -445,8 +446,8 @@ Q_learn_states <- function(par,data,return_value,gamma){
   # return_value=c("-2loglik","likelihood_by_trial")
   # Gamma is discount factor for future rewards 
   # Returns Q-values per trial and predicts choice using softmax
-  beta <- par[1]
-  alpha <- par[2]
+  beta <- par[[1]]
+  alpha <- par[[2]]
 
   #Define matrix of state spaces for each game 
   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))

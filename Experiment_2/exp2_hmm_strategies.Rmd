@@ -126,12 +126,17 @@ summary(fmod,compact=FALSE)
 
 ```{r}
 
-# Create table for each trial and calc proportions of states 
+# Adding posterior probabilities to original data for each state 
 # Check book draft for weather prediction data 
 # p <- posterior(fmod)[60:66,1]
 # p
 
-forwardbackward(fmod)$gamma
+lik_by_trial_2["post_QLS"] <- forwardbackward(fmod)$gamma[,1]
+lik_by_trial_2["post_Bayes_NT"] <- forwardbackward(fmod)$gamma[,2]
+lik_by_trial_2["post_Bayes_Tr"] <- forwardbackward(fmod)$gamma[,3]
+
+
+
 #check section called decoding 
 
 ```

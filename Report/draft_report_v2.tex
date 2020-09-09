@@ -122,7 +122,7 @@ Being able to transfer previously acquired knowledge to a new domain is one of t
 
 One way to build abstract representations of the environment when the task involves interactions with others is to build a model of the person we are interacting with that may inform what actions they are likely to take next. Once we learn something about them, we can use this knowledge to inform how to best behave in novel situations. This may lead to very efficient generalization of knowledge, even to situations that are dissimilar to the history of interaction, assuming what we have learned about others is an abstract representation that is not too dependent on the environment of the initial interaction. There is evidence that people learn models of their opponents when they play repeated economic games (Stahl \& Wilson, 1995), engage in bilateral negotiations (Baarslag, Hendrikx, Hindriks, \& Jonker, 2016), or simply try to exploit a non random player in chance games such as Rock-Paper-Scissors (Weerd, Verbrugge, \& Verheij, 2012). In this paper, we are specifically interested in the way in which people build and use models of their opponent to facilitate learning transfer, when engaged in situations involving an interaction with strategic considerations. These situations arise frequently such as in negotiations, auctions, strategic planning and all other domains in which theory of mind abilities (Woodruff, Sciences, Brain, \& 1978, n.d.) play a role in determining human behaviour. In order to explore learning transfer in these strategic settings, it is generally useful to study simple games as a model of more complex interactions. More specifically, we need a framework that allows the study of whether and how a player takes into consideration, over time, the impact of its current and future actions on the future actions of the opponent and the future cumulative rewards. Repeated games, in which players interact repeatedly with the same opponent and have the ability to learn about the opponent's strategies and preferences (Mertens, 1990) are particularly adapted to the task of opponent modelling.
 
-Early literature on learning transfer in games has mostly focused on measuring the proportion of people who play normatively optimal (Nash Equilibria) or salient actions (e.g Risk Dominance) in later games, having had experience with a similar game environment previously. For instance, Ho, Camerer, \& Weigelt (1998) measure transfer as the proportion of players who choose the Nash Equilibrium in later p-beauty contest games, after training on similar games. They find there is no evidence of immediate transfer (Nash equilibrium play in the first round of the new game) but positive structural learning transfer as shown by the faster convergence to equilibrium play by experienced vs non experienced players. Knez \& Camerer (2000) test learning transfer in players exposed to two games with multiple equilibria sequentially and explore the ability of players to coordinate their actions to choose a particular equilibrium in subsequent games having reached it in prior ones. They distinguish between games that are similar in a purely descriptive way, meaning similar choice labels, identity of players, format and number of action choices; and games that are similar in a strategic sense, meaning similar payoffs from combination of actions, identical equilibrium properties or significant social characteristics of payoffs such as possibility of punishment, need for fairness and cooperative vs competitive settings. They find that transfer of learning (successful coordination) occurs more readily in the presence of both descriptive and strategic similarity. If the games were only strategically similar, then the transfer was much weaker.
+Early literature on learning transfer in games has mostly focused on measuring the proportion of people who play normatively optimal (Nash Equilibria) or salient actions (e.g Risk Dominance) in later games, having had experience with a similar game environment previously. For instance, Ho, Camerer, \& Weigelt (1998) measure transfer as the proportion of players who choose the Nash Equilibrium in later p-beauty contest games, after training on similar games. They find there is no evidence of immediate transfer (Nash equilibrium play in the first round of the new game) but positive structural learning transfer as shown by the faster convergence to equilibrium play by experienced vs non experienced players. ({\textbf{???}}) test learning transfer in players exposed to two games with multiple equilibria sequentially and explore the ability of players to coordinate their actions to choose a particular equilibrium in subsequent games having reached it in prior ones. They distinguish between games that are similar in a purely descriptive way, meaning similar choice labels, identity of players, format and number of action choices; and games that are similar in a strategic sense, meaning similar payoffs from combination of actions, identical equilibrium properties or significant social characteristics of payoffs such as possibility of punishment, need for fairness and cooperative vs competitive settings. They find that transfer of learning (successful coordination) occurs more readily in the presence of both descriptive and strategic similarity. If the games were only strategically similar, then the transfer was much weaker.
 
 Juvina, Saleem, Martin, Gonzalez, \& Lebiere (2013) made a similar distinction between what they deemed surface and deep similarities and find that both contribute to positive learning transfer. However, they show that surface similarity is not necessary for deep transfer and can either aid or block this type of transfer depending on whether it leads to congruent or incongruent actions in later games. In a series of experiments using economic signalling games (Cooper \& Kagel, 2003, 2008) the researchers found that participants who have learned to play according to Nash Equilibrium in one game can transfer this to subsequent games, even though the actions consistent with Nash Equilibrium in later games are different. They show that this transfer is driven by the emergence of sophisticated players who are able to represent the strategic implications of their actions and reason about the consequences of changed opponent payoffs.
 
@@ -236,7 +236,16 @@ A total of 48 participants (21 females, 28 males, 1 unknown) used the Prolific A
 \hypertarget{procedure-1}{%
 \subsubsection{Procedure}\label{procedure-1}}
 
-The participants each played 3 games sequentially against both level-1 and level-2 computer opponents, rather than just one like in the first experiment. The three games were Rock-Paper-Scissors, Fire-Water-Grass, and the penalty shootout game. The first two games were identical to the ones used in the first experiment. In the final game (shootout) the participants played the role of the player shooting a football (soccer) penalty, and the AI opponent was the goalkeeper. Players had the choice between three actions, like in the first two games: Shooting the football to the left, right or centre of the goal. If the player shoots in a direction different from that of where the goalkeeper dives, they win the round and the goalkeeper loses. Otherwise, the goalkeeper catches the ball and the player loses the round. There is no possibility of ties in this game. Figure XXXXXXXXX shows a snapshot of play in the shootout game. What makes this game different however is that there are two ways to beat the opponent in each round: if we think the opponent is going to choose \enquote{'right}' in the next round, we can win by both choosing \enquote{'left}' and \enquote{'center}'. A level-1 player (thinks that his opponent will repeat his last action) has two ways to win the next round. As such, we have programmed the level-2 computer program to choose randomly between the two possibilities that a level-1 player may choose.
+The participants each played 3 games sequentially against both level-1 and level-2 computer opponents, rather than just one like in the first experiment. The three games were Rock-Paper-Scissors, Fire-Water-Grass, and the penalty shootout game. The first two games were identical to the ones used in the first experiment. In the final game (shootout) the participants played the role of the player shooting a football (soccer) penalty, and the AI opponent was the goalkeeper. Players had the choice between three actions, like in the first two games: Shooting the football to the left, right or centre of the goal. If the player shoots in a direction different from that of where the goalkeeper dives, they win the round and the goalkeeper loses. Otherwise, the goalkeeper catches the ball and the player loses the round. There is no possibility of ties in this game. Figure~\ref{fig:screenshot-shootout} shows a snapshot of play in the shootout game. What makes this game different however is that there are two ways to beat the opponent in each round: if we think the opponent is going to choose \enquote{'right}' in the next round, we can win by both choosing \enquote{'left}' and \enquote{'center}'. A level-1 player (thinks that his opponent will repeat his last action) has two ways to win the next round. As such, we have programmed the level-2 computer program to choose randomly between the two possibilities that a level-1 player may choose.
+
+\begin{figure}
+
+{\centering \includegraphics{images/shootout} 
+
+}
+
+\caption{Screenshot of the shootout game}\label{fig:screenshot-shootout}
+\end{figure}
 
 Like in the first experiment, the computer opponents retained the same strategy throughout the 3 games, however the participants faced each opponent twice in each game. Specifically, each game was divided into 4 stages numbered 1 to 4, consisting of 20, 20, 10, and 10 rounds respectively for a total of 60 rounds per game. Participants start by facing one of the opponents in stage one, then face the other in stage two. This is repeated in the same order in stages 3 and 4. Which opponent they faced first was counterbalanced. All participants engage in the same three games (namely RPS, FWG and Shootout) in this exact order, and were aware that the opponent was not able to know their choices beforehand but was choosing simultaneously with the player.
 
@@ -412,7 +421,35 @@ The fact that the likelihoods of the main strategies considered cross over in bo
 
 In order to test for the existence of strategy switching in participants' play, we fit Hidden Markov Models in which the latent states are the 3 strategies used (Q learning with state space consisting of previous round play, ToM based model with and without opponent model transfer). Hidden Markov models are useful tools to explore structure in observed time series. They are named because of two properties: First, they make the assumption that any observable action at time t results from a process whose state at time t , named \(S_{t}\) is \enquote{hidden} from the observer. Second, it also assumes that this hidden process has a Markov property, meaning that given state \(S_{t-1}\), the value of \(S_{t}\) is independent of all states occuring before time \(t-1\). We also assume that \(S_{t}\) has a discrete probability distribution in that it take one of K discrete values. The model is therefore specified by initial probabilities of being in each state \({1,2,...,K}\) and transition probabilities for moving from state \(i\) to state \(j\). These probabilities are fit using obsserved actiosn generated from these hidden states.
 
-Using the R DepmixS4 package, we fit a total of two HMMs. In the first model, we allow for a non-nil probability of players transitioning from one state (strategy) to another. In the second model, we assume that such switching does not happen, and as such assume implicitly that when players start with a particular strategy, they continue using it throughout the game. We then compare the likleihoods of each HMM model using a likelihood ration test. In experiment 1, the HMM model with swithcing has a significantly higher likelihood than the non-swithcing one (p-value = 0.00). The switching model in experiment two has also significantly higher likelihood (p-value = 0.00). On top of indications from looking at the liklihood by trial graphs, we have therefore further evidence that participants did indeed switch their strategies as the games progressed.
+sing the R DepmixS4 package, we fit a total of two HMMs. In the first model, we allow for a non-nil probability of players transitioning from one state (strategy) to another. In the second model, we assume that such switching does not happen, and as such assume implicitly that when players start with a particular strategy, they continue using it throughout the game. We then compare the likleihoods of each HMM model using a likelihood ration test.
+
+\hypertarget{experiment-1-1}{%
+\subsubsection{Experiment 1:}\label{experiment-1-1}}
+
+\begin{figure}
+
+{\centering \includegraphics{draft_report_v2_files/figure-latex/exp1-posteriors-plot-1} 
+
+}
+
+\caption{Experiment1 posterior probability of strategies by game and opponent faced}\label{fig:exp1-posteriors-plot}
+\end{figure}
+
+In experiment 1, the HMM model with swithcing has a significantly higher likelihood than the non-switching one (p-value = 0.00). This is further statistical evidence in favour of the hypothesis that participants switch between strategies. In order to understand at which stage of the games the switching might happen, and whether there are any differences between games and type of opponents faced, we plot in Figure~\ref{fig:exp1-posteriors-plot} the average (across participants) posterior probabilities given our HMM trial by trial for each game and opponent faced. Th eposterior probability is the probability that an observation comes from a component distribution a posteriori, i.e.~given the value of the observation. In the first experiment, we can see from the plots of fwg and numbers games for level-1 opponent that although the likelihoods are very close, the posterior probability of the Bayesian model with transfer is slightly higher than that of the QLS model in the very early rounds, but decreases rapidly while the posterior probability of the QL-learning with states models keeps increasing.
+
+\hypertarget{experiment-2-1}{%
+\subsubsection{Experiment 2:}\label{experiment-2-1}}
+
+\begin{figure}
+
+{\centering \includegraphics{draft_report_v2_files/figure-latex/exp2-posteriors-plot-1} 
+
+}
+
+\caption{Experiment2 likelihood by trial by game and opponent faced}\label{fig:exp2-posteriors-plot}
+\end{figure}
+
+The switching model in experiment two has also significantly higher likelihood (p-value = 0.00). On top of indications from looking at the liklihood by trial graphs, we have therefore further evidence that participants did indeed switch their strategies as the games progressed. The posterior probability plot in Figure~\ref{fig:exp2-posteriors-plot} shows switching much more clearly across games ans stages, indicating a robust process. The switchign also seems to happen very early one at the beginning of each game and stage, and is also consistently in the same direction: The probability of Bayesian models with transfer being initially high, then decreasing rapidly while the posterior probability of QL-Learning with states and within transfer learning increases rapidly.
 
 \newpage
 
@@ -441,15 +478,18 @@ Our second experimental design allows us to test whether the first explanation h
 
 Our results show that in fact, it was harder to transfer learning when facing level-2 opponents, both comparing first intractions across games and using early rounds analysis. Based on our assumptions, we conclude that the most likely explanation is that participants who are able to beat the opponent and transfer learning are likely to be explicitly modelling the opponent strategy using level-k reasoning, compared to using simple learning rules they uncovered during the ourse of learning.
 
+Our computational modelling allowed us to delve deeper into what might be driving the observed learning transfer. Initial modelling of observations using all available data seems to indicated that the most likely model was a Q-learning type model. However, as we argued above, that would be inconsistent with the evidence for learning transfer. Breaking down likelihoods by trial and fitting a hidden markov model to the data with states being the various strategies that participants are assumes to be using, we showed evidence for within game switching of strategies. Participants start the early rounds of a new game acting in a way consistent with a Bayesian Theory of mind level, which would be accurate and generalisable but computationally expensive. However, as trials continue, participants seem to switch to a habitual type of learning (QL-models).
+
+Why is this switching happening? We believe that participants show flexibility in their use of learning strategies. When a new game is started that is similar to a previously played game with the same opponent, participants need a way to transfer prior knowledge of the opponent and apply it to the new game in order to best respond. Adopting a Bayesian model based on ToM achieves the goal of trasnfering the opponent model and thus coming up with best responses in the early trials. However, Bayesian ToM models are computationally expensive and require a lot of higher order thinking (I think that you think that I think\ldots{}). As such, as the games progresses, they become burdensome and the higher amount of historical interaction in the new game allows participants to have enough data to start using the cognitively cheaper model-free learning strategies such as Q-learning. The bias towards less computationally demanding strategies is well established Wouter Kool, Joseph T. McGuire, Zev B. Rosen, Matthew M. Bovinick (2011). Moreover, the ability to flexibly switch is also consistent with evidence from the literature on learning strategies in humans, showing that they indeed shift between model-based and model-free learning when the environment requires it Simon \& Daw (2011).
+
 \newpage
 
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
 
-Our online experiments confirm behavioural game theory results, stating that human players can deviate from Nash equilibrium play and learn to adapt to the opponent strategy and exploit it when the opponent itself is deviating from Nash equilibrium. Moreover, we showed that participants do transfer their learning to new games with varying degrees of similarity. The most likely explanation as we saw is that players build a mental representation of their opponent strategy, rather than rely on associative learning or action-based heuristics. The transfer is also moderated by the level of sophistication of the opponent, with participants showing more success in learning and transferring against opponents adopting a less sophisticated strategy.
+Our online experiments confirm behavioural game theory results, stating that human players can deviate from Nash equilibrium play and learn to adapt to the opponent strategy and exploit it when the opponent itself is deviating from Nash equilibrium. Moreover, we showed that participants do transfer their learning to new games with varying degrees of similarity. The transfer is also moderated by the level of sophistication of the opponent, with participants showing more success in learning and transferring against opponents adopting a less sophisticated strategy.
 
-Having said that, there remains a high degree of heterogeneity between players. There is a high positive association between players who learn to beat the sophisticated and less sophisticated opponents, indicating that some players are more able to detect the patterns in opponent play and learn how to exploit them. Moreover, the computational modelling shows that a significant number of players are still using random strategies in the games. Whether this ability depends on engagement with the experiment or on other characteristics of the learner is an open question that more research in the area would hope to answer.
-
+Having said that, there remains a high degree of heterogeneity between players. There is a high positive association between players who learn to beat the sophisticated and less sophisticated opponents, indicating that some players are more able to detect the patterns in opponent play and learn how to exploit them. Moreover, the computational modelling shows that it is likely that players start each game using a model-based learning strategy that facilitates generalisation and opponent model transfer, but then switch to behvior that is consistent with a model-free learning strategy as the experiment goes on. This is likely driven by a trade-off between computational complexity and accuracy between model based and model free strategies.
 \newpage
 
 \hypertarget{references}{%
@@ -493,9 +533,6 @@ Ho, T.-H., Camerer, C., \& Weigelt, K. (1998). Iterated dominance and iterated b
 \leavevmode\hypertarget{ref-Juvina2013}{}%
 Juvina, I., Saleem, M., Martin, J. M., Gonzalez, C., \& Lebiere, C. (2013). Reciprocal trust mediates deep transfer of learning between games of strategic interaction. \emph{Organizational Behavior and Human Decision Processes}, \emph{120}(2), 206--215. doi:\href{https://doi.org/10.1016/j.obhdp.2012.09.004}{10.1016/j.obhdp.2012.09.004}
 
-\leavevmode\hypertarget{ref-knez2000increasing}{}%
-Knez, M., \& Camerer, C. (2000). Increasing cooperation in prisoner's dilemmas by establishing a precedent of efficiency in coordination games. \emph{Organizational Behavior and Human Decision Processes}, \emph{82}(2), 194--216.
-
 \leavevmode\hypertarget{ref-Lake2017}{}%
 Lake, B. M., Ullman, T. D., Tenenbaum, J. B., \& Gershman, S. J. (2017). Building machines that learn and think like people. \emph{Behavioral and Brain Sciences}, \emph{40}. doi:\href{https://doi.org/10.1017/S0140525X16001837}{10.1017/S0140525X16001837}
 
@@ -504,6 +541,9 @@ Mertens, J.-F. (1990). Repeated games. In \emph{Game theory and applications} (p
 
 \leavevmode\hypertarget{ref-shachat2004we}{}%
 Shachat, J., \& Swarthout, J. T. (2004). Do we detect and exploit mixed strategy play by opponents? \emph{Mathematical Methods of Operations Research}, \emph{59}(3), 359--373.
+
+\leavevmode\hypertarget{ref-Simon_Daw_11}{}%
+Simon, D. A., \& Daw, N. D. (2011). Environmental statistics and the trade-off between model-based and TD learning in humans. \emph{Advances in Neural Information Processing Systems 24: 25th Annual Conference on Neural Information Processing Systems 2011, NIPS 2011}, 1--9.
 
 \leavevmode\hypertarget{ref-simon1972theories}{}%
 Simon, H. A. (1972). Theories of bounded rationality. \emph{Decision and Organization}, \emph{1}(1), 161--176.
@@ -522,6 +562,9 @@ Weerd, H. de, Verbrugge, R., \& Verheij, B. (2012). Higher-order social cognitio
 
 \leavevmode\hypertarget{ref-Woodruff}{}%
 Woodruff, G., Sciences, D. P. B., Brain, \& 1978. (n.d.). Does the chimpanzee have a theory of mind.
+
+\leavevmode\hypertarget{ref-Kool_2011}{}%
+Wouter Kool, Joseph T. McGuire, Zev B. Rosen, Matthew M. Bovinick. (2011). Decision Making and the Avoidance of Cognitive Demand. \emph{Experimental Psychology}. doi:\href{https://doi.org/10.2996/kmj/1138846322}{10.2996/kmj/1138846322}
 
 \leavevmode\hypertarget{ref-arad201211}{}%
 Arad, A., \& Rubinstein, A. (2012). The 11-20 money request game: A level-k reasoning study. \emph{American Economic Review}, \emph{102}(7), 3561--3573.
@@ -556,9 +599,6 @@ Ho, T.-H., Camerer, C., \& Weigelt, K. (1998). Iterated dominance and iterated b
 \leavevmode\hypertarget{ref-Juvina2013}{}%
 Juvina, I., Saleem, M., Martin, J. M., Gonzalez, C., \& Lebiere, C. (2013). Reciprocal trust mediates deep transfer of learning between games of strategic interaction. \emph{Organizational Behavior and Human Decision Processes}, \emph{120}(2), 206--215. doi:\href{https://doi.org/10.1016/j.obhdp.2012.09.004}{10.1016/j.obhdp.2012.09.004}
 
-\leavevmode\hypertarget{ref-knez2000increasing}{}%
-Knez, M., \& Camerer, C. (2000). Increasing cooperation in prisoner's dilemmas by establishing a precedent of efficiency in coordination games. \emph{Organizational Behavior and Human Decision Processes}, \emph{82}(2), 194--216.
-
 \leavevmode\hypertarget{ref-Lake2017}{}%
 Lake, B. M., Ullman, T. D., Tenenbaum, J. B., \& Gershman, S. J. (2017). Building machines that learn and think like people. \emph{Behavioral and Brain Sciences}, \emph{40}. doi:\href{https://doi.org/10.1017/S0140525X16001837}{10.1017/S0140525X16001837}
 
@@ -567,6 +607,9 @@ Mertens, J.-F. (1990). Repeated games. In \emph{Game theory and applications} (p
 
 \leavevmode\hypertarget{ref-shachat2004we}{}%
 Shachat, J., \& Swarthout, J. T. (2004). Do we detect and exploit mixed strategy play by opponents? \emph{Mathematical Methods of Operations Research}, \emph{59}(3), 359--373.
+
+\leavevmode\hypertarget{ref-Simon_Daw_11}{}%
+Simon, D. A., \& Daw, N. D. (2011). Environmental statistics and the trade-off between model-based and TD learning in humans. \emph{Advances in Neural Information Processing Systems 24: 25th Annual Conference on Neural Information Processing Systems 2011, NIPS 2011}, 1--9.
 
 \leavevmode\hypertarget{ref-simon1972theories}{}%
 Simon, H. A. (1972). Theories of bounded rationality. \emph{Decision and Organization}, \emph{1}(1), 161--176.
@@ -585,6 +628,9 @@ Weerd, H. de, Verbrugge, R., \& Verheij, B. (2012). Higher-order social cognitio
 
 \leavevmode\hypertarget{ref-Woodruff}{}%
 Woodruff, G., Sciences, D. P. B., Brain, \& 1978. (n.d.). Does the chimpanzee have a theory of mind.
+
+\leavevmode\hypertarget{ref-Kool_2011}{}%
+Wouter Kool, Joseph T. McGuire, Zev B. Rosen, Matthew M. Bovinick. (2011). Decision Making and the Avoidance of Cognitive Demand. \emph{Experimental Psychology}. doi:\href{https://doi.org/10.2996/kmj/1138846322}{10.2996/kmj/1138846322}
 
 \endgroup
 

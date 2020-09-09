@@ -26,7 +26,7 @@ abstract: |
 # keywords          : "keywords"
 # wordcount         : "X"
 
-bibliography      : ["Mendeley.bib"]
+bibliography      : ["Mendeley2.bib"]
 # csl               : "apa-6th-edition.csl"
 
 floatsintext      : yes
@@ -260,7 +260,13 @@ A total of 48 participants (21 females, 28 males, 1 unknown) used the Prolific A
 
 ### Procedure
 
-The participants each played 3 games sequentially against both level-1 and level-2 computer opponents, rather than just one like in the first experiment. The three games were Rock-Paper-Scissors, Fire-Water-Grass, and the penalty shootout game. The first two games were identical to the ones used in the first experiment. In the final game (shootout) the participants played the role of the player shooting a football (soccer) penalty, and the AI opponent was the goalkeeper. Players had the choice between three actions, like in the first two games: Shooting the football to the left, right or centre of the goal. If the player shoots in a direction different from that of where the goalkeeper dives, they win the round and the goalkeeper loses. Otherwise, the goalkeeper catches the ball and the player loses the round. There is no possibility of ties in this game. Figure XXXXXXXXX shows a snapshot of play in the shootout game. What makes this game different however is that there are two ways to beat the opponent in each round: if we think the opponent is going to choose ''right'' in the next round, we can win by both choosing ''left'' and ''center''. A level-1 player (thinks that his opponent will repeat his last action) has two ways to win the next round. As such, we have programmed the level-2 computer program to choose randomly between the two possibilities that a level-1 player may choose.  
+The participants each played 3 games sequentially against both level-1 and level-2 computer opponents, rather than just one like in the first experiment. The three games were Rock-Paper-Scissors, Fire-Water-Grass, and the penalty shootout game. The first two games were identical to the ones used in the first experiment. In the final game (shootout) the participants played the role of the player shooting a football (soccer) penalty, and the AI opponent was the goalkeeper. Players had the choice between three actions, like in the first two games: Shooting the football to the left, right or centre of the goal. If the player shoots in a direction different from that of where the goalkeeper dives, they win the round and the goalkeeper loses. Otherwise, the goalkeeper catches the ball and the player loses the round. There is no possibility of ties in this game. Figure\ \@ref(fig:screenshot-shootout)  shows a snapshot of play in the shootout game. What makes this game different however is that there are two ways to beat the opponent in each round: if we think the opponent is going to choose ''right'' in the next round, we can win by both choosing ''left'' and ''center''. A level-1 player (thinks that his opponent will repeat his last action) has two ways to win the next round. As such, we have programmed the level-2 computer program to choose randomly between the two possibilities that a level-1 player may choose.  
+
+```{r screenshot-shootout, fig.cap = "Screenshot of the shootout game", fig.align='center'}
+
+knitr::include_graphics("images/shootout.png")
+```
+
 
 Like in the first experiment, the computer opponents retained the same strategy throughout the 3 games, however the participants faced each opponent twice in each game. Specifically, each game was divided into 4 stages numbered 1 to 4, consisting of 20, 20, 10, and 10 rounds respectively for a total of 60 rounds per game. Participants start by facing one of the opponents in stage one, then face the other in stage two. This is repeated in the same order in stages 3 and 4. Which opponent they faced first was counterbalanced. All participants engage in the same three games (namely RPS, FWG and Shootout) in this exact order, and were aware that the opponent was not able to know their choices beforehand but was choosing simultaneously with the player. 
 
@@ -533,13 +539,13 @@ exp1_lik_by_trial  <- read.csv("../exp1_lik_by_trial.csv")
 mean_lik <- exp1_lik_by_trial %>%
   dplyr::select(human_id,condition,game, round, QLS_lik, Bayes_NT_lik, Bayes_Tr_lik) %>%
   group_by(condition,game,round) %>%
-  summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
+  dplyr::summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
             mean_NT_lik = mean(Bayes_NT_lik, na.rm = TRUE),
             mean_Tr_lik = mean(Bayes_Tr_lik, na.rm = TRUE))
 
 mean_lik$game <- factor(mean_lik$game,levels=c("rps","fwg","numbers"))
 
-data_long <- gather(mean_lik, strategy, probability, mean_QLS_lik:mean_Tr_lik, factor_key=TRUE)
+data_long <- tidyr::gather(mean_lik, strategy, probability, mean_QLS_lik:mean_Tr_lik, factor_key=TRUE)
 
 
 ```
@@ -686,8 +692,241 @@ The fact that the likelihoods of the main strategies considered cross over in bo
 
 In order to test for the existence of strategy switching in participants' play, we fit Hidden Markov Models in which the latent states are the 3 strategies used (Q learning with state space consisting of previous round play, ToM based model with and without opponent model transfer). Hidden Markov models are useful tools to explore structure in observed time series. They are named because of two properties: First, they make the assumption that any observable action at time t results from a process whose state at time t , named $S_{t}$ is "hidden" from the observer. Second, it also assumes that this hidden process has a Markov property, meaning that given state $S_{t-1}$, the value of $S_{t}$ is independent of all states occuring before time $t-1$. We also assume that $S_{t}$ has a discrete probability distribution in that it take one of K discrete values. The model is therefore specified by initial probabilities of being in each state ${1,2,...,K}$ and transition probabilities for moving from state $i$ to state $j$. These probabilities are fit using obsserved actiosn generated from these hidden states.
 
+sing the R DepmixS4 package, we fit a total of two HMMs. In the first model, we allow for a non-nil probability of players transitioning from one state (strategy) to another. In the second model, we assume that such switching does not happen, and as such assume implicitly that when players start with a particular strategy, they continue using it throughout the game. We then compare the likleihoods of each HMM model using a likelihood ration test.
 
-Using the R DepmixS4 package, we fit a total of two HMMs. In the first model, we allow for a non-nil probability of players transitioning from one state (strategy) to another. In the second model, we assume that such switching does not happen, and as such assume implicitly that when players start with a particular strategy, they continue using it throughout the game. We then compare the likleihoods of each HMM model using a likelihood ration test. In experiment 1, the HMM model with swithcing has a significantly higher likelihood than the non-swithcing one (p-value = 0.00). The switching model in experiment two has also significantly higher likelihood (p-value = 0.00).  On top of indications from looking at the liklihood by trial graphs, we have therefore further evidence that participants did indeed switch their strategies as the games progressed.
+### Experiment 1:
+```{r define-dummy-response, include=FALSE}
+setClass("dummyResponse", contains="response")
+
+setGeneric("dummyResponse", function(y, pstart = NULL, fixed = NULL, ...) standardGeneric("dummyResponse"))
+
+setMethod("dummyResponse", 
+    signature(y="ANY"), 
+    function(y,pstart=NULL,fixed=NULL, ...) {
+      y <- matrix(y,length(y))
+  		x <- matrix(1)
+  		parameters <- list()
+  		npar <- 0
+      mod <- new("dummyResponse",parameters=parameters,fixed=logical(0),x=x,y=y,npar=npar)
+      mod
+	}
+)
+
+setMethod("show","dummyResponse",
+    function(object) {
+        cat("Dummy for fixed likelihood Model \n")
+    }
+)
+
+setMethod("dens","dummyResponse",
+  function(object,log=FALSE) {
+   if(log) log(as.numeric(object@y)) else as.numeric(object@y)
+  }
+)
+
+setMethod("getpars","dummyResponse",
+    function(object,which="pars",...) {
+        switch(which,
+            "pars" = {
+                pars <- numeric(0)
+            },
+            "fixed" = {
+                pars <- logical(0)
+            }
+        )
+        return(pars)
+    }
+)
+
+setMethod("setpars","dummyResponse",
+    function(object, values, which="pars", ...) {
+        npar <- npar(object)
+        if(length(values)!=npar) stop("length of 'values' must be",npar)
+        # determine whether parameters or fixed constraints are being set
+		nms <- ""
+		switch(which,
+		  "pars"= {
+		      },
+		  "fixed" = {
+		    }
+		  )
+      names(object@parameters) <- nms
+      return(object)
+    }
+)
+
+setMethod("fit","dummyResponse",
+    function(object,w) {
+		  return(object)
+	}
+)
+
+setMethod("predict","dummyResponse", 
+    function(object) {
+        ret <- object@y
+        return(ret)
+    }
+)
+```
+
+```{r, include=FALSE}
+
+## EXPERIMENT 1 Data 
+
+QLS_lik <- exp1_lik_by_trial$QLS_lik
+# QLS_lik[which(QLS_lik == 0)] <- .001
+# QLS_lik[is.na(QLS_lik)] <- .33 # this is a hack; there shouldn't be any missing values
+Bayes_NT_lik <- exp1_lik_by_trial$Bayes_NT_lik
+Bayes_Tr_lik <- exp1_lik_by_trial$Bayes_Tr_lik
+
+nsubject <- length(unique(exp1_lik_by_trial$human_id)) # number of participants
+ngame <- 3 # number of games
+ntrial <- c(50,50,50) # numer of trials in each game
+
+rModels <- list(
+  list(
+	  dummyResponse(QLS_lik)
+	),
+	list(
+		dummyResponse(Bayes_NT_lik)
+	),
+  list(
+    dummyResponse(Bayes_Tr_lik)
+  )
+)
+
+trstart <- matrix(c(0.8,0.1,0.1,0.1,0.8,0.1,.1,.1,.8),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+instart <- c(1/3,1/3,1/3)
+inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),data=data.frame(rep(1,nsubject*ngame)))
+
+mod1 <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod1 <- fit(mod1, emcontrol=em.control(random.start=FALSE))
+```
+
+
+```{r no-switch, include =FALSE}
+
+# No switching. Force off diagonal initial elements of transtion matrix to 0
+trstart <- matrix(c(1,0,0,0,1,0,0,0,1),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+mod1_noswitch <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod1_noswitch <- fit(mod1_noswitch, emcontrol=em.control(random.start=FALSE))
+
+# p-value for comparison between a model with strategy switches and one without:
+
+1-pchisq(-2*as.numeric(logLik(fmod1_noswitch)) - (-2*as.numeric(logLik(fmod1))),df=6)
+```
+```{r, include = FALSE}
+
+exp1_lik_by_trial["post_QLS"] <- forwardbackward(fmod1)$gamma[,1]
+exp1_lik_by_trial["post_Bayes_NT"] <- forwardbackward(fmod1)$gamma[,2]
+exp1_lik_by_trial["post_Bayes_Tr"] <- forwardbackward(fmod1)$gamma[,3]
+
+mean_post_1 <- exp1_lik_by_trial %>%
+  dplyr::select(human_id,game,condition, round, post_QLS, post_Bayes_Tr) %>%
+  group_by(game,condition, round) %>%
+  summarise(QLS_posterior = mean(post_QLS, na.rm = TRUE),
+            Bayes_Transfer_posterior = mean(post_Bayes_Tr, na.rm = TRUE))
+
+mean_post_1$game <- factor(mean_post_1$game,levels=c("rps","fwg","numbers"))
+
+data_long_post1 <- gather(mean_post_1, strategy, probability, QLS_posterior,Bayes_Transfer_posterior, factor_key=TRUE)
+
+
+```
+
+```{r exp1-posteriors-plot, fig.cap = "Experiment1 posterior probability of strategies by game and opponent faced", fig.align ='center'}
+
+ggplot(data_long_post1,aes(x=round,y=probability,colour=strategy)) +
+  geom_line() +
+  facet_grid(game~condition)
+
+```
+
+In experiment 1, the HMM model with swithcing has a significantly higher likelihood than the non-switching one (p-value = 0.00). This is further statistical evidence in favour of the hypothesis that participants switch between strategies. In order to understand at which stage of the games the switching might happen, and whether there are any differences between games and type of opponents faced, we plot in Figure\ \@ref(fig:exp1-posteriors-plot) the average (across participants) posterior probabilities given our HMM trial by trial for each game and opponent faced. Th eposterior probability is the probability that an observation comes from a component distribution a posteriori, i.e. given the value of the observation. In the first experiment, we can see from the plots of fwg and numbers games for level-1 opponent that although the likelihoods are very close, the posterior probability of the Bayesian model with transfer is slightly higher than that of the QLS model in the very early rounds, but decreases rapidly while the posterior probability of the QL-learning with states models keeps increasing. 
+
+### Experiment 2: 
+
+```{r, include =FALSE}
+## EXPERIMENT 2 DATA 
+# we need to have "dat" available and lik_by_trial
+QLS_lik <- exp2_lik_by_trial$QLS_lik
+Bayes_NT_lik <- exp2_lik_by_trial$Bayes_NT_lik
+Bayes_Tr_lik <- exp2_lik_by_trial$Bayes_Tr_lik
+
+nsubject <- length(unique(exp2_lik_by_trial$human_id)) # number of participants
+ngame <- 12 # number of games
+#ntrial <- c(60,60,60)
+
+ntrial <- c(20,20,10,10,20,20,10,10,20,20,10,10) # number of trials in each game
+
+rModels <- list(
+  list(
+	  dummyResponse(QLS_lik)
+	),
+	list(
+		dummyResponse(Bayes_NT_lik)
+	),
+  list(
+    dummyResponse(Bayes_Tr_lik)
+  )
+)
+
+trstart <- matrix(c(0.8,0.1,0.1,0.1,0.8,0.1,.1,.1,.8),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+instart <- c(1/3,1/3,1/3)
+inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),data=data.frame(rep(1,nsubject*ngame)))
+
+mod <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod <- fit(mod, emcontrol=em.control(random.start=TRUE))
+```
+
+```{r}
+
+exp2_lik_by_trial["post_QLSw"] <- forwardbackward(fmod)$gamma[,1]
+exp2_lik_by_trial["post_Bayes_NT"] <- forwardbackward(fmod)$gamma[,2]
+exp2_lik_by_trial["post_Bayes_Tr"] <- forwardbackward(fmod)$gamma[,3]
+
+mean_post_2 <- exp2_lik_by_trial %>%
+  dplyr::select(human_id,game,stage,round_condition, round, post_QLSw, post_Bayes_Tr) %>%
+  group_by(game,stage, round) %>%
+  summarise(mean_post_QLSw = mean(post_QLSw, na.rm = TRUE),
+            mean_post_Tr = mean(post_Bayes_Tr, na.rm = TRUE))
+
+mean_post_2$game <- factor(mean_post_2$game,levels=c("rps","fwg","shootout"))
+
+data_long_post2 <- gather(mean_post_2, strategy, probability, mean_post_QLSw,mean_post_Tr, factor_key=TRUE)
+
+
+```
+
+```{r exp2-posteriors-plot, fig.cap = "Experiment2 likelihood by trial by game and opponent faced", fig.align ='center'}
+
+ggplot(data_long_post2,aes(x=round,y=probability,colour=strategy)) +
+  geom_line() +
+  facet_grid(game~stage)
+
+```
+
+The switching model in experiment two has also significantly higher likelihood (p-value = 0.00).  On top of indications from looking at the liklihood by trial graphs, we have therefore further evidence that participants did indeed switch their strategies as the games progressed. The posterior probability plot in Figure\ \@ref(fig:exp2-posteriors-plot) shows switching much more clearly across games ans stages, indicating a robust process. The switchign also seems to happen very early one at the beginning of each game and stage, and is also consistently in the same direction: The probability of Bayesian models with transfer being initially high, then decreasing rapidly while the posterior probability of QL-Learning with states and within transfer learning increases rapidly. 
+
+
 
 \newpage
 
@@ -719,6 +958,10 @@ Our second experimental design allows us to test whether the first explanation h
 
 Our results show that in fact, it was harder to transfer learning when facing level-2 opponents, both comparing first intractions across games and using early rounds analysis. Based on our assumptions, we conclude that the most likely explanation is that participants who are able to beat the opponent and transfer learning are likely to be explicitly modelling the opponent strategy using level-k reasoning, compared to using simple learning rules they uncovered during the ourse of learning. 
 
+Our computational modelling allowed us to delve deeper into what might be driving the observed learning transfer. Initial modelling of observations using all available data seems to indicated that the most likely model was a Q-learning type model. However, as we argued above, that would be inconsistent with the evidence for learning transfer. Breaking down likelihoods by trial and fitting a hidden markov model to the data with states being the various strategies that participants are assumes to be using, we showed evidence for within game switching of strategies. Participants start the early rounds of a new game acting in a way consistent with a Bayesian Theory of mind level, which would be accurate and generalisable but computationally expensive. However, as trials continue, participants seem to switch to a habitual type of learning (QL-models). 
+
+Why is this switching happening? We believe that participants show flexibility in their use of learning strategies. When a new game is started that is similar to a previously played game with the same opponent, participants need a way to transfer prior knowledge of the opponent and apply it to the new game in order to best respond. Adopting a Bayesian model based on ToM achieves the goal of trasnfering the opponent model and thus coming up with best responses in the early trials. However, Bayesian ToM models are computationally expensive and require a lot of higher order thinking (I think that you think that I think...). As such, as the games progresses, they become burdensome and the higher amount of historical interaction in the new game allows participants to have enough data to start using the cognitively cheaper model-free learning strategies such as Q-learning. The bias towards less computationally demanding strategies is well established @Kool_2011.  Moreover, the ability to flexibly switch is also consistent with evidence from the literature on learning strategies in humans, showing that they indeed shift between model-based and model-free learning when the environment requires it @Simon_Daw_11. 
+
 
 \newpage
 
@@ -727,18 +970,16 @@ Our results show that in fact, it was harder to transfer learning when facing le
 
 # Conclusion 
 
-Our online experiments confirm behavioural game theory results, stating that human players can deviate from Nash equilibrium play and learn to adapt to the opponent strategy and exploit it when the opponent itself is deviating from Nash equilibrium. Moreover, we showed that participants do transfer their learning to new games with varying degrees of similarity. The most likely explanation as we saw is that players build a mental representation of their opponent strategy, rather than rely on associative learning or action-based heuristics. The transfer is also moderated by the level of sophistication of the opponent, with participants showing more success in learning and transferring against opponents adopting a less sophisticated strategy. 
+Our online experiments confirm behavioural game theory results, stating that human players can deviate from Nash equilibrium play and learn to adapt to the opponent strategy and exploit it when the opponent itself is deviating from Nash equilibrium. Moreover, we showed that participants do transfer their learning to new games with varying degrees of similarity. The transfer is also moderated by the level of sophistication of the opponent, with participants showing more success in learning and transferring against opponents adopting a less sophisticated strategy. 
 
-Having said that, there remains a high degree of heterogeneity between players. There is a high positive association between players who learn to beat the sophisticated and less sophisticated opponents, indicating that some players are more able to detect the patterns in opponent play and learn how to exploit them. Moreover, the computational modelling shows that a significant number of players are still using random strategies in the games. Whether this ability depends on engagement with the experiment or on other characteristics of the learner is an open question that more research in the area would hope to answer. 
-
-
+Having said that, there remains a high degree of heterogeneity between players. There is a high positive association between players who learn to beat the sophisticated and less sophisticated opponents, indicating that some players are more able to detect the patterns in opponent play and learn how to exploit them. Moreover, the computational modelling shows that it is likely that players start each game using a model-based learning strategy that facilitates generalisation and opponent model transfer, but then switch to behvior that is consistent with a  model-free learning strategy as the experiment goes on. This is likely driven by a trade-off between computational complexity and accuracy between model based and model free strategies. 
 \newpage
 
 # References
 
 
 ```{r create_r-references}
-r_refs(file = "Mendeley.bib")
+r_refs(file = "Mendeley2.bib")
 
 ```
 
