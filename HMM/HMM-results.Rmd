@@ -1,0 +1,208 @@
+---
+title: "Strategy switching HMM analysis"
+author: "Maarten Speekenbrink"
+date: "19/04/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(depmixS4)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+source("dummy-HMM.R")
+source("Qlearn-HMM.R")
+source("ToM-HMM.R")
+```
+
+# Hidden Markov model
+
+Three strategies:
+
+- Random actions (Nash); This model has no parameters
+- Bayesian cognitive hierarchy learning (formerly known as Theory of Mind); This model has a single parameter: $0.5 \leq \alpha \leq 1$, which is the probability that the opponent is assumed to follow their cognitive hierarchy level. Participants are assumed to probability match best responses to this. 
+- Q-learning. This model has two parameters: $0 \leq \alpha \leq 1$, the learning rate, and $0 \leq \beta \leq 1000$, the temperature in the softmax response function. 
+
+We fitted two versions: 
+
+- a model which allows for strategy swtiches within a game. This model also estimates the starting probability for each strategy (2 parameters) and the transition probabilities between states (6 free parameters)
+- a restricted versions without switches, which assumes that within a game, a single strategy is used. This model doesn't estimate transition probabilities, and just uses two free parameters to estimate the initial state probabilities. 
+
+We fitted the models to all participants (assuming the model parameters are identical over participants), and for each participant separately. The latter allows parameters to differ between participants (which is good) but it may also be prone to overfitting (which is bad). Estimation was done using the `donlp2` numerical optimization routine. 
+
+# Results
+
+## Experiment 1
+
+The switching model for all participants:
+```{r}
+load("newHMMs-exp1.RData")
+summary(fmod_all)
+```
+The non-switching model for all participants:
+```{r}
+summary(fmod_all_noswitch)
+```
+
+The switching model had a BIC of `r prettyNum(BIC(fmod_all))`, whilst the no-switching version had a BIC of `r prettyNum(BIC(fmod_all_noswitch))`, meaning the former fitted better. This is thus evidence for within-game switching.
+
+```{r}
+dat <- read.csv("../data20180719.csv")
+tmp <- forwardbackward(fmod_all)
+dat$pS1 <- tmp$gamma[,1]
+dat$pS2 <- tmp$gamma[,2]
+dat$pS3 <- tmp$gamma[,3]
+dat %>%
+  dplyr::select(human_id, condition, game, round, pS1, pS2, pS3) %>%
+  group_by(human_id, condition, game, round) %>%
+  pivot_longer(cols=starts_with("pS"), names_to = "strategy", values_to = "probability") %>%
+  group_by(strategy, condition, game, round) %>%
+  summarise(p = mean(probability)) %>%
+  mutate(strategy = recode_factor(strategy, pS1 = "Nash", pS2 = "BCH", pS3 = "Q")) %>%
+  mutate(game = factor(game, levels = c("rps","fwg","numbers"))) %>%
+  ggplot(aes(x=round, y = p, group=strategy, colour=strategy)) + geom_line() + facet_wrap(condition~game) + ylab("probability")
+```
+
+Individual models
+
+```{r}
+res <- data.frame()
+for(i in 1:length(fmod_ind)) {
+  pars <- getpars(fmod_ind[[i]])[13:15]
+  tab <- table(posterior(fmod_ind[[i]])[,1])
+  res <- rbind(res,
+               data.frame(id=i, BCH_alpha = pars[1], Q_alpha = pars[2], Q_beta = pars[3], n_S1 = as.numeric(tab["1"]), n_S2 = as.numeric(tab["2"]), n_S3 = as.numeric(tab["3"]), AIC = as.numeric(-2*logLik(fmod_ind[[i]]) + 2*11), BIC = as.numeric(-2*logLik(fmod_ind[[i]]) + 11*log(150))))
+}
+res_ind <- res
+
+res <- data.frame()
+for(i in 1:length(fmod_ind_noswitch)) {
+  pars <- getpars(fmod_ind_noswitch[[i]])[13:15]
+  tab <- table(posterior(fmod_ind_noswitch[[i]])[,1])
+  res <- rbind(res,
+               data.frame(id=i, BCH_alpha = pars[1], Q_alpha = pars[2], Q_beta = pars[3], n_S1 = as.numeric(tab["1"]), n_S2 = as.numeric(tab["2"]), n_S3 = as.numeric(tab["3"]), AIC = as.numeric(-2*logLik(fmod_ind_noswitch[[i]]) + 2*5), BIC = as.numeric(-2*logLik(fmod_ind_noswitch[[i]]) + 5*log(150))))
+}
+res_ind_noswitch <- res
+```
+
+According to the BIC, the switching version fitted better than the no switching version for `r sum(res_ind$BIC < res_ind_noswitch$BIC)` out of `r nrow(res_ind)` participants. According to the AIC, the switching version fitted better than the no switching version for `r sum(res_ind$AIC < res_ind_noswitch$AIC)` out of `r nrow(res_ind)` participants. On an individual level, the six additional parameters required to model the state transitions are thus not entirely justified, which is unsurprising, given the relatively little number of observations and expected switches.
+
+```{r}
+ind_states <- data.frame()
+for(i in 1:length(fmod_ind)) {
+  tmp <- forwardbackward(fmod_ind[[i]])
+  tdat <- data.frame(pS1 = tmp$gamma[,1],
+                     pS2 = tmp$gamma[,2],
+                     pS3 = tmp$gamma[,3])
+  ind_states <- rbind(ind_states,tdat)
+}
+ind_states <- cbind(dplyr::select(dat,human_id, condition, game, round),ind_states)
+ind_states %>%
+  dplyr::select(human_id, condition, game, round, pS1, pS2, pS3) %>%
+  group_by(human_id, condition, game, round) %>%
+  pivot_longer(cols=starts_with("pS"), names_to = "strategy", values_to = "probability") %>%
+  group_by(strategy, condition, game, round) %>%
+  summarise(p = mean(probability)) %>%
+  mutate(strategy = recode_factor(strategy, pS1 = "Nash", pS2 = "BCH", pS3 = "Q")) %>%
+  mutate(game = factor(game, levels = c("rps","fwg","numbers"))) %>%
+  ggplot(aes(x=round, y = p, group=strategy, colour=strategy)) + geom_line() + facet_wrap(condition~game) + ylab("probability")
+```
+
+Parameter estimates
+
+```{r}
+res_ind %>%
+  mutate(condition = filter(dat, round == 1 & game == "rps")$condition) %>%
+  group_by(id,condition) %>%
+  pivot_longer(cols=c("BCH_alpha", "Q_alpha", "Q_beta"), names_to = "parameter", values_to = "estimate") %>%
+  ggplot(aes(x=estimate)) + geom_histogram(bins=20) + facet_grid(condition ~ parameter, scales = "free")
+
+```
+
+## Experiment 2
+
+The switching model for all participants:
+```{r}
+load("newHMMs-exp2.RData")
+summary(fmod_all)
+```
+The non-switching model for all participants:
+```{r}
+summary(fmod_all_noswitch)
+```
+
+The switching model had a BIC of `r prettyNum(BIC(fmod_all))`, whilst the no-switching version had a BIC of `r prettyNum(BIC(fmod_all_noswitch))`, meaning the former fitted better. This is thus evidence for within-game switching.
+
+```{r}
+dat <- read.csv("../Experiment_2/MyData.csv")
+dat$round <- 1:60
+tmp <- forwardbackward(fmod_all)
+dat$pS1 <- tmp$gamma[,1]
+dat$pS2 <- tmp$gamma[,2]
+dat$pS3 <- tmp$gamma[,3]
+dat %>%
+  dplyr::select(human_id, condition, game, round, pS1, pS2, pS3) %>%
+  group_by(human_id, condition, game, round) %>%
+  pivot_longer(cols=starts_with("pS"), names_to = "strategy", values_to = "probability") %>%
+  group_by(strategy, condition, game, round) %>%
+  summarise(p = mean(probability)) %>%
+  mutate(strategy = recode_factor(strategy, pS1 = "Nash", pS2 = "BCH", pS3 = "Q")) %>%
+  mutate(game = factor(game, levels = c("rps","fwg","shootout"))) %>%
+  ggplot(aes(x=round, y = p, group=strategy, colour=strategy)) + geom_line() + facet_wrap(condition~game) + ylab("probability")
+```
+
+Individual models
+
+```{r}
+res <- data.frame()
+for(i in 1:length(fmod_ind)) {
+  pars <- getpars(fmod_ind[[i]])[13:15]
+  tab <- table(posterior(fmod_ind[[i]])[,1])
+  res <- rbind(res,
+               data.frame(id=i, BCH_alpha = pars[1], Q_alpha = pars[2], Q_beta = pars[3], n_S1 = as.numeric(tab["1"]), n_S2 = as.numeric(tab["2"]), n_S3 = as.numeric(tab["3"]), AIC = as.numeric(-2*logLik(fmod_ind[[i]]) + 2*11), BIC = as.numeric(-2*logLik(fmod_ind[[i]]) + 11*log(180))))
+}
+res_ind <- res
+
+res <- data.frame()
+for(i in 1:length(fmod_ind_noswitch)) {
+  pars <- getpars(fmod_ind_noswitch[[i]])[13:15]
+  tab <- table(posterior(fmod_ind_noswitch[[i]])[,1])
+  res <- rbind(res,
+               data.frame(id=i, BCH_alpha = pars[1], Q_alpha = pars[2], Q_beta = pars[3], n_S1 = as.numeric(tab["1"]), n_S2 = as.numeric(tab["2"]), n_S3 = as.numeric(tab["3"]), AIC = as.numeric(-2*logLik(fmod_ind_noswitch[[i]]) + 2*5), BIC = as.numeric(-2*logLik(fmod_ind_noswitch[[i]]) + 5*log(180))))
+}
+res_ind_noswitch <- res
+```
+
+According to the BIC, the switching version fitted better than the no switching version for `r sum(res_ind$BIC < res_ind_noswitch$BIC)` out of `r nrow(res_ind)` participants. According to the AIC, the switching version fitted better than the no switching version for `r sum(res_ind$AIC < res_ind_noswitch$AIC)` out of `r nrow(res_ind)` participants. On an individual level, the six additional parameters required to model the state transitions are thus not entirely justified, which is unsurprising, given the relatively little number of observations and expected switches.
+
+```{r}
+ind_states <- data.frame()
+for(i in 1:length(fmod_ind)) {
+  tmp <- forwardbackward(fmod_ind[[i]])
+  tdat <- data.frame(pS1 = tmp$gamma[,1],
+                     pS2 = tmp$gamma[,2],
+                     pS3 = tmp$gamma[,3])
+  ind_states <- rbind(ind_states,tdat)
+}
+ind_states <- cbind(dplyr::select(dat,human_id, condition, game, round),ind_states)
+ind_states %>%
+  dplyr::select(human_id, condition, game, round, pS1, pS2, pS3) %>%
+  group_by(human_id, condition, game, round) %>%
+  pivot_longer(cols=starts_with("pS"), names_to = "strategy", values_to = "probability") %>%
+  group_by(strategy, condition, game, round) %>%
+  summarise(p = mean(probability)) %>%
+  mutate(strategy = recode_factor(strategy, pS1 = "Nash", pS2 = "BCH", pS3 = "Q")) %>%
+  mutate(game = factor(game, levels = c("rps","fwg","shootout"))) %>%
+  ggplot(aes(x=round, y = p, group=strategy, colour=strategy)) + geom_line() + facet_wrap(condition~game) + ylab("probability")
+```
+
+Parameter estimates
+
+```{r}
+res_ind %>%
+  mutate(condition = filter(dat, round == 1 & game == "rps")$condition) %>%
+  group_by(id,condition) %>%
+  pivot_longer(cols=c("BCH_alpha", "Q_alpha", "Q_beta"), names_to = "parameter", values_to = "estimate") %>%
+  ggplot(aes(x=estimate)) + geom_histogram(bins=20) + facet_grid(condition ~ parameter, scales = "free")
+```

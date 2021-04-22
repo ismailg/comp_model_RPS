@@ -1,51 +1,58 @@
 library(depmixS4)
 
 setClass(
-  "ToM",
+  "Qlearn",
   representation(
+    reward = "numeric",
+    state = "numeric",
     act = "numeric",
-    opp_act = "numeric",
-    pred = "array", # nT * nA * nS 
-    n_act = "numeric", # for each trial
+    act_mask = "matrix",
+    opponent_id = "numeric",
     nS = "numeric",
-    nA = "numeric", # max n(act)
+    nA = "numeric",
+    nO = "numeric",
     ntimes = "numeric"
   ),
   prototype(
+    reward = 1,
+    state = 1,
     act = 1,
-    opp_act = 1,
-    pred = array(1.0, dim=c(1,1,1)),
-    n_act = 1,
+    act_mask = matrix(1),
+    opponent_id = 1,
     nS = 1,
     nA = 1,
+    nO = 1,
     ntimes = 1
   ),
   contains = "response"
 )
 
-setGeneric("ToM", function(act,
-                           opp_act,
-                           pred,
-                           n_act,
-                           data = NULL,
-                           ntimes = NULL,
-                           pstart = NULL,
-                           fixed = NULL,
-                           ...)
-  standardGeneric("ToM"))
+setGeneric("Qlearn", function(reward,
+                              state,
+                              act,
+                              act_mask,
+                              opponent_id,
+                              data = NULL,
+                              ntimes = NULL,
+                              pstart = NULL,
+                              fixed = NULL,
+                              ...)
+  standardGeneric("Qlearn"))
 
-setMethod("ToM",
+setMethod("Qlearn",
           signature(
+            reward = "numeric",
+            state = "numeric",
             act = "numeric",
-            opp_act = "numeric",
-            pred = "array",
-            n_act = "numeric",
+            act_mask = "matrix",
+            opponent_id = "numeric",
             ntimes = "numeric"
           ),
-          function(act,
-                   opp_act,
-                   pred,
-                   n_act,
+          function(reward,
+                   state,
+                   act,
+                   act_mask,
+                   opponent_id,
                    data = NULL,
                    ntimes = NULL,
                    pstart = NULL,
@@ -53,13 +60,16 @@ setMethod("ToM",
                    prob = TRUE,
                    na.action = "na.pass",
                    ...) {
-            if (!all.equal(length(act), length(opp_act), length(n_act), dim(pred)[1]))
+            if (!all.equal(length(reward), length(state), length(act), nrow(act_mask), length(opponent_id)))
               stop("unequal length of data")
             
-            nT <- length(act)
-            nS <- dim(pred)[3]
-            nA <- dim(pred)[2]
-        
+            nT <- length(reward)
+            nS <- max(state, na.rm = TRUE)
+            nA <- max(act)
+            nO <- max(opponent_id)
+            
+            #Q <- array(0.0, dim = c(nT, nS, nA))
+            
             if (!is.null(ntimes)) {
               if (sum(ntimes) != nT)
                 stop("invalid ntimes; sum of ntimes should equal total number of observations")
@@ -67,7 +77,7 @@ setMethod("ToM",
               ntimes = nT
             }
             
-            parameters <- list(alpha = .1)
+            parameters <- list(alpha = .1, beta = 1)
             constr <- NULL
             
             npar <- length(unlist(parameters))
@@ -78,22 +88,26 @@ setMethod("ToM",
               if (length(pstart) != npar)
                 stop("length of 'pstart' must be", npar)
               parameters$alpha <- pstart[1]
+              parameters$beta <- pstart[2]
             } else {
               # do nothing
             }
             mod <-
               new(
-                "ToM",
+                "Qlearn",
+                #formula = ~ 1,
                 parameters = parameters,
                 fixed = fixed,
                 x = matrix(1),
                 y = matrix(1),
+                reward = reward,
+                state = state,
                 act = act,
-                opp_act = opp_act,
-                pred = pred,
-                n_act = n_act,
+                act_mask = act_mask,
+                opponent_id = opponent_id,
                 nS = nS,
                 nA = nA,
+                nO = nO,
                 npar = npar,
                 ntimes = ntimes,
                 constr = constr
@@ -101,7 +115,7 @@ setMethod("ToM",
             mod
           })
 
-setMethod("setpars", "ToM",
+setMethod("setpars", "Qlearn",
           function(object,
                    values,
                    which = "pars",
@@ -117,6 +131,7 @@ setMethod("setpars", "ToM",
             switch(which,
                    "pars" = {
                      object@parameters$alpha <- values[1]
+                     object@parameters$beta <- values[2]
                    },
                    "fixed" = {
                      object@fixed <- as.logical(values)
@@ -125,7 +140,7 @@ setMethod("setpars", "ToM",
             return(object)
           })
 
-setMethod("getpars", "ToM",
+setMethod("getpars", "Qlearn",
           function(object, which = "pars", ...) {
             switch(which,
                    "pars" = {
@@ -137,33 +152,36 @@ setMethod("getpars", "ToM",
             return(pars)
           })
 
-setMethod("fit", "ToM",
+setMethod("fit", "Qlearn",
           function(object, w) {
             if (missing(w))
               w <- NULL
             pars <- object@parameters
-            # start <- c(gtools::logit(pars$alpha))
-            #fit <- optim(start,
-            #        fn = ToM.logLik,
-            #        object = object,
-            #        w = w)
-            #pars$alpha <- gtools::inv.logit(fit$par[1])
-            pars$alpha <- optimise(ToM.logLik, interval=c(.5,1), object = object, w = w)$minimum
+            start <-
+              c(gtools::logit(pars$alpha),
+                gtools::logit(pars$beta, max = 10))
+            fit <-
+              optim(start,
+                    fn = Qlearn.logLik,
+                    object = object,
+                    w = w)
+            pars$alpha <- gtools::inv.logit(fit$par[1])
+            pars$beta <- gtools::inv.logit(fit$par[2])
             object <- setpars(object, unlist(pars))
             object
           })
 
-ToM.logLik <- function(par, object, w) {
-  #obj <-
-  #  setpars(object, c(gtools::inv.logit(par[1])))
-  obj <- setpars(object, par[1])
+Qlearn.logLik <- function(par, object, w) {
+  obj <-
+    setpars(object, c(gtools::inv.logit(par[1]), gtools::inv.logit(par[2], max =
+                                                                     10)))
   if (!is.null(w))
     return(-2 * sum(w * dens(obj, log = TRUE)))
   else
     return(-2 * sum(dens(obj, log = TRUE)))
 }
 
-setMethod("dens", "ToM",
+setMethod("dens", "Qlearn",
           function(object, log = FALSE) {
             pred <- depmixS4::predict(object)
             p <- pred[cbind(1:nrow(pred), object@act)]
@@ -173,43 +191,37 @@ setMethod("dens", "ToM",
             p
           })
 
-setMethod("logLik", "ToM",
+setMethod("logLik", "Qlearn",
           function(object) {
             sum(dens(object, log = TRUE))
           })
 
-setMethod("predict", "ToM",
+setMethod("predict", "Qlearn",
           function(object) {
             lt <- length(object@ntimes)
             et <- cumsum(object@ntimes)
             bt <- c(1, et[-lt] + 1)
             
             nT <- et[lt]
-            predict <- matrix(0.0, nrow=nT, ncol=object@nA)
-            post <- lik <- matrix(0.0, nrow=nT, ncol=object@nS)
-            for(i in 1:object@nS) {
-              lik[,i] <- object@pred[,,i][cbind(1:nT,object@opp_act)]
-            }
-            lik <- object@parameters$alpha*lik + (1-object@parameters$alpha)*(1/object@n_act)
+            pred <- matrix(0.0, nrow=nT, ncol=object@nA)
             
-            prior <- rep(1,object@nS) # prior alpha for dirichlet on p(level)
-            prior <- prior/sum(prior)
             for (id in 1:lt) {
-              #lik <- object@parameters$alpha*lik[bt[id]:et[id],] + (1-object@parameters$alpha)*(1/object@n_act)
-              
-              for(s in 1:object@nS) {
-                lik[bt[id]:et[id],s] <- dplyr::lag(log(prior[s]) + cumsum(log(lik[bt[id]:et[id],s])),default=log(prior[s]))
+              Q <- array(0.0, dim = c(object@nA, object@nS, object@nO))
+              for (t in bt[id]:et[id]) {
+                # prob of action
+                if (is.na(object@state[t])) {
+                  pred[t, as.logical(object@act_mask[t, ])] <- 1 / sum(object@act_mask[t, ])
+                } else {
+                  pred[t, as.logical(object@act_mask[t, ])] <-
+                    exp(Q[as.logical(object@act_mask[t, ]), object@state[t], object@opponent_id[t]] / object@parameters$beta) /
+                    sum(exp(Q[as.logical(object@act_mask[t, ]), object@state[t], object@opponent_id[t]] / object@parameters$beta))
+                }
+                # update Q
+                if (!is.na(object@state[t])) {
+                  Q[object@act[t], object@state[t], object@opponent_id[t]] <-
+                    Q[object@act[t], object@state[t], object@opponent_id[t]] + object@parameters$alpha * (object@reward[t] - Q[object@act[t], object@state[t], object@opponent_id[t]])
+                }
               }
-              min <- apply(lik[bt[id]:et[id],],1,min)
-              lik[bt[id]:et[id],] <- exp(lik[bt[id]:et[id],] - min)
-              lik[bt[id]:et[id],] <- lik[bt[id]:et[id],]/rowSums(lik[bt[id]:et[id],])
-              post[bt[id]:et[id],] <- lik[bt[id]:et[id],] # prior predictive
             }
-            for(a in 1:object@nA) {
-              predict[,a] <- rowSums(post*(object@parameters$alpha*object@pred[,a,] + (1-object@parameters$alpha)*(1/object@n_act)))
-            }
-            ### THIS IS A HACK TO GET BEST RESPONSE; SHOULD BE MORE GENERAL SOLUTION
-            predict[object@n_act != 5,] <- predict[object@n_act != 5,c(3,1,2,4,5)]
-            predict[object@n_act == 5,] <- predict[object@n_act == 5,c(5,1,2,3,4)]
-            return(predict)
+            return(pred)
           })

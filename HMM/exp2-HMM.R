@@ -1,144 +1,112 @@
 library(dplyr)
 library(depmixS4)
-source("HMM/Qlearn-HMM.R")
-source("HMM/ToM-HMM.R")
+source("HMM/Qlearn-HMM-exp2.R")
+source("HMM/ToM-HMM-exp2.R")
 source("HMM/dummy-HMM.R")
 
-dat <- read.csv("data20180719.csv")
+dat <- read.csv("Experiment_2/MyData.csv")
 
 dat <- as_tibble(dat) %>% group_by(human_id,game)
 dat <- dat %>%
   mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1)) %>%
-    mutate(state = interaction(ai_action_prev,human_action_prev))
+  mutate(state = interaction(ai_action_prev,human_action_prev))
 dat <- dat %>% mutate(pred_a1_level0 = case_when(
   game == "rps" & ai_action_prev == "rock" ~ 1,
   game == "fwg" & ai_action_prev == "fire" ~ 1,
-  game == "numbers" & ai_action_prev == "one" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "left" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a2_level0 = case_when(
   game == "rps" & ai_action_prev == "paper" ~ 1,
   game == "fwg" & ai_action_prev == "water" ~ 1,
-  game == "numbers" & ai_action_prev == "two" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "center" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a3_level0 = case_when(
   game == "rps" & ai_action_prev == "scissors" ~ 1,
   game == "fwg" & ai_action_prev == "grass" ~ 1,
-  game == "numbers" & ai_action_prev == "three" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "right" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
-  !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a4_level0 = case_when(
-  game == "numbers" & ai_action_prev == "four" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
-  !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a5_level0 = case_when(
-  game == "numbers" & ai_action_prev == "five" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
   !is.na(ai_action_prev) ~ 0))
 
 ## level 1 predictions
 dat <- dat %>% mutate(pred_a1_level1 = case_when(
   game == "rps" & human_action_prev == "scissors" ~ 1,
   game == "fwg" & human_action_prev == "grass" ~ 1,
-  game == "numbers" & human_action_prev == "five" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & human_action_prev == "left" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a2_level1 = case_when(
   game == "rps" & human_action_prev == "rock" ~ 1,
   game == "fwg" & human_action_prev == "fire" ~ 1,
-  game == "numbers" & human_action_prev == "one" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & human_action_prev == "center" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a3_level1 = case_when(
   game == "rps" & human_action_prev == "paper" ~ 1,
   game == "fwg" & human_action_prev == "water" ~ 1,
-  game == "numbers" & ai_action_prev == "two" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & human_action_prev == "right" ~ 1,
   is.na(ai_action_prev) ~ 1/3,
-  !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a4_level1 = case_when(
-  game == "numbers" & ai_action_prev == "three" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
-  !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a5_level1 = case_when(
-  game == "numbers" & ai_action_prev == "four" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
   !is.na(ai_action_prev) ~ 0))
 
 ## level 2 predictions
 dat <- dat %>% mutate(pred_a1_level2 = case_when(
   game == "rps" & ai_action_prev == "paper" ~ 1,
   game == "fwg" & ai_action_prev == "water" ~ 1,
-  game == "numbers" & ai_action_prev == "four" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "left" ~ 1/2,
+  game == "shootout" & ai_action_prev == "right" ~ 1/2,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a2_level2 = case_when(
   game == "rps" & ai_action_prev == "scissors" ~ 1,
   game == "fwg" & ai_action_prev == "grass" ~ 1,
-  game == "numbers" & ai_action_prev == "five" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "left" ~ 1/2,
+  game == "shootout" & ai_action_prev == "right" ~ 1/2,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
 dat <- dat %>% mutate(pred_a3_level2 = case_when(
   game == "rps" & ai_action_prev == "rock" ~ 1,
   game == "fwg" & ai_action_prev == "fire" ~ 1,
-  game == "numbers" & ai_action_prev == "one" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  game == "shootout" & ai_action_prev == "left" ~ 1/2,
+  game == "shootout" & ai_action_prev == "right" ~ 1/2,
   is.na(ai_action_prev) ~ 1/3,
   !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a4_level2 = case_when(
-  game == "numbers" & ai_action_prev == "two" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
-  !is.na(ai_action_prev) ~ 0))
-dat <- dat %>% mutate(pred_a5_level2 = case_when(
-  game == "numbers" & ai_action_prev == "three" ~ 1,
-  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
-  !is.na(ai_action_prev) ~ 0))
+
 
 # vars for Qlearn
 reward <- as.numeric(dat$winner == "human")
 reward[dat$winner == "ai"] <- -1
 state <- as.numeric(dat$state)
-act <- as.numeric(factor(dat$human_action,levels=c("rock","paper","scissors","fire","water","grass","one","two","three","four","five")))
-act_mask <- matrix(0,nrow=nrow(dat),ncol=3+3+5)
+act <- as.numeric(factor(dat$human_action,levels=c("rock","paper","scissors","fire","water","grass","left","center","right")))
+act_mask <- matrix(0,nrow=nrow(dat),ncol=3+3+3)
 act_mask[dat$game == "rps",1:3] <- 1
 act_mask[dat$game == "fwg",4:6] <- 1
-act_mask[dat$game == "numbers",7:11] <- 1
+act_mask[dat$game == "shootout",7:9] <- 1
+
+opponent_id <- dplyr::recode(dat$round_condition, Level1 = 1, Level2 = 2)
+game_id <- dplyr::recode(dat$game, rps = 1, fwg = 2, shootout = 3)
+
 
 # vars to ToM
-dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
-dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
+dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
 act_num <- dat$human_action_num
 opp_act_num <- dat$ai_action_num
-pred <- array(0.0,dim=c(nrow(dat),5,3))
+pred <- array(0.0,dim=c(nrow(dat),3,3))
 pred[,1,1] <- dat$pred_a1_level0
 pred[,2,1] <- dat$pred_a2_level0
 pred[,3,1] <- dat$pred_a3_level0
-pred[,4,1] <- dat$pred_a4_level0
-pred[,5,1] <- dat$pred_a5_level0
 pred[,1,2] <- dat$pred_a1_level1
 pred[,2,2] <- dat$pred_a2_level1
 pred[,3,2] <- dat$pred_a3_level1
-pred[,4,2] <- dat$pred_a4_level1
-pred[,5,2] <- dat$pred_a5_level1
 pred[,1,3] <- dat$pred_a1_level2
 pred[,2,3] <- dat$pred_a2_level2
 pred[,3,3] <- dat$pred_a3_level2
-pred[,4,3] <- dat$pred_a4_level2
-pred[,5,3] <- dat$pred_a5_level2
-n_act <- 3*(dat$game != "numbers") + 5*(dat$game == "numbers")
-
+n_act <- 3
 
 nsubject <- length(unique(dat$human_id)) # number of participants
 ngame <- 3 # number of games
-ntrial <- c(50,50,50) # number of trials in each game
+ntrial <- c(60,60,60) # number of trials in each game
 
 
 rModels <- list(
@@ -146,10 +114,10 @@ rModels <- list(
     dummyResponse(1/n_act)
   ),
   list(
-    ToM(act = act_num, opp_act = opp_act_num, pred = pred, n_act = n_act, ntimes=rep(sum(ntrial),nsubject))
+    ToM(act = act_num, opp_act = opp_act_num, pred = pred, n_act = n_act, opponent_id = opponent_id, game_id = game_id, ntimes=rep(sum(ntrial),nsubject))
   ),
   list(
-    Qlearn(reward = reward, state = state, act = act, act_mask = act_mask, ntimes=rep(sum(ntrial),nsubject))
+    Qlearn(reward = reward, state = state, act = act, act_mask = act_mask, opponent_id = opponent_id, ntimes=rep(sum(ntrial),nsubject))
   )
 )
 
@@ -164,7 +132,7 @@ inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),da
 
 mod <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
 
-# fmod <- fit(mod, emcontrol=em.control(random.start=FALSE))
+#fmod <- fit(mod, emcontrol=em.control(random.start=FALSE))
 
 conr <- matrix(0,nrow=3,ncol=15)
 conr[1,13] <- 1
@@ -197,7 +165,7 @@ fixed <- c(rep(FALSE,3),rep(TRUE,9),rep(FALSE,3))
 mod_noswitch <- setpars(mod,pars)
 fmod_all_noswitch <- fit(mod_noswitch, method="donlp",conrows=conr,conrows.lower=conr.l,conrows.upper=conr.u, fixed=fixed)
 
-save(fmod_all,fmod_all_noswitch, file="newHMMs-exp1.RData")
+save(fmod_all,fmod_all_noswitch, file="HMM/newHMMs-exp2.RData")
 
 fmod_ind <- list()
 fmod_ind_noswitch <- list()
@@ -211,48 +179,47 @@ for(id in unique(dat_save$human_id)) {
   reward <- as.numeric(dat$winner == "human")
   reward[dat$winner == "ai"] <- -1
   state <- as.numeric(dat$state)
-  act <- as.numeric(factor(dat$human_action,levels=c("rock","paper","scissors","fire","water","grass","one","two","three","four","five")))
-  act_mask <- matrix(0,nrow=nrow(dat),ncol=3+3+5)
+  act <- as.numeric(factor(dat$human_action,levels=c("rock","paper","scissors","fire","water","grass","left","center","right")))
+  act_mask <- matrix(0,nrow=nrow(dat),ncol=3+3+3)
   act_mask[dat$game == "rps",1:3] <- 1
   act_mask[dat$game == "fwg",4:6] <- 1
-  act_mask[dat$game == "numbers",7:11] <- 1
+  act_mask[dat$game == "shootout",7:9] <- 1
+  
+  opponent_id <- dplyr::recode(dat$round_condition, Level1 = 1, Level2 = 2)
+  game_id <- dplyr::recode(dat$game, rps = 1, fwg = 2, shootout = 3)
+  
   
   # vars to ToM
-  dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
-  dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+  dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
+  dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "left" = 1, "center" = 2, "right" = 3)
   act_num <- dat$human_action_num
   opp_act_num <- dat$ai_action_num
-  pred <- array(0.0,dim=c(nrow(dat),5,3))
+  pred <- array(0.0,dim=c(nrow(dat),3,3))
   pred[,1,1] <- dat$pred_a1_level0
   pred[,2,1] <- dat$pred_a2_level0
   pred[,3,1] <- dat$pred_a3_level0
-  pred[,4,1] <- dat$pred_a4_level0
-  pred[,5,1] <- dat$pred_a5_level0
   pred[,1,2] <- dat$pred_a1_level1
   pred[,2,2] <- dat$pred_a2_level1
   pred[,3,2] <- dat$pred_a3_level1
-  pred[,4,2] <- dat$pred_a4_level1
-  pred[,5,2] <- dat$pred_a5_level1
   pred[,1,3] <- dat$pred_a1_level2
   pred[,2,3] <- dat$pred_a2_level2
   pred[,3,3] <- dat$pred_a3_level2
-  pred[,4,3] <- dat$pred_a4_level2
-  pred[,5,3] <- dat$pred_a5_level2
-  n_act <- 3*(dat$game != "numbers") + 5*(dat$game == "numbers")
+  n_act <- 3
   
   nsubject <- length(unique(dat$human_id)) # number of participants
   ngame <- 3 # number of games
-  ntrial <- c(50,50,50) # number of trials in each game
+  ntrial <- c(60,60,60) # number of trials in each game
+  
   
   rModels <- list(
     list(
       dummyResponse(1/n_act)
     ),
     list(
-      ToM(act = act_num, opp_act = opp_act_num, pred = pred, n_act = n_act, ntimes=rep(sum(ntrial),nsubject))
+      ToM(act = act_num, opp_act = opp_act_num, pred = pred, n_act = n_act, opponent_id = opponent_id, game_id = game_id, ntimes=rep(sum(ntrial),nsubject))
     ),
     list(
-      Qlearn(reward = reward, state = state, act = act, act_mask = act_mask, ntimes=rep(sum(ntrial),nsubject))
+      Qlearn(reward = reward, state = state, act = act, act_mask = act_mask, opponent_id = opponent_id, ntimes=rep(sum(ntrial),nsubject))
     )
   )
   
@@ -266,8 +233,6 @@ for(id in unique(dat_save$human_id)) {
   inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),data=data.frame(rep(1,nsubject*ngame)))
   
   mod <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
-  
-  # fmod <- fit(mod, emcontrol=em.control(random.start=FALSE))
   
   conr <- matrix(0,nrow=3,ncol=15)
   conr[1,13] <- 1
@@ -301,5 +266,5 @@ for(id in unique(dat_save$human_id)) {
   
   cat(id, "done\n")
   
-  save(fmod_all, fmod_all_noswitch, fmod_ind, fmod_ind_noswitch, file="newHMMs-exp1.RData")
+  save(fmod_all, fmod_all_noswitch, fmod_ind, fmod_ind_noswitch, file="HMM/newHMMs-exp2.RData")
 }

@@ -193,18 +193,18 @@ setMethod("predict", "Qlearn",
             bt <- c(1, et[-lt] + 1)
             
             nT <- et[lt]
-            pred <- matrix(1.0, nrow=nT, ncol=object@nA)
+            pred <- matrix(0.0, nrow=nT, ncol=object@nA)
             
             for (id in 1:lt) {
               Q <- array(0.0, dim = c(object@nA, object@nS))
               for (t in bt[id]:et[id]) {
                 # prob of action
                 if (is.na(object@state[t])) {
-                  pred[t, object@act_mask[t, ]] <- 1 / sum(object@act_mask[t, ])
+                  pred[t, as.logical(object@act_mask[t, ])] <- 1 / sum(object@act_mask[t, ])
                 } else {
-                  pred[t, object@act_mask[t, ]] <-
-                    exp(Q[object@act_mask[t, ], object@state[t]] / object@parameters$beta) /
-                    sum(exp(Q[object@act_mask[t, ], object@state[t]] / object@parameters$beta))
+                  pred[t, as.logical(object@act_mask[t, ])] <-
+                    exp(Q[as.logical(object@act_mask[t, ]), object@state[t]] / object@parameters$beta) /
+                    sum(exp(Q[as.logical(object@act_mask[t, ]), object@state[t]] / object@parameters$beta))
                 }
                 # update Q
                 if (!is.na(object@state[t])) {

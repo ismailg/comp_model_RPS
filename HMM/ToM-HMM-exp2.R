@@ -7,8 +7,11 @@ setClass(
     opp_act = "numeric",
     pred = "array", # nT * nA * nS 
     n_act = "numeric", # for each trial
+    opponent_id = "numeric",
+    game_id = "numeric",
     nS = "numeric",
     nA = "numeric", # max n(act)
+    nO = "numeric",
     ntimes = "numeric"
   ),
   prototype(
@@ -16,8 +19,11 @@ setClass(
     opp_act = 1,
     pred = array(1.0, dim=c(1,1,1)),
     n_act = 1,
+    opponent_id = 1,
+    game_id = 1,
     nS = 1,
     nA = 1,
+    nO = 1,
     ntimes = 1
   ),
   contains = "response"
@@ -27,6 +33,8 @@ setGeneric("ToM", function(act,
                            opp_act,
                            pred,
                            n_act,
+                           opponent_id,
+                           game_id,
                            data = NULL,
                            ntimes = NULL,
                            pstart = NULL,
@@ -40,12 +48,16 @@ setMethod("ToM",
             opp_act = "numeric",
             pred = "array",
             n_act = "numeric",
+            opponent_id = "numeric",
+            game_id = "numeric",
             ntimes = "numeric"
           ),
           function(act,
                    opp_act,
                    pred,
                    n_act,
+                   opponent_id,
+                   game_id,
                    data = NULL,
                    ntimes = NULL,
                    pstart = NULL,
@@ -53,12 +65,13 @@ setMethod("ToM",
                    prob = TRUE,
                    na.action = "na.pass",
                    ...) {
-            if (!all.equal(length(act), length(opp_act), length(n_act), dim(pred)[1]))
+            if (!all.equal(length(act), length(opp_act), length(n_act), dim(pred)[1], length(opponent_id)))
               stop("unequal length of data")
             
             nT <- length(act)
             nS <- dim(pred)[3]
             nA <- dim(pred)[2]
+            nO <- max(opponent_id)
         
             if (!is.null(ntimes)) {
               if (sum(ntimes) != nT)
@@ -92,8 +105,11 @@ setMethod("ToM",
                 opp_act = opp_act,
                 pred = pred,
                 n_act = n_act,
+                opponent_id = opponent_id,
+                game_id = game_id,
                 nS = nS,
                 nA = nA,
+                nO = nO,
                 npar = npar,
                 ntimes = ntimes,
                 constr = constr
@@ -186,6 +202,7 @@ setMethod("predict", "ToM",
             
             nT <- et[lt]
             predict <- matrix(0.0, nrow=nT, ncol=object@nA)
+            
             post <- lik <- matrix(0.0, nrow=nT, ncol=object@nS)
             for(i in 1:object@nS) {
               lik[,i] <- object@pred[,,i][cbind(1:nT,object@opp_act)]
@@ -197,19 +214,23 @@ setMethod("predict", "ToM",
             for (id in 1:lt) {
               #lik <- object@parameters$alpha*lik[bt[id]:et[id],] + (1-object@parameters$alpha)*(1/object@n_act)
               
-              for(s in 1:object@nS) {
-                lik[bt[id]:et[id],s] <- dplyr::lag(log(prior[s]) + cumsum(log(lik[bt[id]:et[id],s])),default=log(prior[s]))
+              for(o_id in unique(object@opponent_id)) {
+                for(s in 1:object@nS) {
+                  lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],s] <- dplyr::lag(log(prior[s]) + cumsum(log(lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],s])),default=log(prior[s]))
+                }
+                min <- apply(lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],],1,min)
+                lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],] <- exp(lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],] - min)
+                lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],] <- lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],]/rowSums(lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],])
+                post[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],] <- lik[(bt[id]:et[id])[object@opponent_id[bt[id]:et[id]] == o_id],] # prior predictive
               }
-              min <- apply(lik[bt[id]:et[id],],1,min)
-              lik[bt[id]:et[id],] <- exp(lik[bt[id]:et[id],] - min)
-              lik[bt[id]:et[id],] <- lik[bt[id]:et[id],]/rowSums(lik[bt[id]:et[id],])
-              post[bt[id]:et[id],] <- lik[bt[id]:et[id],] # prior predictive
             }
             for(a in 1:object@nA) {
               predict[,a] <- rowSums(post*(object@parameters$alpha*object@pred[,a,] + (1-object@parameters$alpha)*(1/object@n_act)))
             }
             ### THIS IS A HACK TO GET BEST RESPONSE; SHOULD BE MORE GENERAL SOLUTION
-            predict[object@n_act != 5,] <- predict[object@n_act != 5,c(3,1,2,4,5)]
-            predict[object@n_act == 5,] <- predict[object@n_act == 5,c(5,1,2,3,4)]
+            predict[object@game_id != 3,] <- predict[object@game_id != 3,c(3,1,2)]
+            predict[object@game_id == 3,] <- cbind(.5*predict[object@game_id == 3,2] +.5* predict[object@game_id == 3,3],
+                                                   .5*predict[object@game_id == 3,1] +.5* predict[object@game_id == 3,3],
+                                                   .5*predict[object@game_id == 3,1] +.5* predict[object@game_id == 3,2])
             return(predict)
           })
