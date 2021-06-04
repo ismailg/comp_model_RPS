@@ -103,21 +103,24 @@ for(id in unique(dat$human_id)) {
   tdat <- dat %>% subset(human_id == id)
 
   # QLS likelihoods 
-  pars_QLS <- unlist(filter(exp2_optim_results, ID == id)%>%select(QL_states_Beta, QL_states_alpha))
-  tdat$QLS_lik <-  exp2_QL_states(pars_QLS,tdat,"likelihood_by_trial",0.0, FALSE)
+  pars_QLS <- unlist(filter(exp2_optim_results, ID == id)%>% dplyr::select(QL_states_Beta, QL_states_alpha))
+  tdat$QLS_lik <-  exp2_QL_states(pars_QLS,tdat,"likelihood_by_trial",gamma =0.0, FALSE)
   
   # QLS within Transfer likelihoods 
-  pars_QLS_within <- unlist(filter(exp2_optim_results, ID == id)%>%select(QLS_within_Tr_Beta,QLS_within_Tr_alpha))
+  pars_QLS_within <- unlist(filter(exp2_optim_results, ID == id)%>% dplyr::select(QLS_within_Tr_Beta,QLS_within_Tr_alpha))
   tdat$QLS_lik_within <-  exp2_QL_states(pars_QLS_within,tdat,"likelihood_by_trial",gamma = 0, TRUE)
   #                
   # 
-  # Bayes model no transfer likelihoods
-  theta_NT <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_no_tr))
-  tdat$Bayes_NT_lik <- Bayes_model_LL(theta_NT, tdat, distinct_opponent = TRUE, generalize = "no",return = "likelihood_by_trial")
+  # Bayes model no transfer likelihoods. Assume softmax = TRUE as default. 
+  # theta_NT <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_no_tr))
+  # lambda_NT <- unlist(filter(exp2_optim_results, ID == id)%>%select(lambda_no_tr))
+  pars_BCH_NT2 <- unlist(filter(exp2_optim_results, ID == id)%>% dplyr::select(theta_no_tr, lambda_no_tr))
+  tdat$Bayes_NT_lik <- Bayes_model_LL(pars_BCH_NT2, tdat, distinct_opponent = TRUE, generalize = "no",return = "likelihood_by_trial")
 
   # Bayes model with Transfer likelihood
-  theta_Tr <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_transfer))
-  tdat$Bayes_Tr_lik <- Bayes_model_LL(theta_Tr, tdat, distinct_opponent = TRUE, generalize = "game",return = "likelihood_by_trial")
+  # theta_Tr <- unlist(filter(exp2_optim_results, ID == id)%>%select(theta_transfer))
+  pars_BCH_BT2 <- unlist(filter(exp2_optim_results, ID == id)%>% dplyr::select(theta_transfer, lambda_transfer))
+  tdat$Bayes_Tr_lik <- Bayes_model_LL(pars_BCH_BT2, tdat, distinct_opponent = TRUE, generalize = "game",return = "likelihood_by_trial")
 
   lik_by_trial_2 <- rbind(lik_by_trial_2,tdat)
 }
@@ -132,7 +135,7 @@ library(tidyr)
 
 
 mean_lik_2 <- lik_by_trial_2 %>%
-  select(human_id,game,stage,round_condition, round, QLS_lik, QLS_lik_within, Bayes_NT_lik, Bayes_Tr_lik) %>%
+  dplyr::select(human_id,game,stage,round_condition, round, QLS_lik, QLS_lik_within, Bayes_NT_lik, Bayes_Tr_lik) %>%
   group_by(game,stage,round) %>%
   summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
             mean_QLS_within_lik = mean(QLS_lik_within, na.rm = TRUE),

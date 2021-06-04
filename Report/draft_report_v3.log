@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.17)  30 OCT 2020 13:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.17)  30 OCT 2020 14:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -717,31 +717,31 @@ Package csquotes Info: ... none found.
 (./draft_report_v3.aux)
 \openout1 = `draft_report_v3.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 113.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 122.
 LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
-13.
+22.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 113.
-LaTeX Font Info:    ... okay on input line 113.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 11
-3.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 122.
+LaTeX Font Info:    ... okay on input line 122.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 12
+2.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
@@ -814,14 +814,14 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2018/08/26 v1.4a longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \microtypecontext on input line 113.
+LaTeX Info: Redefining \microtypecontext on input line 122.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `basictext'.
-LaTeX Info: Redefining \showhyphens on input line 113.
+LaTeX Info: Redefining \showhyphens on input line 122.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -830,7 +830,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 )
 \AtBeginShipoutBox=\box41
-Package hyperref Info: Link coloring ON on input line 113.
+Package hyperref Info: Link coloring ON on input line 122.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/refcount.sty
@@ -842,53 +842,53 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count155
 )
-LaTeX Info: Redefining \ref on input line 113.
-LaTeX Info: Redefining \pageref on input line 113.
-LaTeX Info: Redefining \nameref on input line 113.
+LaTeX Info: Redefining \ref on input line 122.
+LaTeX Info: Redefining \pageref on input line 122.
+LaTeX Info: Redefining \nameref on input line 122.
 (./draft_report_v3.out) (./draft_report_v3.out)
 \@outlinefile=\write5
 \openout5 = `draft_report_v3.out'.
 
-Class apa6 Info: Keywords not defined on input line 115.
+Class apa6 Info: Keywords not defined on input line 124.
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 1
-15.
+24.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-15.
+24.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-15.
+24.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-115.
+124.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-115.
+124.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 115.
+(Font)              <12> on input line 124.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 115.
+(Font)              <8> on input line 124.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 115.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 115
+(Font)              <6> on input line 124.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 124
 .
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 115
+LaTeX Font Info:    Trying to load font information for U+msb on input line 124
 .
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -901,339 +901,189 @@ File: mt-eur.cfg 2006/07/31 v1.1 microtype config. file: AMS Euler Roman (RS)
 ] [2] [3] [4]
 Underfull \vbox (badness 4752) has occurred while \output is active []
 
-[5]
-Underfull \vbox (badness 4752) has occurred while \output is active []
-
-[6]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[7] [8] [9]
-<images/feedback_rps.png, id=182, 452.4102pt x 263.5446pt>
+[5] [6] [7] [8]
+<images/feedback_rps.png, id=178, 452.4102pt x 263.5446pt>
 File: images/feedback_rps.png Graphic file (type png)
 <use images/feedback_rps.png>
-Package pdftex.def Info: images/feedback_rps.png  used on input line 159.
+Package pdftex.def Info: images/feedback_rps.png  used on input line 168.
 (pdftex.def)             Requested size: 452.40909pt x 263.54395pt.
-<draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf, id=184, 469.755
+<draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf, id=180, 469.755
 pt x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf Graphic fil
 e (type pdf)
 <use draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-avg-scores-gam
-e-1.pdf  used on input line 171.
+e-1.pdf  used on input line 180.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[10]
-<draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf, id=196, 469.755pt 
+[9]
+<draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf, id=192, 469.755pt 
 x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf Graphic file (
 type pdf)
 <use draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-3factor-plot-1
-.pdf  used on input line 183.
+.pdf  used on input line 192.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[11 <./images/feedback_rps.png>]
+[10 <./images/feedback_rps.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[12 <./draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf>]
-<draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf, id=219, 469.755pt 
+[11 <./draft_report_v3_files/figure-latex/exp1-avg-scores-game-1.pdf>]
+<draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf, id=215, 469.755pt 
 x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf Graphic file (
 type pdf)
 <use draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-score-by-opp-1
-.pdf  used on input line 199.
+.pdf  used on input line 208.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[13 <./draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf>]
+[12 <./draft_report_v3_files/figure-latex/exp1-3factor-plot-1.pdf>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[14 <./draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf>] [15] [16]
-<images/shootout.png, id=257, 1927.2pt x 1084.05pt>
+[13 <./draft_report_v3_files/figure-latex/exp1-score-by-opp-1.pdf>] [14] [15]
+<images/shootout.png, id=253, 1927.2pt x 1084.05pt>
 File: images/shootout.png Graphic file (type png)
 <use images/shootout.png>
-Package pdftex.def Info: images/shootout.png  used on input line 235.
+Package pdftex.def Info: images/shootout.png  used on input line 244.
 (pdftex.def)             Requested size: 469.7421pt x 264.22992pt.
-[17 <./images/shootout.png>]
+[16 <./images/shootout.png>]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 252.
+(Font)              <10> on input line 261.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 252.
+(Font)              <7> on input line 261.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 252.
-[18]
-<draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf, id=273, 469.755pt 
+(Font)              <5> on input line 261.
+[17]
+<draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf, id=269, 469.755pt 
 x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf Graphic file (
 type pdf)
 <use draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-score-by-opp-1
-.pdf  used on input line 256.
+.pdf  used on input line 265.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[19 <./draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf>]
-<draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf, id=286, 469.755pt 
+[18 <./draft_report_v3_files/figure-latex/exp2-score-by-opp-1.pdf>]
+<draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf, id=281, 469.755pt 
 x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf Graphic file (
 type pdf)
 <use draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-early-scores-1
-.pdf  used on input line 273.
+.pdf  used on input line 282.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[20] [21 <./draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf>] [22] [
-23] [24]
-<draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf, id=328, 469.755pt x
+[19] [20 <./draft_report_v3_files/figure-latex/exp2-early-scores-1.pdf>] [21] [
+22] [23]
+<draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf, id=324, 469.755pt x
  325.215pt>
 File: draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf Graphic file (t
 ype pdf)
 <use draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-comp-models-1.
-pdf  used on input line 368.
+pdf  used on input line 377.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[25] [26 <./draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf>]
-<draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf, id=349, 469.755pt x 3
+[24] [25 <./draft_report_v3_files/figure-latex/exp1-comp-models-1.pdf>]
+<draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf, id=345, 469.755pt x 3
 25.215pt>
 File: draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-cumScores-1.pd
-f  used on input line 379.
+f  used on input line 388.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf, id=350, 469.755pt x
+<draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf, id=346, 469.755pt x
  325.215pt>
 File: draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf Graphic file (t
 ype pdf)
 <use draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-comp-models-1.
-pdf  used on input line 391.
+pdf  used on input line 400.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
-98.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 4
+07.
 (/Users/mbp17/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [27 <./draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf>]
-<draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf, id=366, 469.755pt x 3
+) [26 <./draft_report_v3_files/figure-latex/exp1-cumScores-1.pdf>]
+<draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf, id=362, 469.755pt x 3
 25.215pt>
 File: draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-cumScores-1.pd
-f  used on input line 426.
+f  used on input line 435.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[28 <./draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf>]
-<draft_report_v3_files/figure-latex/exp1-lik-by-tr-1.pdf, id=380, 469.755pt x 3
+[27 <./draft_report_v3_files/figure-latex/exp2-comp-models-1.pdf>]
+<draft_report_v3_files/figure-latex/exp1-lik-by-tr-1.pdf, id=376, 469.755pt x 3
 25.215pt>
 File: draft_report_v3_files/figure-latex/exp1-lik-by-tr-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v3_files/figure-latex/exp1-lik-by-tr-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-lik-by-tr-1.pd
-f  used on input line 444.
+f  used on input line 453.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[29]
-<draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf, id=389, 469.755pt x 3
+[28]
+<draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf, id=385, 469.755pt x 3
 25.215pt>
 File: draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf Graphic file (typ
 e pdf)
 <use draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pd
-f  used on input line 455.
+f  used on input line 464.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 3291) has occurred while \output is active []
 
-[30 <./draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf>] [31 <./draft_r
+[29 <./draft_report_v3_files/figure-latex/exp2-cumScores-1.pdf>] [30 <./draft_r
 eport_v3_files/figure-latex/exp1-lik-by-tr-1.pdf>]
-<draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf, id=409, 469.755
+<draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf, id=404, 469.755
 pt x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf Graphic fil
 e (type pdf)
 <use draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp1-posteriors-plo
-t-1.pdf  used on input line 473.
+t-1.pdf  used on input line 482.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[32 <./draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf>]
-<draft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf, id=423, 469.755
+[31 <./draft_report_v3_files/figure-latex/exp2-lik-by-tr-1.pdf>]
+<draft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf, id=418, 469.755
 pt x 325.215pt>
 File: draft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf Graphic fil
 e (type pdf)
 <use draft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf>
 Package pdftex.def Info: draft_report_v3_files/figure-latex/exp2-posteriors-plo
-t-1.pdf  used on input line 487.
+t-1.pdf  used on input line 496.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[33 <./draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf>] [34 <./d
-raft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf>] [35] [36] [37] [
-38] [39] [40] [41] [42]pdfTeX warning (ext4): destination with the same identif
-ier (name{ref-arad201211}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.619 \leavevmode\hypertarget{ref-arad201211}{}
-                                               %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-baarslag2016learning}) has been already 
-used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.622 ...e\hypertarget{ref-baarslag2016learning}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-camerer1997experience}) has been alre
-ady used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.625 ...\hypertarget{ref-camerer1997experience}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-knez2000}) has been already used, dup
-licate ignored
-<to be read again> 
-                   \relax 
-l.628 \leavevmode\hypertarget{ref-knez2000}{}
-                                             %pdfTeX warning (ext4): destinatio
-n with the same identifier (name{ref-cheung1994learning}) has been already used
-, duplicate ignored
-<to be read again> 
-                   \relax 
-l.631 ...ode\hypertarget{ref-cheung1994learning}{}
-                                                  % [43]pdfTeX warning (ext4): 
-destination with the same identifier (name{ref-cooper2003lessons}) has been alr
-eady used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.634 ...mode\hypertarget{ref-cooper2003lessons}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-Cooper2008}) has been already used, d
-uplicate ignored
-<to be read again> 
-                   \relax 
-l.637 \leavevmode\hypertarget{ref-Cooper2008}{}
-                                               %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-goodie2012levels}) has been already used
-, duplicate ignored
-<to be read again> 
-                   \relax 
-l.640 ...vmode\hypertarget{ref-goodie2012levels}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-Haruvy2012}) has been already used, d
-uplicate ignored
-<to be read again> 
-                   \relax 
-l.643 \leavevmode\hypertarget{ref-Haruvy2012}{}
-                                               %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-ho2004economics}) has been already used,
- duplicate ignored
-<to be read again> 
-                   \relax 
-l.646 ...evmode\hypertarget{ref-ho2004economics}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-ho1998iterated}) has been already use
-d, duplicate ignored
-<to be read again> 
-                   \relax 
-l.649 ...vevmode\hypertarget{ref-ho1998iterated}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-Juvina2013}) has been already used, d
-uplicate ignored
-<to be read again> 
-                   \relax 
-l.652 \leavevmode\hypertarget{ref-Juvina2013}{}
-                                               %pdfTeX warning (ext4): destinat
-ion with the same identifier (name{ref-Lake2017}) has been already used, duplic
-ate ignored
-<to be read again> 
-                   \relax 
-l.655 \leavevmode\hypertarget{ref-Lake2017}{}
-                                             %pdfTeX warning (ext4): destinatio
-n with the same identifier (name{ref-mertens1990repeated}) has been already use
-d, duplicate ignored
-<to be read again> 
-                   \relax 
-l.658 ...de\hypertarget{ref-mertens1990repeated}{}
-                                                  % [44]pdfTeX warning (ext4): 
-destination with the same identifier (name{ref-perkins1992transfer}) has been a
-lready used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.661 ...de\hypertarget{ref-perkins1992transfer}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-premack1978does}) has been already us
-ed, duplicate ignored
-<to be read again> 
-                   \relax 
-l.664 ...evmode\hypertarget{ref-premack1978does}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-shachat2004we}) has been already used
-, duplicate ignored
-<to be read again> 
-                   \relax 
-l.667 \leavevmode\hypertarget{ref-shachat2004we}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-Simon_Daw_11}) has been already used,
- duplicate ignored
-<to be read again> 
-                   \relax 
-l.670 \leavevmode\hypertarget{ref-Simon_Daw_11}{}
-                                                 %pdfTeX warning (ext4): destin
-ation with the same identifier (name{ref-simon1972theories}) has been already u
-sed, duplicate ignored
-<to be read again> 
-                   \relax 
-l.673 ...mode\hypertarget{ref-simon1972theories}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-spiliopoulos2013strategic}) has been 
-already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.676 ...ertarget{ref-spiliopoulos2013strategic}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-stahl1995players}) has been already u
-sed, duplicate ignored
-<to be read again> 
-                   \relax 
-l.679 ...vmode\hypertarget{ref-stahl1995players}{}
-                                                  %pdfTeX warning (ext4): desti
-nation with the same identifier (name{ref-watkins1992q}) has been already used,
- duplicate ignored
-<to be read again> 
-                   \relax 
-l.682 \leavevmode\hypertarget{ref-watkins1992q}{}
-                                                 %pdfTeX warning (ext4): destin
-ation with the same identifier (name{ref-de2012higher}) has been already used, 
-duplicate ignored
-<to be read again> 
-                   \relax 
-l.685 \leavevmode\hypertarget{ref-de2012higher}{}
-                                                 %pdfTeX warning (ext4): destin
-ation with the same identifier (name{ref-Kool_2011}) has been already used, dup
-licate ignored
-<to be read again> 
-                   \relax 
-l.688 \leavevmode\hypertarget{ref-Kool_2011}{}
-                                              % [45] AED endfloat: Processing e
-nd Figures and Tables [46]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 693.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 693.
+[32 <./draft_report_v3_files/figure-latex/exp1-posteriors-plot-1.pdf>] [33 <./d
+raft_report_v3_files/figure-latex/exp2-posteriors-plot-1.pdf>] [34] [35] [36] [
+37] [38] [39] AED endfloat: Processing end Figures and Tables [40]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 559.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 559.
 (./draft_report_v3.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 693.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 693.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 559.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 559.
 Package rerunfilecheck Info: File `draft_report_v3.out' has not changed.
 (rerunfilecheck)             Checksum: 9BA3EF5A6A632CBA8872E3E6CC9A926A;4472.
  ) 
 Here is how much of TeX's memory you used:
- 16805 strings out of 494107
- 253638 string characters out of 6170493
- 379263 words of memory out of 5000000
+ 16771 strings out of 494107
+ 253106 string characters out of 6170493
+ 379476 words of memory out of 5000000
  20330 multiletter control sequences out of 15000+600000
- 81130 words of font info for 118 fonts, out of 8000000 for 9000
+ 80872 words of font info for 116 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 46i,12n,51p,2200b,502s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 46i,12n,51p,2187b,502s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/Users/mbp17/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/Users
 /mbp17/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/Users/mbp1
 7/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/Users/mbp17/Lib
@@ -1252,10 +1102,10 @@ p17/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb></Users/mbp17/Li
 brary/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/mbp17/Library
 /TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></Users/mbp17/Library/TinyT
 eX/texmf-dist/fonts/type1/public/lm/lmtt12.pfb>
-Output written on draft_report_v3.pdf (46 pages, 668499 bytes).
+Output written on draft_report_v3.pdf (40 pages, 653058 bytes).
 PDF statistics:
- 623 PDF objects out of 1000 (max. 8388607)
- 526 compressed objects within 6 object streams
- 153 named destinations out of 1000 (max. 500000)
+ 557 PDF objects out of 1000 (max. 8388607)
+ 467 compressed objects within 5 object streams
+ 123 named destinations out of 1000 (max. 500000)
  10572 words of extra memory for PDF output out of 12000 (max. 10000000)
 

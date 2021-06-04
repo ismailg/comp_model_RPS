@@ -161,12 +161,12 @@ for(id in unique(dat$human_id)) {
   tdat$QLS_lik <- Q_learn_states(pars_QLS ,tdat,"likelihood_by_trial",gamma = 0)
   
   #Bayes model no transfer likelihoods
-  theta_NT <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_no_transfer))
-  tdat$Bayes_NT_lik <- exp1_Bayes_model_LL(theta_NT ,data = tdat, generalize = "no", "likelihood_by_trial")
+  pars_BCH_NT <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_no_transfer,lambda_no_transfer))
+  tdat$Bayes_NT_lik <- exp1_Bayes_model_LL(pars_BCH_NT ,data = tdat, generalize = "no", softmax = TRUE, "likelihood_by_trial")
 
   # Bayes model with Transfer likelihood
-  theta_Tr <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_transfer))
-  tdat$Bayes_Tr_lik <- exp1_Bayes_model_LL(theta_Tr ,data = tdat, generalize = "game", "likelihood_by_trial")
+  pars_BCH_Tr <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_transfer,lambda_transfer))
+  tdat$Bayes_Tr_lik <- exp1_Bayes_model_LL(pars_BCH_Tr,data = tdat, generalize = "game", softmax = TRUE, "likelihood_by_trial")
 
 
   
@@ -203,7 +203,7 @@ summary(is.na(exp1_lik_by_trial$QLS_lik))
 ```{r}
 
 mean_lik <- exp1_lik_by_trial %>%
-  select(human_id,condition,game, round,QLS_lik,Bayes_NT_lik,Bayes_Tr_lik) %>%
+  dplyr::select(human_id,condition,game, round,QLS_lik,Bayes_NT_lik,Bayes_Tr_lik) %>%
   group_by(game, condition, round)  %>%
   dplyr::summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
             mean_NT_lik = mean(Bayes_NT_lik, na.rm = TRUE),

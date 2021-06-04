@@ -152,102 +152,6 @@ save(QL_modelling,file="QL_modelling.RData")
 ```
 
 
-
-## First attempt : Q-Learning with state space consisting of last round play (deprecated) 
-```{r}
-
-# Q_learn_states <- function(par,data,return_value,gamma){
-#   # Par[1] -> beta= inverse temperature parameter in softmax choice function
-#   # Par[2] -> lambda = learning rate (one per game?)
-#   # data : participant and ai choice data.
-#   # return_value=c("-2loglik","likelihood_by_trial")
-#   # Gamma is discount factor for future rewards 
-#   # Returns Q-values per trial and predicts choice using softmax
-#   beta <- par[1]
-#   alpha <- par[2]
-# 
-#   #gamma <- 0.9 
-# 
-#   #Define matrix of state spaces for each game 
-#   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
-#   states_RPS <- paste0(G1$Var1,G1$Var2)
-# 
-#   G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
-#   states_FWG <- paste0(G2$Var1,G2$Var2)
-# 
-#   G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
-#   states_NUM <- paste0(G3$Var1,G3$Var2)
-#   
-#   Q_vals_RPS = matrix(-0.5,9,3)
-#   dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
-# 
-#   Q_vals_FWG = matrix(-0.5,9,3)
-#   dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
-#   
-#   Q_vals_NUM = matrix(-0.5,25,5)
-#   dimnames(Q_vals_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
-#  
-#   lik_hum <- matrix(0.0,nrow(data))
-# 
-#   for(t in 1:nrow(data)) {
-#     t_game <- data[t,"game"]
-#     if(t_game == "numbers") nopts <- 5 else nopts <- 3
-#     
-#     if(data[t,"round"] == 1) {
-#       # first round is uniform prediction
-#       Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
-#       state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, numbers = states_NUM)
-#       lik_hum[t] <- 1/nopts
-#       # Randomly select prev_state and actions for first round
-#       curr_state <- sample(state_vec, size = 1)
-#       h_act <- sample(colnames(Q_vals), size =1)
-#       ai_act <- sample(colnames(Q_vals), size =1)
-#       reward <- 0 
-#       
-#     } else {
-#       # Get past human action and associated reward 
-#       h_act <- as.character(data[t-1,"h_action"])
-#       ai_act <- as.character(data[t-1,"a_action"])
-#       reward <- as.numeric(data[t-1,"score"])
-#     }
-#     
-#     
-#     # cat(curr_state, " This is the previous state", "\n")
-#     new_state <- paste0(h_act,ai_act)
-#     # cat(new_state,"This is new state","\n")
-#     
-#     # Q_learning: update rule (time  = t-1)
-#     Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act])
-#     
-#     # Assume human chooses action probabilistically using softmax on Q values
-#     probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
-#     #if (data[t,"round"] == 50) { cat(Q_vals,"\n") }
-#     
-#     # Get actual human action and compute likelihood
-#     h_act <- as.character(data[t,"h_action"])
-#     act_index <- match(h_act, colnames(Q_vals))
-#     lik_hum[t] <- probs[[act_index]]
-#       
-#     # Update state
-#     curr_state <- new_state 
-#     #}
-#   }
-#   if(return_value == "-2loglik") {
-#     ret <- -2*sum(log(lik_hum))
-#     if(is.infinite(ret) || is.nan(ret)) {
-#       return(1e+300)
-#     } else {
-#       return(ret)
-#     }
-#   }
-#   if(return_value == "likelihood_by_trial") return(lik_hum)
-#   
-# }
-
-```
-
-
-
 #Second attempt at QL algorithm with states: No guessing of initial states
 ```{r}
 Q_learn_states <- function(par,data,return_value,gamma){
@@ -631,137 +535,6 @@ save(EWA_self_modelling,file="EWA_self_modelling.RData")
 
 
 
-##  First attempt : Self-Tuning EWA with prior round play as state (Camerer & Ho 2007) 
-```{r}
-# Initiates N(0) = 1 as in Camerer and Ho 1997 paper. 
-# 
-# EWA_states <- function(par,data,return_value){
-# 
-#   lambda <- par[1]
-# 
-#   #Define matrix of state spaces for each game 
-#   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
-#   states_RPS <- paste0(G1$Var1,G1$Var2)
-# 
-#   G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
-#   states_FWG <- paste0(G2$Var1,G2$Var2)
-# 
-#   G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
-#   states_NUM <- paste0(G3$Var1,G3$Var2)
-#   
-#   A_RPS = matrix(-0.5,9,3)
-#   dimnames(A_RPS) = list(states_RPS, c("R", "P", "S"))
-# 
-#   A_FWG = matrix(-0.5,9,3)
-#   dimnames(A_FWG) = list(states_FWG, c("F", "W", "G"))
-#   
-#   A_NUM = matrix(-0.5,25,5)
-#   dimnames(A_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
-# 
-#   
-#   # # Define reward matrices from the perspective of the row player (human in our case)
-#   reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
-#   dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
-#   
-#   reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
-#   dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
-#   
-#   reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
-#   dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
-#   
-#   # Initiate likelihood by trial vector 
-#   lik_hum <- matrix(0.0,nrow(data))
-# 
-#   for(t in 1:nrow(data)) {
-#     t_game <- data[t,"game"]
-#     if(t_game == "numbers") nopts <- 5 else nopts <- 3
-#     if(data[t,"round"] == 1) {
-#       Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
-#       state_vec <- switch(as.character(t_game), rps=states_RPS, fwg = states_FWG, numbers = states_NUM)
-#       reward <- switch(as.character(t_game), rps=reward_RPS, fwg = reward_FWG, numbers = reward_NUM)
-#       game_data <- subset(data, game == t_game)
-#       
-#       # first round is uniform prediction
-#       lik_hum[t] <- 1/nopts
-#       N <- 1.0
-# 
-#       R_t <- rep(0.0,nopts)
-#       H_t <- R_t
-#       
-#       # Randomly select prev_state and actions for first round
-#       curr_state <- sample(state_vec, size = 1)
-#       h_act_prev <- sample(colnames(Att), size =1)
-#       a_act_prev <- sample(colnames(Att), size =1)
-#       #reward <- 0 
-#       
-#     } else {
-#       
-#       indx <- data[t,"round"]
-#       state_indx <- match(curr_state,state_vec)
-#       #cat("this is the current state index", state_indx, "\n")
-#       
-#       # Get reward and past human action
-#       h_act_prev <- as.character(game_data[indx-1,"h_action"])
-#       a_act_prev <- as.character(game_data[indx-1,"a_action"])
-#       new_state <- paste0(h_act_prev,a_act_prev)
-# 
-#       # Estimate R(t) (recent history) then H(t) (history) then phi(t) (change detector)
-#       R_t <- as.numeric(colnames(Att) == a_act_prev)
-#       #cat("This is R(t)",R_t,"\n")
-#       
-#       H_t <- (H_t*(indx-2) + R_t)/(indx-1)
-#       #cat("this is H(t)",H_t,"\n")
-#       
-#       Phi_t <- 1 - 0.5*sum((H_t-R_t)^2)
-#       #cat("This is Phit(t)",Phi_t,"\t")
-#       
-#       # Estimate vector Delta(t)
-#       delta_t <- as.numeric(reward[,a_act_prev] >= as.numeric(game_data[indx-1,"score"]))
-#       #cat("this is delta(t)",delta_t,"\n")
-#       
-#       for (i in 1:nopts) {
-#         action <- as.character(colnames(Att)[i])
-# 
-#         #cat("this is current indexed action",action,"\n")
-#         #cat("this is previous human action",h_act_prev,"\n")
-#         
-#         # Attraction vector update rule
-#         Att[state_indx,i] <- (Phi_t*N*Att[state_indx,i]  + ( delta_t[[i]] + (1- delta_t[[i]])*(action == h_act_prev))*as.numeric(reward[action,a_act_prev])) / (Phi_t*N + 1)
-#       }
-#       
-#       #Update the value of N 
-#       N <- Phi_t*N + 1
-# 
-#       # Assume human chooses action probabilistically using softmax on Attraction values
-#       probs <- exp(lambda*Att[new_state,])/sum(exp(lambda*Att[new_state,]))
-#       
-#       # Get actual human action and compute likelihood
-#       h_act <- as.character(game_data[indx,"h_action"])
-#       act_index <- match(h_act, colnames(Att))
-#       lik_hum[t] <- probs[[act_index]]
-#       
-#       curr_state <- new_state
-#       
-#       # if (indx == 50) {
-#       #   cat("this is the attraction matrix at last round of", "\n")
-#       #   print(Att)
-#       # }
-#     }
-#   }
-#   
-#  if(return_value == "-2loglik") {
-#     ret <- -2*sum(log(lik_hum))
-#     if(is.infinite(ret) || is.nan(ret)) {
-#       return(1e+300)
-#     } else {
-#       return(ret)
-#     }
-#   }
-#   if(return_value == "likelihood_by_trial") return(lik_hum)
-# }
-
-```
-
 ### Second attempt at ST_EWA with states and no initial guess of initial states. 
 ```{r}
 ST_EWA_STATES <- function(par,data,return_value){
@@ -1057,12 +830,12 @@ save(MBM_modelling, file="MBM_modelling.RData")
 
 ## Putting results together 
 ```{r}
-# load("QL_modelling.RData")
-# load("QL_states_modelling.RData")
-# load("EWA_modelling.RData")
-# load("EWA_self_modelling.RData")
-# load("MBM_modelling.RData")
-# load("ST_EWA_STATES_modelling.RData")
+load("QL_modelling.RData")
+load("QL_states_modelling.RData")
+load("EWA_modelling.RData")
+load("EWA_self_modelling.RData")
+load("MBM_modelling.RData")
+load("ST_EWA_STATES_modelling.RData")
 
 
 All_results <- data.frame()
@@ -1073,12 +846,25 @@ for(id in unique(dat$human_id)) {
                          "condition" = dat[dat$human_id==id,"condition"][1],
                          "Random_BIC" = -2*(100*log(1/3) + 50*log(1/5)),
                          
-                         # Bayesian updating with/without transfer
-                         "Bayes_Tr_BIC" = exp1_Bayes_game_Tr[[id]]$optim$bestval+ 1*log(150),
-                         "Bayes_No_Tr_BIC" = exp1_Bayes_no_Tr[[id]]$optim$bestval + 1*log(150),
+                         # Bayesian updating with/without transfer 
+                         # "Bayes_Tr_BIC" = exp1_Bayes_game_Tr[[id]]$optim$bestval+ 1*log(150),
+                         # "Bayes_No_Tr_BIC" = exp1_Bayes_no_Tr[[id]]$optim$bestval + 1*log(150),
+                         # # Theta is the parameter governing AI stochasticity. Truth is 0.9
+                         # "theta_transfer" = exp1_Bayes_game_Tr[[id]]$optim$bestmem[[1]],
+                         # "theta_no_transfer" = exp1_Bayes_no_Tr[[id]]$optim$bestmem[[1]],
+                         # 
+                         
+                         # BCH with/without transfer (With Softmax) 
+                         "Bayes_Tr_BIC" = use_softmax_tr[[id]]$optim$bestval+ 2*log(150),
+                         "Bayes_No_Tr_BIC" = use_softmax_NT[[id]]$optim$bestval+ 2*log(150),
+                         
                          # Theta is the parameter governing AI stochasticity. Truth is 0.9
-                         "theta_transfer" = exp1_Bayes_game_Tr[[id]]$optim$bestmem[[1]],
-                         "theta_no_transfer" = exp1_Bayes_no_Tr[[id]]$optim$bestmem[[1]],
+                         "theta_transfer" = use_softmax_tr[[id]]$optim$bestmem[[1]],
+                         "lambda_transfer" = use_softmax_tr[[id]]$optim$bestmem[[2]],
+                         
+                         "theta_no_transfer" = use_softmax_NT[[id]]$optim$bestmem[[1]],
+                         "lambda_no_transfer" = use_softmax_NT[[id]]$optim$bestmem[[2]],
+                         
                          
                                                                                     
                          # Q-Learning

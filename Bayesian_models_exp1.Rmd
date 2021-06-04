@@ -1,10 +1,11 @@
 ---
-title: "Bayesian_models_exp2"
+title: "Bayesian_models_exp1"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
 ```
 
 
@@ -15,7 +16,7 @@ dat <- read.csv("data20180719.csv")
 
 ####### test data 
 
-# dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
+#dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
 
 
 
@@ -138,17 +139,18 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 
 # if human generalizes over games, we can run update the prior generally
 # if human does not generalize, we need to reset the prior at the start of each ?stage?
-exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_value = "-2loglik") {
-   # return_value=c("-2loglik","likelihood_by_trial")
-  # data is a subset for a single participant
+exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), softmax= TRUE, return_value = "-2loglik") {
+  
+  # return_value=c("-2loglik","likelihood_by_trial")
+  # input data for this function should be a subset for a single participant
   generalize <- match.arg(generalize)
   alpha <- par[1] # probability that ai opponent plays according to strategy
-  if(length(par) > 1) {
-    beta <- par[2] # probability that human plays according to best response 
-  } else{
-    beta <- 1 # probability that human plays according to best response 
-  }
   
+  if(softmax) {
+    lambda <- par[2] # inverse temperature parameter in softmax function
+  } 
+
+  beta <- 1 # probability that human plays according to best response 
   prior <- c(1,1,1) # prior alpha for dirichlet on p(level)
   prior <- prior/sum(prior)
   
@@ -240,8 +242,25 @@ exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_va
              )
         )
   
+  
+  #cat(as.character(c(round(dat$p_self_a1,2), "\n", "\n")))
+  
   # now finally compute the likelihood of human actions 
-  dat <- dat %>% 
+  if (softmax) {
+    
+        dat <- dat %>% 
+    mutate(sumexp = exp(lambda*p_self_a1) + exp(lambda*p_self_a2) + exp(lambda*p_self_a3) + exp(lambda*p_self_a4) + exp(lambda*p_self_a5)) %>%
+             mutate(
+               loglik = case_when(
+                 human_action_num == 1 ~ log(exp(lambda*p_self_a1)/sumexp),
+                 human_action_num == 2 ~ log(exp(lambda*p_self_a2)/sumexp),
+                 human_action_num == 3 ~ log(exp(lambda*p_self_a3)/sumexp),
+                 human_action_num == 4 ~ log(exp(lambda*p_self_a4)/sumexp),
+                 human_action_num == 5 ~ log(exp(lambda*p_self_a5)/sumexp)
+      )
+    )
+  } else {
+    dat <- dat %>% 
     mutate(
       loglik = case_when(
         human_action_num == 1 ~ log(p_self_a1),
@@ -250,6 +269,9 @@ exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_va
         human_action_num == 4 ~ log(p_self_a4),
         human_action_num == 5 ~ log(p_self_a5))
     )
+    
+  }
+  
   
   #cat(as.character(exp(dat$loglik)), "\n", "\n")
   
@@ -270,8 +292,68 @@ exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), return_va
 ```
 
 ```{r}
-exp1_Bayes_model_LL(0.4,data = dat, generalize = "no", "likelihood_by_trial")[51]
+# testing funcrion. Careful dat here can be all participants data, check how it is defined. 
+exp1_Bayes_model_LL(c(0.4, 1) ,data = dat, generalize = "no", softmax = TRUE, "likelihood_by_trial")[51]
+exp1_Bayes_model_LL(c(0.4) ,data = dat, generalize = "no", softmax = FALSE, "likelihood_by_trial")[51]
 ```
+## Compare loglikelihood: probability matching vs softmax (with Between game transfer for now)
+
+```{r echo=FALSE}
+library(DEoptim)
+
+prob_match_tr <- use_softmax_tr <- use_softmax_NT <- list()
+
+# # Using DEOptim 
+for(id in levels(dat$human_id)) {
+  tdat <- subset(dat,human_id == id)
+  ctrl <- DEoptim.control(NP = 20, itermax=50,parallelType = 1, packages = c("dplyr"))
+  
+  prob_match_tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+                                  generalize = "game",FALSE, control=ctrl)
+  
+  use_softmax_tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat, generalize = "game",TRUE, control=ctrl)
+  
+  use_softmax_NT[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat, generalize = "no",TRUE, control=ctrl)
+  
+}
+
+save(prob_match_tr,file="BCH_prob_match_tr.RData")
+save(use_softmax_tr,file="BCH_use_softmax_tr.RData")
+save(use_softmax_NT,file="BCH_use_softmax_NT.RData")
+```
+
+```{r}
+compare_table <- data.frame()
+for(id in levels(dat$human_id)) {
+  compare_table <- rbind(compare_table,
+                       data.frame(
+                         "ID" = id,
+                         "prob_match_tr_BIC" = prob_match_tr[[id]]$optim$bestval+ 1*log(150),
+                         "softmax_tr_BIC" = use_softmax_tr[[id]]$optim$bestval+ 2*log(150)
+                         ))
+}
+  
+```
+
+```{r}
+
+comp_models <- compare_table[c("ID","prob_match_tr_BIC","softmax_tr_BIC")]
+
+BIC_weights_BCH <- comp_models["ID"]
+BIC_weights_BCH[,2:ncol(comp_models)] <- t(apply(comp_models[,2:ncol(comp_models)], 1, function(i) exp(-0.5*(i-min(i)) )))
+colnames(BIC_weights_BCH) <-colnames(comp_models)
+
+BIC_weights_BCH[,2:ncol(BIC_weights_BCH)] <- t(apply(BIC_weights_BCH[,-1], 1, function(i) round(i/sum(i),2)))
+
+colMeans(BIC_weights_BCH[,2:ncol(BIC_weights_BCH)])
+```
+
+```{r}
+
+```
+
+
+
 
 ```{r}
 #PLot likelihood for first participant as function of parameter 
@@ -289,13 +371,14 @@ dev.off()
 
 ```
 
+
 ```{r, ECHO = FALSE}
 
 library(DEoptim)
 
 exp1_Bayes_game_Tr <- exp1_Bayes_no_Tr <- list()
 
-# # USing DEOptim 
+# # Using DEOptim 
 for(id in levels(dat$human_id)) {
   tdat <- subset(dat,human_id == id)
   ctrl <- DEoptim.control(NP = 20, itermax=50,parallelType = 1, packages = c("dplyr"))

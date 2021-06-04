@@ -1,0 +1,3239 @@
+---
+title: "Bayesian_models_exp1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+
+```{r}
+
+
+dat <- read.csv("data20180719.csv")
+
+####### test data 
+
+#dat <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
+
+
+
+
+#######
+
+dat <- as_tibble(dat) %>% group_by(human_id,game)
+dat <- dat %>%
+  mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1))
+
+```
+
+```{r}
+## the following computes probabilities of ai actions assuming
+## strategy is always followed. (level refers to ai level)
+
+## level 0 predictions
+dat <- dat %>% mutate(pred_a1_level0 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "numbers" & ai_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level0 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level0 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level0 = case_when(
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level0 = case_when(
+  game == "numbers" & ai_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+## level 1 predictions
+dat <- dat %>% mutate(pred_a1_level1 = case_when(
+  game == "rps" & human_action_prev == "scissors" ~ 1,
+  game == "fwg" & human_action_prev == "grass" ~ 1,
+  game == "numbers" & human_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level1 = case_when(
+  game == "rps" & human_action_prev == "rock" ~ 1,
+  game == "fwg" & human_action_prev == "fire" ~ 1,
+  game == "numbers" & human_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level1 = case_when(
+  game == "rps" & human_action_prev == "paper" ~ 1,
+  game == "fwg" & human_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level1 = case_when(
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level1 = case_when(
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+## level 2 predictions
+dat <- dat %>% mutate(pred_a1_level2 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level2 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "numbers" & ai_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level2 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "numbers" & ai_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level2 = case_when(
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level2 = case_when(
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+
+
+dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+
+```
+
+```{r}
+# group data by subjective component id
+
+
+# if human generalizes over games, we can run update the prior generally
+# if human does not generalize, we need to reset the prior at the start of each ?stage?
+exp1_Bayes_model_LL <- function(par,data, generalize = c("game","no"), softmax= TRUE, return_value = "-2loglik") {
+  
+  # return_value=c("-2loglik","likelihood_by_trial")
+  # input data for this function should be a subset for a single participant
+  generalize <- match.arg(generalize)
+  alpha <- par[1] # probability that ai opponent plays according to strategy
+  
+  if(softmax) {
+    lambda <- par[2] # inverse temperature parameter in softmax function
+  } 
+
+  beta <- 1 # probability that human plays according to best response 
+  prior <- c(1,1,1) # prior alpha for dirichlet on p(level)
+  prior <- prior/sum(prior)
+  
+  # use alpha to change the "deterministic" prediction
+    
+  dat <- ungroup(data) %>%
+     mutate_at(.vars = vars(c(starts_with("pred_a1"),starts_with("pred_a2"),starts_with("pred_a3"))), 
+                            funs (case_when(
+      game == "numbers" ~  alpha*. + (1-alpha)/5,
+                  TRUE ~ alpha*. + (1-alpha)/3))) %>%
+     mutate_at(.vars = vars(c(starts_with("pred_a4"),starts_with("pred_a5"))), 
+                            funs (case_when(
+      game == "numbers" ~  alpha*. + (1-alpha)/5,
+                  TRUE ~ 0)))
+  
+  if(generalize == "no") {
+    # group by game and stage
+    dat <- group_by(dat,game,add=TRUE)
+  }
+  
+  # compute likelihood of ai action
+  dat <- dat %>%
+    mutate(
+      lik_level0 = case_when(
+        ai_action_num == 1 ~ pred_a1_level0,
+        ai_action_num == 2 ~ pred_a2_level0,
+        ai_action_num == 3 ~ pred_a3_level0,
+        ai_action_num == 4 ~ pred_a4_level0,
+        ai_action_num == 5 ~ pred_a5_level0
+      ),
+      lik_level1 = case_when(
+        ai_action_num == 1 ~ pred_a1_level1,
+        ai_action_num == 2 ~ pred_a2_level1,
+        ai_action_num == 3 ~ pred_a3_level1,
+        ai_action_num == 4 ~ pred_a4_level1,
+        ai_action_num == 5 ~ pred_a5_level1
+      ),
+      lik_level2 = case_when(
+        ai_action_num == 1 ~ pred_a1_level2,
+        ai_action_num == 2 ~ pred_a2_level2,
+        ai_action_num == 3 ~ pred_a3_level2,
+        ai_action_num == 4 ~ pred_a4_level2,
+        ai_action_num == 5 ~ pred_a5_level2
+      )
+    )
+  
+  # use likelihood to compute the posterior predictive probability of each level
+  dat <- dat %>%
+    mutate(logpost_level0 = lag(log(prior[1]) + cumsum(log(lik_level0)),default=log(prior[1])),
+           logpost_level1 = lag(log(prior[2]) + cumsum(log(lik_level1)),default=log(prior[2])),
+           logpost_level2 = lag(log(prior[3]) + cumsum(log(lik_level2)),default=log(prior[3]))) %>%
+    # you can add or subtract any constant from the log-likelihoods; this can aid in precision
+    mutate(min = pmin(logpost_level0,logpost_level1, logpost_level2)) %>%
+      mutate(normalize = exp(logpost_level0 - min) + exp(logpost_level1 - min) + exp(logpost_level2 - min)) %>%
+        mutate(post_level0 = exp(logpost_level0 - min)/normalize,
+               post_level1 = exp(logpost_level1 - min)/normalize,
+               post_level2 = exp(logpost_level2 - min)/normalize)
+  
+   #cat(as.character(c(round(dat$post_level0,2), round(dat$post_level1,2), round(dat$post_level2,2)), "\n", "\n"))
+  
+  # use posterior predictive probability to predict probability of each ai and then human action
+  # opp is ai and self is human player here
+  dat <- dat %>%
+    mutate(p_opp_a1 = post_level0*pred_a1_level0 + post_level1*pred_a1_level1 + post_level2*pred_a1_level2,
+           p_opp_a2 = post_level0*pred_a2_level0 + post_level1*pred_a2_level1 + post_level2*pred_a2_level2,
+           p_opp_a3 = post_level0*pred_a3_level0 + post_level1*pred_a3_level1 + post_level2*pred_a3_level2,
+           p_opp_a4 = post_level0*pred_a4_level0 + post_level1*pred_a4_level1 + post_level2*pred_a4_level2,
+           p_opp_a5 = post_level0*pred_a5_level0 + post_level1*pred_a5_level1 + post_level2*pred_a5_level2
+    ) %>%
+      mutate(p_self_a1 = case_when(
+              game == "numbers" ~ (1-beta)*(1/3) + beta*p_opp_a5,
+              TRUE ~ (1-beta)*(1/3) + beta*(p_opp_a3)
+                ),
+             p_self_a2 = case_when(
+               game == "numbers" ~ (1-beta)*(1/3) + beta*p_opp_a1,
+               TRUE ~ (1-beta)*(1/3) + beta*(p_opp_a1)
+             ),
+             p_self_a3 = case_when(
+               game == "numbers" ~ (1-beta)*(1/3) + beta*p_opp_a2,
+               TRUE ~ (1-beta)*(1/3) + beta*(p_opp_a2)
+             ),
+             p_self_a4 = case_when(
+               game == "numbers" ~ (1-beta)*(1/3) + beta*p_opp_a3,
+               TRUE ~ 0
+             ),
+             p_self_a5 = case_when(
+               game == "numbers" ~ (1-beta)*(1/3) + beta*p_opp_a4,
+               TRUE ~ 0
+             )
+        )
+  
+  
+  #cat(as.character(c(round(dat$p_self_a1,2), "\n", "\n")))
+  
+  # now finally compute the likelihood of human actions 
+  if (softmax) {
+    
+        dat <- dat %>% 
+    mutate(sumexp = exp(lambda*p_self_a1) + exp(lambda*p_self_a2) + exp(lambda*p_self_a3) + exp(lambda*p_self_a4) + exp(lambda*p_self_a5)) %>%
+             mutate(
+               loglik = case_when(
+                 human_action_num == 1 ~ log(exp(lambda*p_self_a1)/sumexp),
+                 human_action_num == 2 ~ log(exp(lambda*p_self_a2)/sumexp),
+                 human_action_num == 3 ~ log(exp(lambda*p_self_a3)/sumexp),
+                 human_action_num == 4 ~ log(exp(lambda*p_self_a4)/sumexp),
+                 human_action_num == 5 ~ log(exp(lambda*p_self_a5)/sumexp)
+      )
+    )
+  } else {
+    dat <- dat %>% 
+    mutate(
+      loglik = case_when(
+        human_action_num == 1 ~ log(p_self_a1),
+        human_action_num == 2 ~ log(p_self_a2),
+        human_action_num == 3 ~ log(p_self_a3),
+        human_action_num == 4 ~ log(p_self_a4),
+        human_action_num == 5 ~ log(p_self_a5))
+    )
+    
+  }
+  
+  
+  #cat(as.character(exp(dat$loglik)), "\n", "\n")
+  
+  ret <- -2*sum(dat$loglik)
+  if(return_value == "-2loglik") {
+    if(is.infinite(ret) || is.nan(ret)) {
+    return(1e+300)
+    } else {
+      return(ret)
+    } 
+  } else if ((return_value == "likelihood_by_trial")) {
+    return(exp(dat$loglik))
+  }
+    
+
+}
+
+```
+
+```{r}
+# testing funcrion. Careful dat here can be all participants data, check how it is defined. 
+exp1_Bayes_model_LL(c(0.4, 1) ,data = dat, generalize = "no", softmax = TRUE, "likelihood_by_trial")[51]
+exp1_Bayes_model_LL(c(0.4) ,data = dat, generalize = "no", softmax = FALSE, "likelihood_by_trial")[51]
+```
+## Compare loglikelihood: probability matching vs softmax (with Between game transfer for now)
+
+```{r echo=FALSE}
+library(DEoptim)
+
+prob_match_tr <- use_softmax_tr <- use_softmax_NT <- list()
+
+# # Using DEOptim 
+for(id in levels(dat$human_id)) {
+  tdat <- subset(dat,human_id == id)
+  ctrl <- DEoptim.control(NP = 20, itermax=50,parallelType = 1, packages = c("dplyr"))
+  
+  prob_match_tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+                                  generalize = "game",FALSE, control=ctrl)
+  
+  use_softmax_tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat, generalize = "game",TRUE, control=ctrl)
+  
+  use_softmax_NT[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat, generalize = "no",TRUE, control=ctrl)
+  
+}
+
+save(prob_match_tr,file="BCH_prob_match_tr.RData")
+save(use_softmax_tr,file="BCH_use_softmax_tr.RData")
+save(use_softmax_NT,file="BCH_use_softmax_NT.RData")
+```
+
+```{r}
+compare_table <- data.frame()
+for(id in levels(dat$human_id)) {
+  compare_table <- rbind(compare_table,
+                       data.frame(
+                         "ID" = id,
+                         "prob_match_tr_BIC" = prob_match_tr[[id]]$optim$bestval+ 1*log(150),
+                         "softmax_tr_BIC" = use_softmax_tr[[id]]$optim$bestval+ 2*log(150)
+                         ))
+}
+  
+```
+
+```{r}
+
+comp_models <- compare_table[c("ID","prob_match_tr_BIC","softmax_tr_BIC")]
+
+BIC_weights_BCH <- comp_models["ID"]
+BIC_weights_BCH[,2:ncol(comp_models)] <- t(apply(comp_models[,2:ncol(comp_models)], 1, function(i) exp(-0.5*(i-min(i)) )))
+colnames(BIC_weights_BCH) <-colnames(comp_models)
+
+BIC_weights_BCH[,2:ncol(BIC_weights_BCH)] <- t(apply(BIC_weights_BCH[,-1], 1, function(i) round(i/sum(i),2)))
+
+colMeans(BIC_weights_BCH[,2:ncol(BIC_weights_BCH)])
+```
+
+```{r}
+
+```
+
+
+
+
+```{r}
+#PLot likelihood for first participant as function of parameter 
+
+dat <- subset(dat, human_id == "QSuzBXpbyRc370HsAACW")
+likelihoods <- list()
+for (t in 1:95) {
+  likelihoods[t] <- exp1_Bayes_model_LL(t/100,data = dat, generalize = "game")
+}
+
+jpeg(file="QSuzBXpbyRc370HsAACW.jpeg")
+plot(unlist(likelihoods))
+dev.off()
+
+
+```
+
+
+```{r, ECHO = FALSE}
+
+library(DEoptim)
+
+exp1_Bayes_game_Tr <- exp1_Bayes_no_Tr <- list()
+
+# # Using DEOptim 
+for(id in levels(dat$human_id)) {
+  tdat <- subset(dat,human_id == id)
+  ctrl <- DEoptim.control(NP = 20, itermax=50,parallelType = 1, packages = c("dplyr"))
+  exp1_Bayes_game_Tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+                                  generalize = "game",control=ctrl)
+  exp1_Bayes_no_Tr[[id]] <- DEoptim(exp1_Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+                                  generalize = "no",control=ctrl)
+}
+
+
+# using optim
+
+
+# for(id in levels(dat$human_id)) {
+#   tdat <- subset(dat,human_id == id)
+#   # ctrl <- DEoptim.control(NP = 20, itermax=50)
+#   
+#   Bayes_same_game[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = FALSE, 
+#                                  generalize = "game", lower = c(0), upper = c(1),method="L-BFGS-B")
+#   
+#   
+#   Bayes_same_stage[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = FALSE, 
+#                                  generalize = "stage", lower = c(0), upper = c(1),method="L-BFGS-B")
+# 
+#   Bayes_same_no[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = FALSE, 
+#                                  generalize = "no", lower = c(0), upper = c(1),method="L-BFGS-B")
+# 
+#   Bayes_distinct_game[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = TRUE, 
+#                                  generalize = "game", lower = c(0), upper = c(1),method="L-BFGS-B")
+# 
+#   Bayes_distinct_stage[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = TRUE, 
+#                                  generalize = "stage", lower = c(0), upper = c(1),method="L-BFGS-B")
+# 
+#   Bayes_distinct_no[[id]] <- optim(c(0.1),fn=Bayes_model_LL,data=tdat, distinct_opponent = TRUE, 
+#                                  generalize = "no", lower = c(0), upper = c(1),method="L-BFGS-B")
+# }
+```
+```{r}
+
+exp1_Bayes_game_Tr[["QSuzBXpbyRc370HsAACW"]]$optim$bestval
+exp1_Bayes_game_Tr[["QSuzBXpbyRc370HsAACW"]]$optim$bestmem[[1]]
+```
+
+
+
+
+<!--chapter:end:Bayesian_models_exp1.Rmd-->
+
+---
+title: "opponent modelling"
+author: "Ismail Guennouni & Maarten Speekenbrink"
+date: "1 November 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading data
+
+```{r}
+dat <- read.csv("data20180719.csv")
+#dat <- read.csv("test_data.csv")
+```
+
+## Preprosessing and transforming data
+
+```{r}
+# using some functions from the 'tidyverse' (also for me to get use to them ;-)
+library(tidyr)
+library(dplyr)
+library(DEoptim)
+library(optimParallel)
+library(ggpubr)
+
+# create a new data.frame in a 'wide format'
+# widedata <- dat %>%
+#   unite(game_block,game,block) %>% # this creates a new variable which combines game and block
+#     group_by(human_id,condition,game_block) %>% # let the functions know you want to separate things by ID, condition, and game_block
+#       summarize(mean_score = mean(score)) %>% # compute average score (i.e wins - losses)
+#         spread(game_block,mean_score) # reformat in the 'wide' format
+# # save the data file as a .csv to use in e.g. SPSS
+# write.csv(widedata,row.names=FALSE,file="scores_wide.csv")
+
+```
+
+
+
+```{r estimate-models, cache=TRUE}
+# read in the various files which 
+rps_predict_opp <- read.csv("rps_predict_opp.csv")
+fwg_predict_opp <- read.csv("fwg_predict_opp.csv")
+numbers_predict_opp <- read.csv("numbers_predict_opp.csv")
+
+# transform 'winner' variable in numeric score
+dat$score <- recode(dat$winner, human = 1, tie = 0, ai = -1)
+# create a new variable 'block' with round 1...25 = block 1 and round 26...50 as block 2
+dat$block <- as.numeric(cut(dat$round,2))
+
+# recode actions to make them equal to the codes in these files
+dat$h_action <- recode(dat$human_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+dat$a_action <- recode(dat$ai_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+
+write.csv(dat,file = "exp1_data.csv", row.names = FALSE)
+
+# logit tranformation
+my_logit <- function(x) {
+  ret <- log(x/(1-x))
+  ret[x==0] <- -Inf
+  ret[x==1] <- Inf 
+  return(ret)
+}
+
+# inverse logit transformation
+my_logistic <- function(x) {
+  ret <- 1/(1+exp(-x))
+  ret[x == -Inf] <- 0.0
+  ret[x == Inf] <- 1.0
+  return(ret)
+}
+  
+
+```
+
+#### New work 
+## Q-learning (Basic)
+```{r}
+Q_learn <- function(par,data,return_value=c("-2loglik","likelihood_by_trial")){
+  # actions
+  # beta= inverse temperature parameter in softmax choice function
+  # lambda = learning rate (one per game?)
+  # data : participant and ai choice data.
+  # Returns Q-values per trial and predicts choice using softmax
+  beta <- par[1]
+  alpha <- par[2]
+  Q_vals_RPS = matrix(0.0,3)
+  names(Q_vals_RPS) <- c("R","P","S")
+  Q_vals_FWG = matrix(0.0,3)
+  names(Q_vals_FWG) <- c("F","W","G")
+  Q_vals_NUM = matrix(0.0,5)
+  names(Q_vals_NUM) <- c("1","2","3","4","5")
+  
+  lik_hum <- matrix(0.0,nrow(data))
+
+  for(t in 1:nrow(data)) {
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    if(data[t,"round"] == 1) {
+      # first round is uniform prediction
+      Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
+      lik_hum[t] <- 1/nopts
+    } else {
+      # Get reward and past human action
+      reward <- as.numeric(data[t-1,"score"])
+      h_act_prev <- as.character(data[t-1,"h_action"])
+      Q_vals[h_act_prev] <- Q_vals[[h_act_prev]] + as.numeric(alpha)*( reward - Q_vals[[h_act_prev]])
+      
+      # cat(Q_vals,"\n") 
+
+      # Assume human chooses action probabilistically using softmax on Q values
+      probs <- exp(Q_vals/beta)/sum(exp(Q_vals/beta))
+      
+      # Get actual human action and compute likelihood
+      h_act <- as.character(data[t,"h_action"])
+      act_index <- match(h_act, names(Q_vals))
+      #cat(as.character(act_index))
+      lik_hum[t] <- probs[[act_index]]
+    }
+  }
+  if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+  
+}
+
+
+```
+
+## Q-learning fit
+```{r, cache=TRUE}
+QL_modelling <- list()
+for(id in unique(dat$human_id)) {
+  QL_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+  QL_modelling[[id]] <- optim(c(1,0.1),fn=Q_learn,gr = NULL, data=tdat,"-2loglik", lower = c(0,0), upper = c(10,0.99), method="L-BFGS-B")
+}
+save(QL_modelling,file="QL_modelling.RData")
+
+
+```
+
+
+
+## First attempt : Q-Learning with state space consisting of last round play (deprecated) 
+```{r}
+
+# Q_learn_states <- function(par,data,return_value,gamma){
+#   # Par[1] -> beta= inverse temperature parameter in softmax choice function
+#   # Par[2] -> lambda = learning rate (one per game?)
+#   # data : participant and ai choice data.
+#   # return_value=c("-2loglik","likelihood_by_trial")
+#   # Gamma is discount factor for future rewards 
+#   # Returns Q-values per trial and predicts choice using softmax
+#   beta <- par[1]
+#   alpha <- par[2]
+# 
+#   #gamma <- 0.9 
+# 
+#   #Define matrix of state spaces for each game 
+#   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+#   states_RPS <- paste0(G1$Var1,G1$Var2)
+# 
+#   G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+#   states_FWG <- paste0(G2$Var1,G2$Var2)
+# 
+#   G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+#   states_NUM <- paste0(G3$Var1,G3$Var2)
+#   
+#   Q_vals_RPS = matrix(-0.5,9,3)
+#   dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
+# 
+#   Q_vals_FWG = matrix(-0.5,9,3)
+#   dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
+#   
+#   Q_vals_NUM = matrix(-0.5,25,5)
+#   dimnames(Q_vals_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+#  
+#   lik_hum <- matrix(0.0,nrow(data))
+# 
+#   for(t in 1:nrow(data)) {
+#     t_game <- data[t,"game"]
+#     if(t_game == "numbers") nopts <- 5 else nopts <- 3
+#     
+#     if(data[t,"round"] == 1) {
+#       # first round is uniform prediction
+#       Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
+#       state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, numbers = states_NUM)
+#       lik_hum[t] <- 1/nopts
+#       # Randomly select prev_state and actions for first round
+#       curr_state <- sample(state_vec, size = 1)
+#       h_act <- sample(colnames(Q_vals), size =1)
+#       ai_act <- sample(colnames(Q_vals), size =1)
+#       reward <- 0 
+#       
+#     } else {
+#       # Get past human action and associated reward 
+#       h_act <- as.character(data[t-1,"h_action"])
+#       ai_act <- as.character(data[t-1,"a_action"])
+#       reward <- as.numeric(data[t-1,"score"])
+#     }
+#     
+#     
+#     # cat(curr_state, " This is the previous state", "\n")
+#     new_state <- paste0(h_act,ai_act)
+#     # cat(new_state,"This is new state","\n")
+#     
+#     # Q_learning: update rule (time  = t-1)
+#     Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act])
+#     
+#     # Assume human chooses action probabilistically using softmax on Q values
+#     probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
+#     #if (data[t,"round"] == 50) { cat(Q_vals,"\n") }
+#     
+#     # Get actual human action and compute likelihood
+#     h_act <- as.character(data[t,"h_action"])
+#     act_index <- match(h_act, colnames(Q_vals))
+#     lik_hum[t] <- probs[[act_index]]
+#       
+#     # Update state
+#     curr_state <- new_state 
+#     #}
+#   }
+#   if(return_value == "-2loglik") {
+#     ret <- -2*sum(log(lik_hum))
+#     if(is.infinite(ret) || is.nan(ret)) {
+#       return(1e+300)
+#     } else {
+#       return(ret)
+#     }
+#   }
+#   if(return_value == "likelihood_by_trial") return(lik_hum)
+#   
+# }
+
+```
+
+
+
+#Second attempt at QL algorithm with states: No guessing of initial states
+```{r}
+Q_learn_states <- function(par,data,return_value,gamma){
+  # Par[1] -> beta= inverse temperature parameter in softmax choice function
+  # Par[2] -> lambda = learning rate (one per game?)
+  # data : participant and ai choice data.
+  # return_value=c("-2loglik","likelihood_by_trial")
+  # Gamma is discount factor for future rewards 
+  # Returns Q-values per trial and predicts choice using softmax
+  beta <- par[[1]]
+  alpha <- par[[2]]
+
+  #Define matrix of state spaces for each game 
+  G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+  states_RPS <- paste0(G1$Var1,G1$Var2)
+
+  G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+  states_FWG <- paste0(G2$Var1,G2$Var2)
+
+  G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  states_NUM <- paste0(G3$Var1,G3$Var2)
+  
+  Q_vals_RPS = matrix(-0.5,9,3)
+  dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
+
+  Q_vals_FWG = matrix(-0.5,9,3)
+  dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
+  
+  Q_vals_NUM = matrix(-0.5,25,5)
+  dimnames(Q_vals_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+ 
+  lik_hum <- matrix(0.0,nrow(data))
+
+  for(t in 1:nrow(data)) {
+    
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    
+    if(data[t,"round"] == 1) {
+      # first round is uniform prediction
+      Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
+      state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, numbers = states_NUM)
+      lik_hum[t] <- 1/nopts
+      
+    } else {
+      # Get past human action and associated reward 
+      h_act_prev <- as.character(data[t-1,"h_action"])
+      ai_act_prev <- as.character(data[t-1,"a_action"])
+      curr_state <- paste0(h_act_prev,ai_act_prev)
+      
+      
+      h_act <- as.character(data[t,"h_action"])
+      ai_act <- as.character(data[t,"a_action"])
+      reward <- as.numeric(data[t,"score"])
+      
+      new_state <- paste0(h_act,ai_act)
+      
+      # Assume human chooses action probabilistically using softmax on Q values
+      probs <- exp(Q_vals[curr_state,]/beta)/sum(exp(Q_vals[curr_state,]/beta))
+      
+      # Get actual human next action and compute likelihood
+      act_index <- match(h_act, colnames(Q_vals))
+      lik_hum[t] <- probs[[act_index]]
+      
+       # Q_learning: update rule (time = t)
+      Q_vals[curr_state, h_act] <- Q_vals[curr_state, h_act] + alpha*( reward + gamma*max(Q_vals[new_state,]) - Q_vals[curr_state, h_act])
+      
+      # Update state
+      curr_state <- new_state 
+
+    }
+    
+  }
+  if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+  
+}
+
+```
+
+```{r}
+data34 <- subset(dat,human_id == "QSuzBXpbyRc370HsAACW")
+
+# Q_learn_states(c(5, 0.5),data34 ,return_value = "likelihood_by_trial",gamma = 0 )
+
+
+```
+
+## Fitting Q_learning with states
+```{r , cache =TRUE}
+# data = subset(dat,human_id == "38VxtUSv_h6RR5-tAAA2")
+# Q_learn_states(c(0.1,0.1), data, "-2loglik")
+
+QL_states_modelling <- list()
+for(id in unique(dat$human_id)) {
+  QL_states_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+  # QL_states_modelling[[id]] <- optim(c(1,0.1),fn=Q_learn_states,gr = NULL, data=tdat,"-2loglik", gamma =0 , lower = c(0,0), upper = c(10,0.99), method="L-BFGS-B")
+
+   QL_states_modelling[[id]] <- DEoptim(fn=Q_learn_states,lower = c(0,0), upper = c(10,1), data=tdat,"-2loglik", gamma = 0, control=list(trace = FALSE,parallelType=1))
+}
+
+save(QL_states_modelling, file="QL_states_modelling.RData")
+
+
+# QL_states_gamma <- list()
+# for(id in unique(dat$human_id)) {
+#   QL_states_gamma[[id]] <- list()
+#   tdat <- subset(dat,human_id == id)
+#   QL_states_gamma[[id]] <- DEoptim(fn=Q_learn_states,lower = c(0,0), upper = c(10,1), data=tdat,"-2loglik", gamma = 0.9, control=list(trace = FALSE,parallelType=1))
+# }
+# save(QL_states_gamma,file="QL_states_gamma.RData")
+
+```
+
+```{r}
+# OK, let's compare BICs and parameters for Gamma = 0 and Gamma = 0.9 (both for initial Q-values of -0.5)
+
+compare_QL_states <- data.frame()
+for(id in unique(dat$human_id)) {
+compare_QL_states  <- rbind(compare_QL_states ,
+                       data.frame(
+                         "id" = id,
+                         "condition" = dat[dat$human_id==id,"condition"][1],
+                         "Zero_Gamma_BIC" = QL_states_modelling[[id]]$optim$bestval + 2*log(150),
+                         "High_gamma_BIC" = QL_states_gamma[[id]]$optim$bestval + 2*log(150),
+                         "diff" = QL_states_modelling[[id]]$optim$bestval - QL_states_gamma[[id]]$optim$bestval
+                       ))
+}
+
+```
+#Notes: Q-Learning as done above is far from optimal. The reason is that most states are never visited during play ( anecdotal evidence, about 40-60% in RPS/FWG and 10-20% in NUM). This method needs a lot more rounds to start modelling players behavior correctly. 
+
+
+## Parametric Experience Weighted Attraction model (Camerer & Ho 1997)
+```{r}
+EWA_par <- function(par,data,return_value){
+  # par: vector of parameters to the EWA model
+  # Data :choice data by trial for each participant
+  # Returns sum of loglikelihoods or likelihood per trial
+  phi <- par[1]
+  delta <- par[2]
+  rho <- par[3]
+  lambda <- par[4]
+
+
+  # Define attraction vectors for each game
+  A_RPS = matrix(0.0,3)
+  names(A_RPS) <- c("R","P","S")
+  A_FWG = matrix(0.0,3)
+  names(A_FWG) <- c("F","W","G")
+  A_NUM = matrix(0.0,5)
+  names(A_NUM) <- c("1","2","3","4","5")
+  
+  # # Define reward matrices from the prospective of the row player (human in our case)
+  reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+  
+  reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+  
+  reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+  dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+
+  # Initiate likelihood by trial vector
+  lik_hum <- matrix(0.0,nrow(data))
+
+  for(t in 1:nrow(data)) {
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    if(data[t,"round"] == 1) {
+      # first round is uniform prediction
+      Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
+      reward <- switch(as.character(t_game),rps=reward_RPS,fwg = reward_FWG, numbers = reward_NUM)
+      lik_hum[t] <- 1/nopts
+      # Initiate N(0) = 1 as in Camerer and Ho 1997 paper.
+      N <- 1
+      
+    } else {
+      # Get reward and past human action
+      h_act_prev <- as.character(data[t-1,"h_action"])
+      a_act_prev <- as.character(data[t-1,"a_action"])
+      for (i in 1:length(Att)) {
+        action <- as.character(names(Att)[i])
+        # cat("this is current strat",action,"\n")
+        # cat("this is previous human action",h_act_prev,"\n")
+
+        # Attraction vector update rule
+        Att[[i]] <- (phi*N*Att[[i]]  + ( delta + (1- delta)*(action == h_act_prev))*as.numeric(reward[action,a_act_prev])) / (rho*N + 1)
+      }
+      #Update the value of N
+      N <- rho*N + 1
+
+      # Assume human chooses action probabilistically using softmax on Attraction values
+      probs <- exp(lambda*Att)/sum(exp(lambda*Att))
+
+      # Get actual human action and compute likelihood
+      h_act <- as.character(data[t,"h_action"])
+      act_index <- match(h_act, names(Att))
+      lik_hum[t] <- probs[[act_index]]
+    }
+  }
+
+ if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret) ) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+}
+```
+
+## Fitting Parametric EWA to data 
+```{r, cache =TRUE}
+
+EWA_modelling <- list()
+for(id in unique(dat$human_id)) {
+  EWA_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+  # EWA_modelling[[id]] <- optim(c(0.5,0.5,0.5,0.5),fn=EWA_par,gr = NULL, data=tdat,"-2loglik", lower = c(0.001,0.001,0.001,0.001), upper = c(1,0.99,0.99,1), method="L-BFGS-B")
+  EWA_modelling[[id]] <- DEoptim(fn=EWA_par,lower = c(0.01,0.01,0.01,0.01), upper = c(10,1,1,10), data=tdat,"-2loglik",control=list(trace = FALSE,parallelType=1))
+}
+
+save(EWA_modelling,file="EWA_modelling.RData")
+
+```
+
+
+##  Self-Tuning EWA (Camerer & Ho 2007) 
+```{r}
+
+EWA_self <- function(par,data,return_value){
+
+  lambda <- par[1]
+  # Initiate N(0) = 1 as in Camerer and Ho 1997 paper. 
+
+  
+  # Define attraction vectors for each game 
+  A_RPS = matrix(0.0,3)
+  names(A_RPS) <- c("R","P","S")
+  A_FWG = matrix(0.0,3)
+  names(A_FWG) <- c("F","W","G")
+  A_NUM = matrix(0.0,5)
+  names(A_NUM) <- c("1","2","3","4","5")
+  
+  # # Define reward matrices from the prospective of the row player (human in our case)
+  reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+  
+  reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+  
+  reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+  dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  
+  # Initiate likelihood by trial vector 
+  lik_hum <- matrix(0.0,nrow(data))
+
+  for(t in 1:nrow(data)) {
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    if(data[t,"round"] == 1) {
+      # first round is uniform prediction
+      Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
+      reward <- switch(as.character(t_game),rps=reward_RPS,fwg = reward_FWG, numbers = reward_NUM)
+      game_data <- subset(data, game == t_game)
+      lik_hum[t] <- 1/nopts
+      N <- 1.0
+
+      R_t <- rep(0.0,nopts)
+      H_t <- R_t
+      
+    } else {
+      
+      indx <- data[t,"round"]
+      # Get reward and past human action
+      h_act_prev <- as.character(game_data[indx-1,"h_action"])
+      a_act_prev <- as.character(game_data[indx-1,"a_action"])
+
+      # Estimate phi(t)
+      R_t <- as.numeric(names(Att) == a_act_prev)
+      # cat("This is R(t)",R_t,"\n")
+      
+      H_t <- (H_t*(indx-2) + R_t)/(indx-1)
+      # cat("this is H(t)",H_t,"\n")
+      
+      Phi_t <- 1 - 0.5*sum((H_t-R_t)^2)
+      # cat("This is Phit(t)",Phi_t,"\t")
+      
+      # Estimate vector Delta(t)
+
+      delta_t <- as.numeric(reward[,a_act_prev] >= as.numeric(game_data[indx-1,"score"]))
+      #cat("this is delta(t)",delta_t,"\n")
+      
+      for (i in 1:length(Att)) {
+        action <- as.character(names(Att)[i])
+        # cat("this is current strat",action,"\n")
+        # cat("this is previous humna action",h_act_prev,"\n")
+        
+        # Attraction vector update rule 
+        Att[[i]] <- (Phi_t*N*Att[[i]]  + ( delta_t[[i]] + (1- delta_t[[i]])*(action == h_act_prev))*as.numeric(reward[action,a_act_prev])) / (Phi_t*N + 1)
+      }
+      #Update the value of N 
+      N <- Phi_t*N + 1
+      #cat(Att,'\n')
+      
+      # Assume human chooses action probabilistically using softmax on Attraction values
+      probs <- exp(lambda*Att)/sum(exp(lambda*Att))
+      
+      # Get actual human action and compute likelihood
+      h_act <- as.character(game_data[indx,"h_action"])
+      act_index <- match(h_act, names(Att))
+      lik_hum[t] <- probs[[act_index]]
+    }
+  }
+  
+ if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+}
+
+```
+
+
+```{r}
+##Plotting self_tuning EWA likelihood function for lambda from 0 to 100 
+# 
+# lambdas <- seq(1,10,0.01)
+# count = 0.0
+# 
+# 
+# 
+# for(id in unique(dat$human_id)) {
+#   if (count <= 15) {
+#       tdat <- subset(dat,human_id == id)
+#       likelihoods <- sapply(lambdas, EWA_self, tdat, "-2loglik")
+#       plot(lambdas,likelihoods)
+#       count <- count + 1
+#   }
+# }
+
+```
+  
+## Fitting Self-Tuning EWA to data 
+```{r, cache=TRUE}
+
+
+EWA_self_modelling <- list()
+for(id in unique(dat$human_id)) {
+  EWA_self_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+#   EWA_self_modelling[[id]] <- optim(10.0,fn=EWA_self,gr = NULL, data=tdat,"-2loglik", lower = 0.0, upper = 200, method="L-BFGS-B")
+# }
+  EWA_self_modelling[[id]] <- DEoptim(fn=EWA_self, lower = 0.0, upper = 100.0, data=tdat, "-2loglik", control=list(trace = FALSE,parallelType=1))
+}
+
+save(EWA_self_modelling,file="EWA_self_modelling.RData")
+
+  
+```
+
+```{r}
+# cat(EWA_self_modelling[["38VxtUSv_h6RR5-tAAA2"]]$optim$bestmem)
+```
+
+
+
+##  First attempt : Self-Tuning EWA with prior round play as state (Camerer & Ho 2007) 
+```{r}
+# Initiates N(0) = 1 as in Camerer and Ho 1997 paper. 
+# 
+# EWA_states <- function(par,data,return_value){
+# 
+#   lambda <- par[1]
+# 
+#   #Define matrix of state spaces for each game 
+#   G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+#   states_RPS <- paste0(G1$Var1,G1$Var2)
+# 
+#   G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+#   states_FWG <- paste0(G2$Var1,G2$Var2)
+# 
+#   G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+#   states_NUM <- paste0(G3$Var1,G3$Var2)
+#   
+#   A_RPS = matrix(-0.5,9,3)
+#   dimnames(A_RPS) = list(states_RPS, c("R", "P", "S"))
+# 
+#   A_FWG = matrix(-0.5,9,3)
+#   dimnames(A_FWG) = list(states_FWG, c("F", "W", "G"))
+#   
+#   A_NUM = matrix(-0.5,25,5)
+#   dimnames(A_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+# 
+#   
+#   # # Define reward matrices from the perspective of the row player (human in our case)
+#   reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+#   dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+#   
+#   reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+#   dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+#   
+#   reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+#   dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+#   
+#   # Initiate likelihood by trial vector 
+#   lik_hum <- matrix(0.0,nrow(data))
+# 
+#   for(t in 1:nrow(data)) {
+#     t_game <- data[t,"game"]
+#     if(t_game == "numbers") nopts <- 5 else nopts <- 3
+#     if(data[t,"round"] == 1) {
+#       Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
+#       state_vec <- switch(as.character(t_game), rps=states_RPS, fwg = states_FWG, numbers = states_NUM)
+#       reward <- switch(as.character(t_game), rps=reward_RPS, fwg = reward_FWG, numbers = reward_NUM)
+#       game_data <- subset(data, game == t_game)
+#       
+#       # first round is uniform prediction
+#       lik_hum[t] <- 1/nopts
+#       N <- 1.0
+# 
+#       R_t <- rep(0.0,nopts)
+#       H_t <- R_t
+#       
+#       # Randomly select prev_state and actions for first round
+#       curr_state <- sample(state_vec, size = 1)
+#       h_act_prev <- sample(colnames(Att), size =1)
+#       a_act_prev <- sample(colnames(Att), size =1)
+#       #reward <- 0 
+#       
+#     } else {
+#       
+#       indx <- data[t,"round"]
+#       state_indx <- match(curr_state,state_vec)
+#       #cat("this is the current state index", state_indx, "\n")
+#       
+#       # Get reward and past human action
+#       h_act_prev <- as.character(game_data[indx-1,"h_action"])
+#       a_act_prev <- as.character(game_data[indx-1,"a_action"])
+#       new_state <- paste0(h_act_prev,a_act_prev)
+# 
+#       # Estimate R(t) (recent history) then H(t) (history) then phi(t) (change detector)
+#       R_t <- as.numeric(colnames(Att) == a_act_prev)
+#       #cat("This is R(t)",R_t,"\n")
+#       
+#       H_t <- (H_t*(indx-2) + R_t)/(indx-1)
+#       #cat("this is H(t)",H_t,"\n")
+#       
+#       Phi_t <- 1 - 0.5*sum((H_t-R_t)^2)
+#       #cat("This is Phit(t)",Phi_t,"\t")
+#       
+#       # Estimate vector Delta(t)
+#       delta_t <- as.numeric(reward[,a_act_prev] >= as.numeric(game_data[indx-1,"score"]))
+#       #cat("this is delta(t)",delta_t,"\n")
+#       
+#       for (i in 1:nopts) {
+#         action <- as.character(colnames(Att)[i])
+# 
+#         #cat("this is current indexed action",action,"\n")
+#         #cat("this is previous human action",h_act_prev,"\n")
+#         
+#         # Attraction vector update rule
+#         Att[state_indx,i] <- (Phi_t*N*Att[state_indx,i]  + ( delta_t[[i]] + (1- delta_t[[i]])*(action == h_act_prev))*as.numeric(reward[action,a_act_prev])) / (Phi_t*N + 1)
+#       }
+#       
+#       #Update the value of N 
+#       N <- Phi_t*N + 1
+# 
+#       # Assume human chooses action probabilistically using softmax on Attraction values
+#       probs <- exp(lambda*Att[new_state,])/sum(exp(lambda*Att[new_state,]))
+#       
+#       # Get actual human action and compute likelihood
+#       h_act <- as.character(game_data[indx,"h_action"])
+#       act_index <- match(h_act, colnames(Att))
+#       lik_hum[t] <- probs[[act_index]]
+#       
+#       curr_state <- new_state
+#       
+#       # if (indx == 50) {
+#       #   cat("this is the attraction matrix at last round of", "\n")
+#       #   print(Att)
+#       # }
+#     }
+#   }
+#   
+#  if(return_value == "-2loglik") {
+#     ret <- -2*sum(log(lik_hum))
+#     if(is.infinite(ret) || is.nan(ret)) {
+#       return(1e+300)
+#     } else {
+#       return(ret)
+#     }
+#   }
+#   if(return_value == "likelihood_by_trial") return(lik_hum)
+# }
+
+```
+
+### Second attempt at ST_EWA with states and no initial guess of initial states. 
+```{r}
+ST_EWA_STATES <- function(par,data,return_value){
+
+  lambda <- par[1]
+
+  #Define matrix of state spaces for each game 
+  G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+  states_RPS <- paste0(G1$Var1,G1$Var2)
+
+  G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+  states_FWG <- paste0(G2$Var1,G2$Var2)
+
+  G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  states_NUM <- paste0(G3$Var1,G3$Var2)
+  
+  A_RPS = matrix(-0.5,9,3)
+  dimnames(A_RPS) = list(states_RPS, c("R", "P", "S"))
+
+  A_FWG = matrix(-0.5,9,3)
+  dimnames(A_FWG) = list(states_FWG, c("F", "W", "G"))
+  
+  A_NUM = matrix(-0.5,25,5)
+  dimnames(A_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+
+  
+  # # Define reward matrices from the perspective of the row player (human in our case)
+  reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+  
+  reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+  
+  reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+  dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  
+  # Initiate likelihood by trial vector 
+  lik_hum <- matrix(0.0,nrow(data))
+  
+   for(t in 1:nrow(data)) {
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    
+    if(data[t,"round"] == 1) {
+      Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
+      state_vec <- switch(as.character(t_game), rps=states_RPS, fwg = states_FWG, numbers = states_NUM)
+      reward <- switch(as.character(t_game), rps=reward_RPS, fwg = reward_FWG, numbers = reward_NUM)
+      game_data <- subset(data, game == t_game)
+      
+      # first round is uniform prediction
+      lik_hum[t] <- 1/nopts
+      # Asumme N(0) = 1 for now...see discussion in paper
+      N <- 1.0
+      # initialize H_t by looking at first action 
+      # H_t <- rep(0.0,nopts)
+      a_act <- as.character(game_data[1,"a_action"])
+      H_t <- as.numeric(colnames(Att) == a_act)
+      
+      # Rounds 2 to end 
+    } else { 
+
+      indx <- data[t,"round"]
+      
+      # Get reward and past human action
+      h_act_prev <- as.character(game_data[indx-1,"h_action"])
+      a_act_prev <- as.character(game_data[indx-1,"a_action"])
+      curr_state <- paste0(h_act_prev,a_act_prev)
+      
+      h_act <- as.character(game_data[indx,"h_action"])
+      a_act <- as.character(game_data[indx,"a_action"])
+      new_state <- paste0(h_act,a_act)
+      
+      # Assume human chooses action probabilistically using softmax on Attraction values
+      probs <- exp(lambda*Att[curr_state,])/sum(exp(lambda*Att[curr_state,]))
+      
+      # Get actual human action and compute likelihood
+      act_index <- match(h_act, colnames(Att))
+      lik_hum[t] <- probs[[act_index]]
+      
+      # Update rule:
+      # Estimate R(t) (recent history) then H(t) (history) then phi(t) (change detector)
+      R_t <- as.numeric(colnames(Att) == a_act)
+      #cat("This is R(t)",R_t,"\n")
+      
+      H_t <- (H_t*(indx-1) + R_t)/(indx)
+      #cat("this is H(t)",H_t,"\n")
+      
+      Phi_t <- 1 - 0.5*sum((H_t-R_t)^2)
+      #cat("This is Phit(t)",Phi_t,"\t")
+      
+      # Estimate vector Delta(t)
+      delta_t <- as.numeric(reward[,a_act] >= as.numeric(game_data[indx,"score"]))
+      #cat("this is delta(t)",delta_t,"\n")
+      
+      # This is a vectorised ST_EWA update rule, easier to follow the loop below in comments
+      state_indx <- match(curr_state,state_vec)
+      Att[state_indx,] <- (Phi_t*N*Att[state_indx,]  + ( delta_t + (1- delta_t)*(colnames(Att) == h_act))*as.numeric(reward[colnames(Att),a_act])) / (Phi_t*N + 1)
+      
+      ##############
+      # for (i in 1:nopts) {
+      #   action <- as.character(colnames(Att)[i])
+      #   state_indx <- match(curr_state,state_vec)
+      #   #cat("this is the current state index", state_indx, "\n")
+      # 
+      #   # Attraction vector update rule
+      #   Att[state_indx,i] <- (Phi_t*N*Att[state_indx,i]  + ( delta_t[[i]] + (1- delta_t[[i]])*(action == h_act))*as.numeric(reward[action,a_act])) / (Phi_t*N + 1)
+      # 
+      # }
+      # 
+      #cat("this is the current Att vector", Att, "\n")
+      ###################
+      
+      #Update the value of N 
+      N <- Phi_t*N + 1
+      
+      #Update the state 
+      curr_state <- new_state 
+    }
+   }  
+  if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+  
+}
+
+```
+
+
+```{r}
+# data12 = subset(dat,human_id == "38VxtUSv_h6RR5-tAAA2")
+# ST_EWA_STATES(0.5, data12, "-2loglik")
+# optim(10.0,fn=ST_EWA_STATES,gr = NULL, data=data12,"-2loglik", lower = 0.0, upper = 200, method="L-BFGS-B")
+
+```
+
+
+```{r, cache=TRUE}
+
+
+ST_EWA_STATES_modelling <- list()
+for(id in unique(dat$human_id)) {
+  ST_EWA_STATES_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+#   ST_EWA_STATES_modelling[[id]] <- optim(10.0,fn=ST_EWA_STATES,gr = NULL, data=tdat,"-2loglik", lower = 0.0, upper = 200, method="L-BFGS-B")
+# }
+  ST_EWA_STATES_modelling[[id]] <- DEoptim(fn=ST_EWA_STATES, lower = 0.0, upper = 100.0, data=tdat, "-2loglik", control=list(trace = FALSE,parallelType=1))
+}
+
+save(ST_EWA_STATES_modelling,file="ST_EWA_STATES_modelling.RData")
+
+```
+
+
+
+## What next?: Fitting models that explicitly take into account opponent strategy. LOLA? Won't work, it suffers from same issues as normal QL in that most states are not visited during game play. Influence model? Like belief lerning. it still has no sequential memory, still computes distribution on beliefs. We need to incorporate models that can mimic human memory by looking at history of play and leverage sequence prediction capabilities. 
+
+
+### Model based model: learn transition probabilities to new states. Weigh the value of an action by the conditional probability of ending up in a future state times the value of the new state.... once you take an action in current round, you can only end up in 3 states, with probabilities p, q and 1-p-q. You are learning these probabilities by updating priors (initial prior is dirichlet). 
+```{r}
+MBM <- function(par,data,return_value,gamma){
+  # Par[1] -> beta= inverse temperature parameter in softmax choice function
+  # Par[2] -> lambda = learning rate (one per game?)
+  # data : participant and ai choice data.
+  # return_value=c("-2loglik","likelihood_by_trial")
+  # Gamma is discount factor for future rewards 
+  # Returns Q-values per trial and predicts choice using softmax
+  beta <- par[1]
+  alpha <- par[2]
+
+  #gamma <- 0.9 
+
+  #Define matrix of state spaces for each game 
+  G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+  states_RPS <- paste0(G1$Var1,G1$Var2)
+
+  G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+  states_FWG <- paste0(G2$Var1,G2$Var2)
+
+  G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  states_NUM <- paste0(G3$Var1,G3$Var2)
+  
+  # Matrices to store Q_values in each state 
+  Q_vals_RPS = matrix(-0.5,9,3)
+  dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
+  Q_vals_FWG = matrix(-0.5,9,3)
+  dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
+  Q_vals_NUM = matrix(-0.5,25,5)
+  dimnames(Q_vals_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+  
+  # Transition Matrices 
+  Transit_RPS = matrix(1/9,9,9)
+  dimnames(Transit_RPS) = list(states_RPS, states_RPS)
+  Transit_FWG = matrix(1/9,9,9)
+  dimnames(Transit_FWG) = list(states_FWG, states_FWG)
+  Transit_NUM = matrix(1/25,25,25)
+  dimnames(Transit_NUM) = list(states_NUM, states_NUM)
+  
+  
+  lik_hum <- matrix(0.0,nrow(data))
+
+  for(t in 1:nrow(data)) {
+    t_game <- data[t,"game"]
+    if(t_game == "numbers") nopts <- 5 else nopts <- 3
+    
+    if(data[t,"round"] == 1) {
+      # first round is uniform prediction
+      Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
+      state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, numbers = states_NUM)
+      Transit <- switch(as.character(t_game),rps=Transit_RPS,fwg = Transit_FWG, numbers = Transit_NUM)
+      lik_hum[t] <- 1/nopts
+      # Randomly select prev_state and actions for first round
+      curr_state <- sample(state_vec, size = 1)
+      h_act <- sample(colnames(Q_vals), size =1)
+      ai_act <- sample(colnames(Q_vals), size =1)
+      reward <- 0 
+      
+    } else {
+      # Get past human action and associated reward 
+      h_act <- as.character(data[t-1,"h_action"])
+      ai_act <- as.character(data[t-1,"a_action"])
+      reward <- as.numeric(data[t-1,"score"])
+    }
+    
+    
+    # cat(curr_state, " This is the previous state", "\n")
+    new_state <- paste0(h_act,ai_act)
+    # cat(new_state,"This is new state","\n")
+    
+    
+    # Update Transit matrix ....first create hot vector = 1 if new state, 0 otherwise 
+    hot_vector <- state_vec == new_state
+  
+    
+    # Transit probs update: TD learning on transition matrix, learning rate fixed at 0.1
+    Transit[curr_state,] <- Transit[curr_state,] + 0.1* (hot_vector - Transit[curr_state,])
+    #cat(Transit[curr_state,], "\n")
+    
+    # Update Q-values as current reward + a weighted (by trasnsit probs) average of future Q-values.
+    Q_Row_max <- apply(Q_vals, 1, max, na.rm = TRUE)
+    #cat(Transit[curr_state,] * Q_Row_max, "\n")
+    Q_vals[curr_state, h_act] <- reward +  gamma*( Transit[curr_state,] %*% Q_Row_max  ) 
+    
+    
+    
+    # Assume human chooses action probabilistically using softmax on Q values
+    probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
+    #if (data[t,"round"] == 50) { cat(Q_vals,"\n") }
+    
+    # Get actual human action and compute likelihood
+    h_act <- as.character(data[t,"h_action"])
+    act_index <- match(h_act, colnames(Q_vals))
+    lik_hum[t] <- probs[[act_index]]
+      
+    # Update state
+    curr_state<- new_state 
+    #}
+  }
+  if(return_value == "-2loglik") {
+    ret <- -2*sum(log(lik_hum))
+    if(is.infinite(ret) || is.nan(ret)) {
+      return(1e+300)
+    } else {
+      return(ret)
+    }
+  }
+  if(return_value == "likelihood_by_trial") return(lik_hum)
+  
+}
+
+```
+
+
+```{r, cache=TRUE}
+MBM_modelling <- list()
+for(id in unique(dat$human_id)) {
+  MBM_modelling[[id]] <- list()
+  tdat <- subset(dat,human_id == id)
+  # MBM_modelling[[id]] <- optim(c(1,0.1),fn=QMBM,gr = NULL, data=tdat,"-2loglik", gamma =0 , lower = c(0,0), upper = c(10,0.99), method="L-BFGS-B")
+
+   MBM_modelling[[id]] <- DEoptim(fn=MBM,lower = c(0,0), upper = c(10,1), data=tdat,"-2loglik", gamma = 0.9, control=list(trace = FALSE,parallelType=1))
+}
+
+save(MBM_modelling, file="MBM_modelling.RData")
+
+```
+
+
+## Putting results together 
+```{r}
+load("QL_modelling.RData")
+load("QL_states_modelling.RData")
+load("EWA_modelling.RData")
+load("EWA_self_modelling.RData")
+load("MBM_modelling.RData")
+load("ST_EWA_STATES_modelling.RData")
+
+
+All_results <- data.frame()
+for(id in unique(dat$human_id)) {
+  All_results <- rbind(All_results,
+                       data.frame(
+                         "ID" = id,
+                         "condition" = dat[dat$human_id==id,"condition"][1],
+                         "Random_BIC" = -2*(100*log(1/3) + 50*log(1/5)),
+                         
+                         # Bayesian updating with/without transfer 
+                         # "Bayes_Tr_BIC" = exp1_Bayes_game_Tr[[id]]$optim$bestval+ 1*log(150),
+                         # "Bayes_No_Tr_BIC" = exp1_Bayes_no_Tr[[id]]$optim$bestval + 1*log(150),
+                         # # Theta is the parameter governing AI stochasticity. Truth is 0.9
+                         # "theta_transfer" = exp1_Bayes_game_Tr[[id]]$optim$bestmem[[1]],
+                         # "theta_no_transfer" = exp1_Bayes_no_Tr[[id]]$optim$bestmem[[1]],
+                         # 
+                         
+                         # BCH with/without transfer (With Softmax) 
+                         "Bayes_Tr_BIC" = use_softmax_tr[[id]]$optim$bestval+ 2*log(150),
+                         "Bayes_No_Tr_BIC" = use_softmax_NT[[id]]$optim$bestval+ 2*log(150),
+                         
+                         # Theta is the parameter governing AI stochasticity. Truth is 0.9
+                         "theta_transfer" = use_softmax_tr[[id]]$optim$bestmem[[1]],
+                         "lambda_transfer" = use_softmax_tr[[id]]$optim$bestmem[[2]],
+                         
+                         "theta_no_transfer" = use_softmax_NT[[id]]$optim$bestmem[[1]],
+                         "lambda_no_transfer" = use_softmax_NT[[id]]$optim$bestmem[[2]],
+                         
+                         
+                                                                                    
+                         # Q-Learning
+                         "QL_BIC" = QL_modelling[[id]]$value + 2*log(150),
+                         # beta ->  inverse temperature parameter in softmax choice function
+                         "QL_Beta" = QL_modelling[[id]]$par[1],
+                         # alpha -> learning rate in QL update
+                         "QL_alpha" = QL_modelling[[id]]$par[2],
+
+                         
+                         # Q-learning with last round states
+                         "QL_states_BIC" = QL_states_modelling[[id]]$optim$bestval + 2*log(150),
+                         # beta ->  inverse temperature parameter in softmax choice function
+                         "QL_states_Beta" = QL_states_modelling[[id]]$optim$bestmem[1],
+                         # alpha -> learning rate in QL update
+                         "QL_states_alpha" = QL_states_modelling[[id]]$optim$bestmem[2],
+                         
+                        
+                         # Parametric EWA
+                         # Parametric EWA BIC
+                         "EWA_BIC" = EWA_modelling[[id]]$optim$bestval + 4*log(150),
+                         "EWA_2LL" = EWA_modelling[[id]]$optim$bestval,
+                         # Phi is depreciation of past attractions
+                         "EWA_Phi" = EWA_modelling[[id]]$optim$bestmem[1],
+                         # Delta is weight of foregone payoffs vs actual payoffs
+                         "EWA_Delta" = EWA_modelling[[id]]$optim$bestmem[2],
+                         # Rho is depreciation of the experience measure N(t)
+                         "EWA_Rho" = EWA_modelling[[id]]$optim$bestmem[3],
+                         #Lambda is a parameter of the softmax choice function (inverse Temperature)
+                         "EWA_Lambda" = EWA_modelling[[id]]$optim$bestmem[4],
+
+
+                         # Self-Tuning EWA (only 1 parameter)
+                          # Parametric EWA BIC
+                         # "EWA_self_2LL" = EWA_self_modelling[[id]]$optim$bestval,
+                         # "EWA_self_BIC" = EWA_self_modelling[[id]]$optim$bestval + 1*log(150),
+                         # #Lambda is a parameter of the softmax choice function (inverse Temperature)
+                         # "EWA_self_Lambda" = EWA_self_modelling[[id]]$optim$bestmem[1],
+                         
+                         # self_tuning EWA with states
+                         
+                         "ST_EWA_STATES_BIC" = ST_EWA_STATES_modelling[[id]]$optim$bestval + 1*log(150),
+                         "ST_EWA_STATES_Lambda" = ST_EWA_STATES_modelling[[id]]$optim$bestmem[1]
+                         
+
+                         ))
+}
+
+write.csv(All_results,file="exp1_all_results.csv",row.names = FALSE)
+
+```
+
+
+## Calucalting BIC weights
+```{r}
+
+comp_BICs <- All_results[c("ID","Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","ST_EWA_STATES_BIC")]
+
+exp1_BIC_weights <- comp_BICs["ID"]
+exp1_BIC_weights[,2:ncol(comp_BICs)] <- t(apply(comp_BICs[,2:ncol(comp_BICs)], 1, function(i) exp(-0.5*(i-min(i)) )))
+colnames(exp1_BIC_weights) <-colnames(comp_BICs)
+
+exp1_BIC_weights[,2:ncol(exp1_BIC_weights)] <- t(apply(exp1_BIC_weights[,-1], 1, function(i) round(i/sum(i),2)))
+                     
+                     
+```
+
+## Building table of best model per participant
+```{r}
+
+# Table_results <- table(All_results[, "condition"],c("random","ToM_BT","ToM_NBT","QL", "QL_states","EWA","S_EWA","ST_EWA_STATES")[apply(All_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_BIC","QL_states_BIC","EWA_BIC","EWA_self_BIC","ST_EWA_STATES_BIC")],1,which.min)])
+
+# We choose to omit the simple QL and EWA and opt to only include the ones with states as they are more relevant. 
+
+Table_results <- table(All_results[, "condition"],c("random","ToM_BT","ToM_NBT", "QL_states","ST_EWA_STATES")[apply(All_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_states_BIC","ST_EWA_STATES_BIC")],1,which.min)])
+
+ write.csv(Table_results,file="Table_results.csv",row.names = TRUE)
+ kable(Table_results)
+ #barplot(Table_results)
+ 
+```
+##### Looks like most participants behavior can be explained by QL_states. Bayesian models best explain a few more behaviors, while the others are consistent with random behavior, and only 1 with QL and 1 with S_EWA. 
+ 
+ 
+###### Question: Can we see evidence for transfer by looking at difference in BICS btwn Bayes with and without transfer. Let's test correlation between difference in BICs  with early rounds score (evidence for transfer) 
+```{r}
+# id_results_tst <- subset(All_results, ID == "38VxtUSv_h6RR5-tAAA2")
+```
+
+```{r}
+
+exp1_model_comp <- data.frame()
+for(id in unique(dat$human_id)) {
+  tdat <- subset(dat,human_id == id)
+  tot_score <- sum(tdat$score)
+  tot_time <- sum(tdat$human_rt)
+  #early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg"))
+  early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg" | game =="numbers") )
+  tr_score <- sum(early_dat$score)
+  id_results <- subset(All_results, ID == id)
+  min_BIC <- apply(id_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_states_BIC","ST_EWA_STATES_BIC")],1,min)
+  
+  best_model <- c("random","ToM_Game_Tr","ToM_No_Tr", "QL_states","ST_EWA_STATES")[apply(id_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_states_BIC","ST_EWA_STATES_BIC")],1,which.min)]
+  
+  exp1_model_comp <- rbind(exp1_model_comp,
+                       data.frame(
+                         "human_id" = id,
+                         "condition" = dat[dat$human_id==id,"condition"][1],
+                         "Early_game_score" = tr_score,
+                         "Total_score" = tot_score,
+                         "Best_model" = best_model,
+                         "Total_time" = sum(tdat$human_rt),
+                         "TR_minus_NT_BIC" = id_results[,"Bayes_Tr_BIC"] - id_results[,"Bayes_No_Tr_BIC"],
+                         "Rand_minus_best_BIC" =  id_results[,"Random_BIC"] - min_BIC
+
+                       ))
+}
+
+write.csv(exp1_model_comp,file = "exp1_model_comp.csv", row.names = FALSE)
+
+```
+
+### Correlate difference between BICs of Bayes transfer and no transfer with early rounds score (evidence for transfer) 
+```{r}
+
+cor.test(exp1_model_comp$TR_minus_NT_BIC,exp1_model_comp$Early_game_score, method="spearman")
+
+```
+
+### Correlation between early game score and difference between best model and random BIC
+```{r}
+cor.test(exp1_model_comp$Rand_minus_best_BIC, exp1_model_comp$Early_game_score, method="spearman")
+
+```
+### Histogram of best fitting models 
+```{r}
+barplot(table(exp1_model_comp$Best_model))
+```
+# Notes : There is positive and stat significant correlation between the difference between the best model BIC and random BIC on one hand, and the early scores from the target games ( FWG and NUM). What does this mean? It can be interpreted as a validation of early game score as good measure of how non-random play is....
+
+
+# More exploratory work......
+
+
+## Let's compare total scores of each participant by the model of best fit, see if Bayes+transfer total scores are higher than Bayes + no transfer  
+
+```{r}
+
+# ggboxplot(exp1_model_comp, x = "model", y = "Total_score",
+#           color = "model", palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+#           order = c("Random", "No Transfer", "Transfer"),
+#           ylab = "Total Score", xlab = "Model with best fit")
+
+exp1_model_comp$model <- recode(exp1_model_comp$Best_model,"Bayes Tr" = "Tranfer","Bayes No Tr" = "No Transfer", "QL_states" = "Q_Learning",  .default = "Random")
+model <- factor(exp1_model_comp$model)
+condition <- factor(exp1_model_comp$condition)
+
+# Total score by best predictive model 
+tapply(exp1_model_comp$Total_score, model, mean)
+
+# Compute the analysis of variance
+res.aov <- aov(Total_score ~ model + condition, data = exp1_model_comp)
+# Summary of the analysis
+summary(res.aov)
+TukeyHSD(res.aov)
+```
+
+## What if we remove from data people who play randomly and then compare Transfer v No Transfer? 
+```{r}
+
+Non_Random_Only <- subset(exp1_model_comp, model != "Random" )
+
+group_by(Non_Random_Only, model) %>%
+  summarise(
+    count = n(),
+    mean = mean(Early_game_score, na.rm = TRUE),
+    sd = sd(Early_game_score, na.rm = TRUE)
+  )
+
+res2 <- aov(Early_game_score ~ model, data = Non_Random_Only) 
+summary(res2)
+TukeyHSD(res2)
+```
+
+# Total time by best predictive model
+```{r}
+tapply(exp1_model_comp$Total_time, model, mean)
+
+time.aov <- aov(Total_time ~ model, data = exp1_model_comp)
+# Summary of the analysis
+summary(time.aov)
+TukeyHSD(time.aov)
+
+``` 
+#Early game scores for people best modelled with a Bayesian model with transfer are indeed higher than those best modelled without transfer but difference is not statistically significant. 
+
+
+
+
+<!--chapter:end:comp_model_1019.Rmd-->
+
+---
+output:
+  html_document: default
+  word_document: default
+---
+--
+title: "opponent modelling"
+author: "Ismail Guennouni"
+date: "30 July 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+dat1 <- read.csv("data20180719.csv")
+```
+
+```{r}
+# using some functions dplyr, ggpubr, PairedData and sjPlot. Need to be loaded. 
+library(tidyr)
+library(dplyr)
+library(MASS)
+library(ggpubr)
+library(PairedData)
+library(multcompView)
+library(lsmeans)
+
+
+# transform 'winner' variable in numeric score
+dat1$score <- recode(dat1$winner, human = 1, tie = 0, ai = -1)
+# create a new variable 'block' with round 1...25 = block 1 and round 26...50 as block 2
+dat1$block <- factor(as.numeric(cut(dat1$round,2)),labels =c("first half", "second half"))
+
+# create a new variable "game.f" as a factor variable of games
+dat1$game.f <- factor(dat1$game, labels = c("RPS","FWG","NUM"),levels=c("rps","fwg","numbers"))
+
+# overall score to pay bonuses 
+dat_score <- dat1 %>% 
+  group_by(human_id) %>% 
+      summarize(overall_score = sum(score))
+(avg_bonus <- floor(mean(abs(dat_score$overall_score))))*0.02
+
+#Group data by human_id and calculate mean score per block of each game.
+dat2 <- dat1 %>% 
+  group_by(human_id,condition,game,block,game.f) %>% 
+      summarize(block_score = mean(score))
+
+# Group data by game and ID
+dat3 <- group_by(dat2, human_id,game.f,game) %>% summarise(game_score = mean(block_score))
+# head(dat3,6)
+
+# Subsetting scores data by game
+rps <- subset(dat3,  game.f == "RPS",game_score)
+fwg <- subset(dat3,  game.f == "FWG",game_score)
+num <- subset(dat3,  game.f == "NUM",game_score)
+# head(rps,6)
+```
+
+
+```{r}
+# Look at some summary statistics of group means #############################
+
+group_by(dat2, game.f) %>%
+  summarise(
+    mean = mean(block_score, na.rm = TRUE),
+    sd = sd(block_score, na.rm = TRUE)
+  )
+
+
+
+group_by(dat2, game.f, block) %>%
+  summarise(
+    count = n(),
+    mean = mean(block_score, na.rm = TRUE),
+    sd = sd(block_score, na.rm = TRUE)
+  )
+
+
+group_by(dat2, game.f, condition,block) %>%
+  summarise(
+    count = n(),
+    mean = mean(block_score, na.rm = TRUE),
+    sd = sd(block_score, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+# PLOTS  #############################
+
+# Plot scores per game 
+
+ggboxplot(dat3, x = "game.f", y = "game_score", group = 1, add =c("mean_ci","jitter"), color="game.f", palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","NUM"), ylab = "Score", xlab = "Games") 
+
+ggerrorplot(dat3, x = "game.f", y = "game_score", group = 1, color="game.f", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","NUM"), ylab = "Score", xlab = "Games") 
+
+
+# Plot paired scores between games
+#pd <- paired(rps,fwg)
+#pd2 <- paired(fwg,num)
+#head(pd)
+#plot(pd, type = "profile")
+#plot(pd2, type = "profile")
+ggpaired(dat3, x = "game.f", y = "game_score",color = "game.f", id = "human_id", line.color = "gray", line.size = 0.4, palette = "npg")
+
+# Plot results by game and block (for all 3 games, learning is happening) 
+ggboxplot(dat2, x = "game", y = "block_score", palette = c("#00AFBB", "#E7B800"),order = c("rps", "fwg","numbers"), fill="block",ylab = "Percentage score", xlab = "Games")
+
+
+# Group data by game and ID
+dat4 <- group_by(dat2, human_id,condition,game.f) %>% summarise(game_score = mean(block_score))
+
+# Level 2 is harder to win against than level 1
+ggboxplot(dat2, x = "condition", y = "block_score", palette = c("#00AFBB", "#E7B800"), fill="condition",ylab = "Percentage score", xlab = "Conditions")
+
+ggerrorplot(dat2, x = "condition", y = "block_score", desc_stat = "mean_ci" , palette = c("#00AFBB", "#E7B800"), color="condition",ylab = "Percentage score", xlab = "Conditions")
+
+# Main effect of block 
+ggerrorplot(dat2, x = "block", y = "block_score", desc_stat = "mean_ci" , palette = c("#00AFBB", "#E7B800"), color="block",ylab = "Percentage score", xlab = "Block")
+
+# Breaking it down by game (seems to be true for RPS and FWG, less so for Numbers )
+ggboxplot(dat4, x = "game.f", y = "game_score", palette = c("#00AFBB","#E7B800","#FC4E07"), fill="condition",order = c("RPS", "FWG","NUM"),ylab = "Game Score", xlab = "Conditions")
+
+```
+
+
+
+```{r}
+# Testing score against hypothesis of random play  ######################################
+
+# Normality of scores 
+shapiro.test(dat3$game_score)
+
+# Testing Scores against random play (expected 0 average score)
+t.test(as.numeric(rps$game_score), mu = 0, alternative = "two.sided")
+t.test(as.numeric(fwg$game_score), mu = 0, alternative = "two.sided")
+t.test(as.numeric(num$game_score), mu = 0, alternative = "two.sided")
+
+```
+
+
+```{r}
+# AFEX PACKAGE FOR RUNNING RM ANOVA AND POST HOC TESTS ############################
+citation(package = "afex", lib.loc = NULL, auto = NULL)
+library(afex)
+a1 <- aov_car( block_score ~ game.f*block*condition + Error(human_id/(game.f*block)), dat2)
+summary(a1)
+(a1_nice <- nice(a1, es = attr(a1$anova_table, "es"),
+  observed = attr(a1$anova_table, "observed"),
+  correction = attr(a1$anova_table, "correction"), MSE = NULL,
+  intercept = NULL, p_adjust_method = attr(a1$anova_table,
+  "p_adjust_method"), sig_symbols = attr(a1$anova_table, "sig_symbols")))
+
+write.table(a1_nice,file = "a1.txt", sep = ",", quote = FALSE, row.names = F)
+
+## Note to Self: no need to worry abour the HF warning. You don't have pb with sphericity according to Mauchly tests, and the warning only applies to Huynh-Feldt corrections for violations of sphericity. 
+```
+
+```{r}
+#Pair waise comparison and post hoc tests for the interaction: Game * Block using lsmeans 
+
+# game score differences statistically significant?
+(ls0 <- lsmeans(a1, "game.f"))
+(lsm0 <- update(pairs(ls0, reverse = TRUE), by=NULL, adjust = "holm"))
+
+
+# Main effect of block 
+(ls01 <- lsmeans(a1, "block"))
+(lsm01 <- update(pairs(ls01, reverse = TRUE), by=NULL, adjust = "holm"))
+lsmip(a1, ~block)
+
+# Main effect of condition
+(ls02 <- lsmeans(a1, "condition"))
+(lsm02 <- update(pairs(ls02, reverse = TRUE), by=NULL, adjust = "holm"))
+
+```
+
+```{r}
+# Pairwise comparison of first halves by game ( first half RPS vs first half WFG scores....)
+(ls1 <- lsmeans(a1, "block" , by="game.f"))
+(lsm1 <- update(pairs(ls1, reverse = TRUE), by=NULL, adjust = "holm"))
+lsmip(a1, game.f ~ block)
+```
+
+```{r}
+# Pairwise comparison of each game score by block (first half RPS vs second half RPS....) + Control for family wise error:
+ls2 <- lsmeans(a1, c("block","game.f"))
+(lsm2 <- update(pairs(ls2, reverse = TRUE), by=NULL, adjust = "holm"))
+(contr2 <- contrast(ls2, list(G1H2vG2H1 = c(0,1,-1,0,0,0))))
+(contr3 <- contrast(ls2, list(G1H1vs0 = c(1,0,0,0,0,0))))
+lsmip(a1, block ~ game.f)
+lsmip(a1, ~ block * game.f)
+```
+
+
+```{r}
+# Pairwise comparison of scores facing the two types of players by game: 
+lsc <- lsmeans(a1, "condition", by="game.f")
+(lsmc <- update(pairs(lsc), by=NULL, adjust = "holm"))
+plot(lsmc,by="game.f")
+lsmip(a1, condition ~ game.f)
+
+
+```
+
+```{r}
+#Pair waise comparison and post hoc tests : Game by Block and Condition
+
+
+
+#library(multcompView)
+#use cld to check for comparison pairs belonging to same group, meaning not significantly different from each other...
+#cld(lsm4)
+
+
+#plots
+ls4 <- lsmeans(a1, "block",c("condition","game.f"))
+ls4
+(lsm4 <- update(pairs(ls4, reverse = TRUE), by=NULL, adjust = "holm"))
+
+
+plot(lsm4,by="game.f")
+lsmip(a1, game.f ~ block | condition)
+
+
+# Interaction plot of game and block by condition 
+lsmip(a1, game.f ~ block | condition)
+lsmip(a1, condition ~ block * game.f)
+```
+
+
+```{r}
+# Transfer harder for level2 opponent than when facing level 1 opponent? 
+# learning to specifiy contrasts - 
+# the below compares the score on each block and game for each type and tells me which scores belong to same group
+# the idea is that if transfer is harder vs lvl2 player, then fwg first half score for lvl2 facing player should be sig lower than fwg first-half score vs lvl1 agent.not the case here as thye belong to same group.
+
+(means.int <- lsmeans(a1, specs = c("game.f","block","condition")))
+
+# Transfer level1: compare H1FWG with H1RPS 
+con1  <- contrast(means.int, list(H1_G2vsH1_G1forlvl1 = c(-1,1,0,0,0,0,0,0,0,0,0,0), H1_G3vsH1_G1forlvl1=c(-1,0,1,0,0,0,0,0,0,0,0,0)))
+summary(con1, adjust = "holm")
+
+# Transfer level2: compare H1FWG with H1RPS 
+con2  <- contrast(means.int, list(H1_G2vsH1_G1forlvl2 = c(0,0,0,0,0,0,-1,1,0,0,0,0), H1_G3vsH1_G1forlvl2=c(0,0,0,0,0,0,-1,0,1,0,0,0)))
+summary(con2, adjust = "holm")
+
+
+# compare first half (H1) scores between level 1 and level 2 players in FWG and NUM
+con3 <- contrast(means.int, list(G1vG2forH1 = c(0,1,0,0,0,0,0,-1,0,0,0,0), G2vG3forh1=c(0,0,1,0,0,0,0,0,-1,0,0,0)))
+summary(con3, adjust ="holm")
+
+
+# Within game learning harder for level2 opponent than when facing level 1 opponent? compare differences between block for each game and type
+con4 <- contrast(means.int, list(L2vL1forRPS = c(1,0,0,-1,0,0,-1,0,0,1,0,0), L2vL1forFWG=c(0,1,0,0,-1,0,0,-1,0,0,1,0), L2vL1forNUM=c(0,0,1,0,0,-1,0,0,-1,0,0,1)))
+summary(con4, adjust ="holm")
+
+```
+
+
+
+
+
+
+```{r}
+
+#looking at TRIALS 2 to 6 to test robustness of evidence for transfer of learning of opponent strategy #########
+
+dat_26 <- subset(dat1,round >1 & round <7, drop =TRUE)
+dat2_6 <- dat_26 %>% 
+  group_by(human_id,condition,game.f,confidence,difficulty) %>% 
+      summarise(early_score = mean(score))
+
+write.csv(dat2_6,"exp1_early_rounds.csv")
+
+# Check group means and SDs
+group_by(dat2_6, game.f) %>%
+  summarise(
+    count = n(),
+    mean = mean(early_score, na.rm = TRUE),
+    sd = sd(early_score, na.rm = TRUE)
+    )
+group_by(dat2_6, game.f,condition) %>%
+  summarise(
+    count = n(),
+    mean = mean(early_score, na.rm = TRUE),
+    sd = sd(early_score, na.rm = TRUE)
+    )
+# plot early scores per game 
+ggerrorplot(dat2_6, x = "game.f", y = "early_score", group = 1, color="game.f", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","NUM"), ylab = "Score", xlab = "Games") 
+
+
+# testing differences between early scores across games 
+library(afex)
+aov_early <- aov_car(early_score ~ game.f*condition + Error(human_id/(game.f)),data=dat2_6)
+summary(aov_early)
+
+aov_ear_nice <- nice(aov_early, es = attr(aov_early$anova_table, "es"),
+  observed = attr(aov_early$anova_table, "observed"),
+  correction = attr(aov_early$anova_table, "correction"), MSE = NULL,
+  intercept = NULL, p_adjust_method = attr(aov_early$anova_table,
+  "p_adjust_method"), sig_symbols = attr(aov_early$anova_table, "sig_symbols"))
+
+write.table(aov_ear_nice,file = "aov_ear.txt", sep = ",", quote = FALSE, row.names = F)
+
+
+# including confidence 
+#aov_conf_26 <- aov_car(early_score ~ game.f*condition*difficulty + Error(human_id/(game.f)),data=dat2_6)
+#summary(aov_conf_26)
+
+```
+
+```{r}
+
+
+# (ls4 <- lsmeans(aov_early, "game.f"))
+# (summary(ls4, infer = c(TRUE,TRUE), null = 0,level = 0.95, adjust = "bon"))
+
+(means.int2 <- lsmeans(aov_early, specs = c("game.f","condition")))
+(trans26 <- summary(means.int2, infer = c(TRUE,TRUE),level = .95, adjust = "none",ref=c("FWG","NUM")))
+#(contr26 <- contrast(means.int2, list(G2L1vsG2L2 = c(0,1,0,0,-1,0))))
+
+
+write.table(format(trans26, digits=2),file = "trans26.txt", sep = ",", quote = FALSE, row.names = F)
+
+# compare early scores in FWG for lvl 1 and lvl2 / same for NUM
+
+contrast(means.int2, list(G1vG2for26 = c(0,1,0,0,-1,0), G2vG3for26=c(0,0,1,0,0,-1)))
+         
+# Plot interactions for early rouns, condition by game
+
+lsmip(aov_early, ~ game.f | condition )
+
+
+# plots overall effect by game :
+ggboxplot(dat2_6,"game.f", "early_score", fill = "game.f", palette = c("#00AFBB", "#E7B800", "#FC4E07"),order = c("RPS","FWG","NUM"))
+
+# Note to Self: possible future work exstension is to pick the guys who scored highly on the first rounds of the second game and fit the various learning models to them only. 
+# Two ways to test learning: compare first half between games for different conditions 
+# compare early score between games for different conditions 
+# Check whteher confidence and difficulty  -> add them as covariates in big anova and early score anova *confidence*difficulty.... --> too hard to interpret 
+
+# do a model comparison with model without confidence and difficulty -> start witn ANCOVA (try and see what happens with various interactions).  
+```
+
+
+```{r}
+# adding confidence and difficulty feedback 
+datcd <- dat1 %>% 
+  group_by(human_id,condition,confidence,difficulty) %>% 
+      summarise(avg_score = mean(score))
+
+# testing conf, diff and score for normality 
+shapiro.test(datcd$avg_score)
+shapiro.test(datcd$confidence)
+shapiro.test(datcd$difficulty)
+
+# histograms 
+hist(datcd$confidence, breaks = 20)
+hist(datcd$difficulty, breaks=10)
+
+# descriptive stats 
+group_by(datcd, condition) %>%
+  summarise(
+    count = n(),
+    median = median(confidence, na.rm = TRUE),
+    IQR = IQR(confidence, na.rm = TRUE)
+  )
+
+group_by(datcd, condition) %>%
+  summarise(
+    count = n(),
+    median = median(difficulty, na.rm = TRUE),
+    IQR = IQR(difficulty, na.rm = TRUE)
+  )
+# Comparing confidence and difficulty by condition
+(res1 <- wilcox.test(confidence ~ condition, data = datcd,exact = FALSE))
+(res2 <- wilcox.test(difficulty ~ condition, data = datcd,exact = FALSE))
+
+# Correlation confidence difficulty and score: 
+mat <- as.matrix(datcd[,unlist(lapply(datcd, is.numeric))])
+cor.test(datcd$confidence, datcd$avg_score, method="spearman")
+cor.test(datcd$difficulty, datcd$avg_score, method="spearman")
+
+
+# Transforming confidence into 4 lvl factor
+datcd$confidence.f <- factor(as.numeric(cut(datcd$confidence,2)),labels =c("low conf","high conf"))
+summary(datcd$confidence.f)
+table(datcd$confidence.f,datcd$condition)
+
+#  explore interaction block confidence
+#(lsm7 <- lsmeans(acd, c("confidence.f","block")))
+#(update(pairs(lsm7, reverse = TRUE, adjust = "holm"), by=NULL))
+#plot(lsm7, by ="confidence.f")
+#lsmip(acd, confidence.f ~ block)
+
+#
+#(lsm8 <- lsmeans(acd, c("confidence.f","block","game.f")))
+#lsmip(acd, confidence.f ~ block*game.f)
+# checking that low confidence NUMBERS play is not different from random play
+#con3 <- contrast(lsm8, list(G1vG2forconf = c(0,0,0,0,0,0,0,0,0,0,1,0)))
+#summary(con3, adjust ="holm")
+
+# low and high confidence players have similar initial score in RPS
+#con4 <- contrast(lsm8, list(HCvLCforRPS = c(-1,1,0,0,0,0,0,0,0,0,0,0)))
+#summary(con4, adjust="holm")
+```
+
+
+
+
+```{r}
+# ANCOVA with confidence as covariate 
+dat_ancova <- dat1 %>% 
+  group_by(human_id,game.f,condition,block,confidence,difficulty) %>% 
+      summarise(avg_score = mean(score))
+# Centering variables for ANCOVA 
+dat_ancova$conf_cen <- scale(dat_ancova$confidence, center=TRUE, scale=FALSE) 
+dat_ancova$diff_cen <- scale(dat_ancova$difficulty, center=TRUE, scale=FALSE) 
+
+# run RM anova using afex library (ran anova including difficulty as well but wasn't significant)
+library(afex)
+acd <- aov_car( avg_score ~ game.f*block*condition + conf_cen + diff_cen + Error(human_id/(game.f*block)), factorize = FALSE,dat_ancova)
+summary(acd)
+
+nice(acd, es = attr(acd$anova_table, "es"),
+  observed = attr(acd$anova_table, "observed"),
+  correction = attr(acd$anova_table, "correction"), MSE = NULL,
+  intercept = NULL, p_adjust_method = attr(acd$anova_table,
+  "p_adjust_method"), sig_symbols = attr(acd$anova_table, "sig_symbols"))
+
+
+
+# post hoc tests
+(anc1 <- lsmeans(acd, c("conf_cen")))
+
+(lsm6 <- lsmeans(acd, c("conf_cen","condition")))
+update(pairs(lsm6, reverse = TRUE, adjust = "holm"), by=NULL)
+plot(lsm6, by ="condition")
+plot(lsm6, by ="conf_cen")
+lsmip(acd, conf_cen ~ condition)
+
+
+```
+
+
+```{r}
+
+# transform data by differencing two consecutive scores, filter for first and second transfer 
+library(dplyr)
+dat_test1 <- dat1 %>% 
+  group_by(human_id,game.f,condition,block,confidence,difficulty) %>% 
+      summarise(avg_score = mean(score)) %>%
+         group_by(human_id) %>%
+            mutate(diff_score = avg_score - lag(avg_score, default = 0)) %>%
+              mutate(learn_phase =c("init RPS","within RPS","transfer 1","within WFG","transfer 2","within MOD"))
+
+head(dat_test1)        
+# define dataset with first transfer only 
+dat_trans1 <- dat_test1 %>%
+  filter (learn_phase == "transfer 1") %>%
+    select(-c(game.f,block,avg_score,learn_phase))
+
+head(dat_trans1)
+# Data of transfer as difference between RPS_H2 and FWG_H1 is normally distributed
+shapiro.test(dat_trans1$diff_score)
+
+
+# Regression transfer score on condition and confidence
+summary(lm(diff_score~ confidence + difficulty + factor(condition)+confidence*factor(condition), data = dat_trans1))
+
+# tets hypothesis diff_score = 0 (transfer) against alternative it is negative -> No transfer
+t.test( dat_trans1$diff_score, mu = 0 ,alternative = "less")
+
+# To be sure.... Compare means of two condition 
+t.test(dat_trans1$diff_score ~ condition, data = dat_trans1,exact = FALSE)
+
+#DOING THE SAME FOR TRANSFER 2 : 
+
+dat_trans2 <- dat_test1 %>%
+  filter (learn_phase == "transfer 2") %>%
+    select(-c(game.f,block,avg_score,learn_phase))
+
+# Regression transfer score on condition and confidence -> no effects 
+summary(lm(diff_score~ confidence + difficulty + factor(condition) + confidence*factor(condition), data = dat_trans2))
+```
+
+
+```{r}
+# Does confidence moderate transfer ?
+# Looking at early rounds only as proxy for transfer 
+dat_fwg <- dat2_6 %>%
+  filter (game.f == "FWG")
+dat_num <- dat2_6 %>%
+  filter (game.f == "NUM")
+
+# correlation confidence and transfer as proxied by score in early rounds : 
+shapiro.test(dat_fwg$confidence)
+cor.test(dat_fwg$confidence, dat_fwg$early_score, method="spearman")
+cor.test(dat_num$confidence, dat_num$early_score, method="spearman")
+
+
+# model explaining early scores in fwg by confidene and condition -> no effects 
+summary(lm(early_score ~ confidence*condition, data=dat_fwg))
+summary(lm(early_score ~ confidence*condition, data=dat_num))
+
+```
+
+```{r}
+# checking whether theta changes between games 
+
+# lvl1 opponent 
+bic <- read.csv("BIC_result.csv")
+head(bic)
+
+dat_lvl1 <- bic %>%
+  select(c(id,condition,level2_3_theta1,level2_3_theta2,level2_3_theta3)) %>%
+    gather(key = game, value = theta,-c(id,condition)) %>%
+      group_by(id)
+dat_lvl1$games <- factor(dat_lvl1$game, labels=c("RPS","FWG","MOD"),levels=c("level2_3_theta1","level2_3_theta2","level2_3_theta3"))
+
+library(afex)
+aov2 <- aov_car( theta ~ games + Error(id/(games)), dat_lvl1)
+summary(aov2)
+
+table2 <- nice(aov2, es = attr(aov2$anova_table, "es"),
+  observed = attr(aov2$anova_table, "observed"),
+  correction = attr(aov2$anova_table, "correction"), MSE = NULL,
+  intercept = NULL, p_adjust_method = attr(aov2$anova_table,
+  "p_adjust_method"), sig_symbols = attr(aov2$anova_table, "sig_symbols"))
+
+kable(table2)
+
+dat_lvl1 %>% 
+  group_by(games) %>%
+  summarise(theta.m = mean(theta),
+            SD = sd(theta, na.rm =TRUE ))
+
+#plot 
+ggerrorplot(dat_lvl1, x = "games", y = "theta", group = 1, color="games", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","MOD"), ylab = "Theta", xlab = "Games") 
+
+
+# lvl2 opponent 
+dat_lvl2 <- bic %>%
+  select(c(id,condition,level3_3_theta1,level3_3_theta2,level3_3_theta3)) %>%
+    gather(key = game, value = theta,-c(id,condition)) %>%
+      group_by(id)
+dat_lvl2$games <- factor(dat_lvl2$game, labels=c("RPS","FWG","MOD"),levels=c("level3_3_theta1","level3_3_theta2","level3_3_theta3"))
+
+# anova
+aov3 <- aov_car( theta ~ games + Error(id/(games)), dat_lvl2)
+summary(aov3)
+
+table3 <- nice(aov3, es = attr(aov3$anova_table, "es"),
+  observed = attr(aov3$anova_table, "observed"),
+  correction = attr(aov3$anova_table, "correction"), MSE = NULL,
+  intercept = NULL, p_adjust_method = attr(aov3$anova_table,
+  "p_adjust_method"), sig_symbols = attr(aov3$anova_table, "sig_symbols"))
+
+kable(table3)
+
+# mean comparison
+dat_lvl2 %>% 
+  group_by(games) %>%
+  summarise(theta.m = mean(theta),
+            SD = sd(theta, na.rm =TRUE ))
+
+require(gridExtra)
+#plot lvl1 
+plot1 <- ggerrorplot(dat_lvl1, x = "games", y = "theta", group = 1, color="games", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","MOD"), ylab = "Theta", xlab = "Games")
+#plot lvl2
+plot2 <- ggerrorplot(dat_lvl2, x = "games", y = "theta", group = 1, color="games", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","MOD"), ylab = "Theta", xlab = "Games") 
+
+
+grid.arrange(plot1, plot2, ncol=2)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--chapter:end:exp1_clean_analysis.Rmd-->
+
+---
+title: "Hidden Markov strategy model"
+author: "Maarten Speekenbrink"
+date: "25/08/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(depmixS4)
+```
+
+```{r define-dummy-response}
+setClass("dummyResponse", contains="response")
+
+setGeneric("dummyResponse", function(y, pstart = NULL, fixed = NULL, ...) standardGeneric("dummyResponse"))
+
+setMethod("dummyResponse", 
+    signature(y="ANY"), 
+    function(y,pstart=NULL,fixed=NULL, ...) {
+      y <- matrix(y,length(y))
+  		x <- matrix(1)
+  		parameters <- list()
+  		npar <- 0
+      mod <- new("dummyResponse",parameters=parameters,fixed=logical(0),x=x,y=y,npar=npar)
+      mod
+	}
+)
+
+setMethod("show","dummyResponse",
+    function(object) {
+        cat("Dummy for fixed likelihood Model \n")
+    }
+)
+
+setMethod("dens","dummyResponse",
+  function(object,log=FALSE) {
+   if(log) log(as.numeric(object@y)) else as.numeric(object@y)
+  }
+)
+
+setMethod("getpars","dummyResponse",
+    function(object,which="pars",...) {
+        switch(which,
+            "pars" = {
+                pars <- numeric(0)
+            },
+            "fixed" = {
+                pars <- logical(0)
+            }
+        )
+        return(pars)
+    }
+)
+
+setMethod("setpars","dummyResponse",
+    function(object, values, which="pars", ...) {
+        npar <- npar(object)
+        if(length(values)!=npar) stop("length of 'values' must be",npar)
+        # determine whether parameters or fixed constraints are being set
+		nms <- ""
+		switch(which,
+		  "pars"= {
+		      },
+		  "fixed" = {
+		    }
+		  )
+      names(object@parameters) <- nms
+      return(object)
+    }
+)
+
+setMethod("fit","dummyResponse",
+    function(object,w) {
+		  return(object)
+	}
+)
+
+setMethod("predict","dummyResponse", 
+    function(object) {
+        ret <- object@y
+        return(ret)
+    }
+)
+```
+
+```{r}
+# we need to have "dat" available and lik_by_trial
+QLS_lik <- lik_by_trial$QLS_lik
+QLS_lik[which(QLS_lik == 0)] <- .001
+QLS_lik[is.na(QLS_lik)] <- .33 # this is a hack; there shouldn't be any missing values
+Bayes_NT_lik <- lik_by_trial$Bayes_NT_lik
+Bayes_Tr_lik <- lik_by_trial$Bayes_Tr_lik
+
+nsubject <- length(unique(dat$human_id)) # number of participants
+ngame <- 3 # number of games
+ntrial <- c(50,50,50) # numer of trials in each game
+
+rModels <- list(
+  list(
+	  dummyResponse(QLS_lik)
+	),
+	list(
+		dummyResponse(Bayes_NT_lik)
+	),
+  list(
+    dummyResponse(Bayes_Tr_lik)
+  )
+)
+
+trstart <- matrix(c(0.8,0.1,0.1,0.1,0.8,0.1,.1,.1,.8),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+instart <- c(1/3,1/3,1/3)
+inMod <- transInit(~1,nstates=3,pstart=instart,family=multinomial("identity"),data=data.frame(rep(1,nsubject*ngame)))
+
+mod <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod <- fit(mod, emcontrol=em.control(random.start=FALSE))
+
+# No switching. Force off diagonal initial elements of transtion matrix to 0
+trstart <- matrix(c(1,0,0,0,1,0,0,0,1),ncol=3)
+transition <- list()
+transition[[1]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[1,],family=multinomial("identity"))
+transition[[2]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[2,],family=multinomial("identity"))
+transition[[3]] <- transInit(~1,nstates=3,data=data.frame(1),pstart=trstart[3,],family=multinomial("identity"))
+
+mod_noswitch <- makeDepmix(response=rModels,transition=transition,prior=inMod,ntimes=rep(ntrial,nsubject))
+
+fmod_noswitch <- fit(mod_noswitch, emcontrol=em.control(random.start=FALSE))
+
+# p-value for comparison between a model with strategy switches and one without:
+
+1-pchisq(-2*as.numeric(logLik(fmod_noswitch)) - (-2*as.numeric(logLik(fmod))),df=6)
+
+```
+
+
+<!--chapter:end:exp1_hmm_strategies.Rmd-->
+
+---
+title: "exp1_lik_by_trial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+# Get Data for experiment 1, remove unecessary columns 
+
+dat <- read.csv("data20180719.csv")
+#####
+# dat <- subset(dat, human_id == "38VxtUSv_h6RR5-tAAA2")
+####
+
+optim_results <- read.csv("exp1_all_results.csv")
+
+```
+
+```{r}
+
+#preparing data for functions to claculate likelihood
+
+#Prepping data for Bayesian code
+dat <- as_tibble(dat) %>% group_by(human_id,game)
+dat <- dat %>%
+  mutate(ai_action_prev = lag(ai_action,1), human_action_prev = lag(human_action,1))
+
+
+## level 0 predictions
+dat <- dat %>% mutate(pred_a1_level0 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "numbers" & ai_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level0 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level0 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level0 = case_when(
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level0 = case_when(
+  game == "numbers" & ai_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+## level 1 predictions
+dat <- dat %>% mutate(pred_a1_level1 = case_when(
+  game == "rps" & human_action_prev == "scissors" ~ 1,
+  game == "fwg" & human_action_prev == "grass" ~ 1,
+  game == "numbers" & human_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level1 = case_when(
+  game == "rps" & human_action_prev == "rock" ~ 1,
+  game == "fwg" & human_action_prev == "fire" ~ 1,
+  game == "numbers" & human_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level1 = case_when(
+  game == "rps" & human_action_prev == "paper" ~ 1,
+  game == "fwg" & human_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level1 = case_when(
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level1 = case_when(
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+## level 2 predictions
+dat <- dat %>% mutate(pred_a1_level2 = case_when(
+  game == "rps" & ai_action_prev == "paper" ~ 1,
+  game == "fwg" & ai_action_prev == "water" ~ 1,
+  game == "numbers" & ai_action_prev == "four" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a2_level2 = case_when(
+  game == "rps" & ai_action_prev == "scissors" ~ 1,
+  game == "fwg" & ai_action_prev == "grass" ~ 1,
+  game == "numbers" & ai_action_prev == "five" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a3_level2 = case_when(
+  game == "rps" & ai_action_prev == "rock" ~ 1,
+  game == "fwg" & ai_action_prev == "fire" ~ 1,
+  game == "numbers" & ai_action_prev == "one" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  is.na(ai_action_prev) ~ 1/3,
+  !is.na(ai_action_prev) ~ 0))
+dat <- dat %>% mutate(pred_a4_level2 = case_when(
+  game == "numbers" & ai_action_prev == "two" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+dat <- dat %>% mutate(pred_a5_level2 = case_when(
+  game == "numbers" & ai_action_prev == "three" ~ 1,
+  game == "numbers" & is.na(ai_action_prev) ~ 1/5,
+  TRUE ~ 0))
+
+
+
+dat$ai_action_num <- recode(dat$ai_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scissors" = 3, "fire" = 1, "water" = 2, "grass" = 3, "one" = 1, "two" = 2, "three" = 3, "four" = 4 , "five" = 5)
+
+
+# transform 'winner' variable in numeric score
+dat$score <- recode(dat$winner, human = 1, tie = 0, ai = -1)
+# create a new variable 'block' with round 1...25 = block 1 and round 26...50 as block 2
+dat$block <- as.numeric(cut(dat$round,2))
+
+# recode actions to make them equal to the codes in these files
+dat$h_action <- recode(dat$human_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+dat$a_action <- recode(dat$ai_action,"rock" = "R", "paper" = "P", "scissors" = "S", "fire" = "F", "water" = "W", "grass" = "G", "one" = "1", "two" = "2", "three" = "3", "four" = "4", "five" = "5")
+
+
+```
+
+
+```{r}
+dat <-as.data.frame(dat)
+exp1_lik_by_trial <- data.frame()
+
+# dat%>% group_by(human_id) %>%
+#   mutate(pars_QLS = as.vector(optim_results%>% dplyr::select(QL_states_Beta,QL_states_alpha))) %>%
+#   mutate(QLS_lik = Q_learn_states(pars_QLS[1,] ,tdat,"likelihood_by_trial",gamma = 0))
+
+for(id in unique(dat$human_id)) {
+  
+  tdat <- dat %>% subset(human_id == id)
+  
+  # QLS likelihoods 
+  pars_QLS <- as.vector(filter(optim_results, ID == id)%>% dplyr::select(QL_states_Beta,QL_states_alpha))
+  tdat$QLS_lik <- Q_learn_states(pars_QLS ,tdat,"likelihood_by_trial",gamma = 0)
+  
+  #Bayes model no transfer likelihoods
+  theta_NT <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_no_transfer))
+  tdat$Bayes_NT_lik <- exp1_Bayes_model_LL(theta_NT ,data = tdat, generalize = "no", "likelihood_by_trial")
+
+  # Bayes model with Transfer likelihood
+  theta_Tr <- unlist(filter(optim_results, ID == id)%>% dplyr::select(theta_transfer))
+  tdat$Bayes_Tr_lik <- exp1_Bayes_model_LL(theta_Tr ,data = tdat, generalize = "game", "likelihood_by_trial")
+
+
+  
+  exp1_lik_by_trial <- dplyr::bind_rows(exp1_lik_by_trial,tdat)
+  
+  
+  # 
+  # exp1_lik_by_trial <- rbind(exp1_lik_by_trial,
+  #                       data.frame(
+  #                         "human_id" = id,
+  #                         "condition" = dat$condition,
+  #                         "game" = dat$game,
+  #                         "round" = dat$round,
+  #                         "QLS_lik" = QLS_lik,
+  #                         "Bayes_NT_lik" = Bayes_NT_lik,
+  #                         "Bayes_Tr_lik" = Bayes_Tr_lik
+  #                       ))
+  #cat(as.character(Bayes_Tr_lik[c(1,51,101)]))
+}
+
+write.csv(exp1_lik_by_trial,file="exp1_lik_by_trial.csv",row.names = FALSE)
+
+```
+
+```{r}
+
+summary(exp1_lik_by_trial$QLS_lik == 1.0 )
+summary(exp1_lik_by_trial$QLS_lik == 0.0 )
+summary(is.na(exp1_lik_by_trial$QLS_lik))
+
+
+```
+
+```{r}
+
+mean_lik <- exp1_lik_by_trial %>%
+  select(human_id,condition,game, round,QLS_lik,Bayes_NT_lik,Bayes_Tr_lik) %>%
+  group_by(game, condition, round)  %>%
+  dplyr::summarise(mean_QLS_lik = mean(QLS_lik, na.rm = TRUE),
+            mean_NT_lik = mean(Bayes_NT_lik, na.rm = TRUE),
+            mean_Tr_lik = mean(Bayes_Tr_lik, na.rm = TRUE))
+
+data_long <- tidyr::gather(mean_lik, strategy, probability, mean_QLS_lik:mean_Tr_lik, factor_key=TRUE)
+
+# make sure the different games are ordered in the way they were played
+data_long$game <- factor(data_long$game,levels=c("rps","fwg","numbers"))
+ggplot(data_long,aes(x=round,y=probability,colour=strategy)) + geom_line() + facet_grid(game~condition)
+
+
+```
+
+
+<!--chapter:end:exp1_lik_by_trial.Rmd-->
+
+---
+title: "Simulation_EWA"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+### Parameter and model recovery Q-Learning with past round as state
+
+
+## Build function that will simulate a QL_states player given parameters alpha and beta, and generate actions for 50 rounds
+## of each game. 
+```{r}
+gen_data_QL_states <- function(beta, alpha, num_rounds, gamma) {
+  
+  games <- c("rps","fwg","numbers")
+  condition <- sample(c("level1","level2"),1)
+  data <- data.frame()
+  
+  #Define matrix of state spaces for each game 
+  G1 <- expand.grid(c("R", "P", "S"),c("R", "P", "S"))
+  states_RPS <- paste0(G1$Var1,G1$Var2)
+
+  G2 <- expand.grid(c("F", "W", "G"), c("F", "W", "G"))
+  states_FWG <- paste0(G2$Var1,G2$Var2)
+
+  G3 <- expand.grid(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  states_NUM <- paste0(G3$Var1,G3$Var2)
+  
+  # Initialize Matrix of Q-values 
+  Q_vals_RPS = matrix(-0.5,9,3)
+  dimnames(Q_vals_RPS) = list(states_RPS, c("R", "P", "S"))
+
+  Q_vals_FWG = matrix(-0.5,9,3)
+  dimnames(Q_vals_FWG) = list(states_FWG, c("F", "W", "G"))
+  
+  Q_vals_NUM = matrix(-0.5,25,5)
+  dimnames(Q_vals_NUM) = list(states_NUM, c("1", "2", "3", "4", "5"))
+  
+  # Build tables that give reward for human player(Row) vs ai player(column) actions. 
+  reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+  
+  reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+  
+  reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+  dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+ 
+  
+   for (t_game in games){
+      # Initiate dataframe
+      game_data <- setNames(data.frame(matrix(ncol = 6, nrow = num_rounds)), c("condition","game", "round", "h_action","a_action","score"))
+      
+      # Initialize attraction vector, rewards + randomly select first actions
+      Q_vals <- switch(as.character(t_game),rps=Q_vals_RPS,fwg = Q_vals_FWG, numbers = Q_vals_NUM)
+      state_vec <- switch(as.character(t_game),rps=states_RPS,fwg = states_FWG, numbers = states_NUM)
+      game_actions <- switch(as.character(t_game),rps=c("R", "P", "S"),fwg = c("F", "W", "G"), numbers = c("1", "2", "3", "4", "5"))
+      reward <- switch(as.character(t_game), rps=reward_RPS, fwg=reward_FWG, numbers=reward_NUM)
+      pred_file_opp <- switch(as.character(t_game),rps = rps_predict_opp,fwg = fwg_predict_opp, numbers = numbers_predict_opp)
+      
+      
+      for(t in 1:num_rounds) {
+        if(t_game == "numbers") nopts <- 5 else nopts <- 3
+        game_data[t,"game"]<- t_game
+        game_data[t,"round"] <- t
+        game_data[t,"condition"] <- condition
+        
+        if(t == 1) {
+          # Initialize previous state randomly. 
+          prev_state  <- sample(state_vec, size = 1)
+          # Sample huamn and ai actions in first round randomly 
+          h_act <- as.character(sample(game_actions, 1 ))
+          ai_act  <- as.character(sample(game_actions, 1 ))
+          # Get reward from first round. 
+          R <- reward[h_act, ai_act]
+          
+          #Fill in table 
+          game_data[t,"h_action"] <- h_act
+          game_data[t,"a_action"] <- ai_act 
+          game_data[t,"score"] <- R
+
+        
+        } else {
+          h_act<- as.character(game_data[t-1,"h_action"])
+          ai_act <- as.character(game_data[t-1,"a_action"])
+          R <- as.numeric(game_data[t-1,"score"])
+      
+        }
+        
+        # cat("round", t, "\n")
+        # cat(prev_state, " This is the previous state", "\n")
+        # cat("observed human action",h_act, "\n")
+        # cat("observed ai action",ai_act, "\n")
+
+        ###### New state is the state we get to after human plays h_act and ai plays  ai_act 
+        new_state <- paste0(h_act,ai_act)
+        ######
+        # cat(new_state,"This is new state","\n")
+        # cat("this is alpha",alpha,"\n")
+        
+        # Q_learning: update rule
+        # cat("this is the Q vals",Q_vals[prev_state, h_act],"\n")
+        # cat("max Q_vals",max(Q_vals[new_state,]),"\n")
+        # cat("This is the reward", R ,"\n")
+        
+        Q_vals[prev_state, h_act] <- Q_vals[prev_state, h_act] + alpha*( R + gamma*max(Q_vals[new_state,]) - Q_vals[prev_state, h_act])
+        probs <- exp(Q_vals[new_state,]/beta)/sum(exp(Q_vals[new_state,]/beta))
+        
+        # Select human action with softmax
+        game_data[t,"h_action"] <- sample(game_actions, size=1,prob=probs)
+         
+        # Update state
+        prev_state <- new_state
+        
+         # Simulate opponent action and get score 
+        game_data[t,"a_action"] <- as.character(filter(pred_file_opp,human_previous == h_act & computer_previous == ai_act)[condition][1,])
+        # Calculate score 
+        game_data[t,"score"] <- reward[game_data[t,"h_action"], game_data[t,"a_action"]]
+        
+      }# End for loop over rounds
+      data <- rbind(data,game_data)
+  }
+  # end of game for loop
+  return(data)
+  
+}
+  
+# QL_dta <- gen_data_QL_states(5,0.5, num_rounds = 5, gamma = 0.9)
+
+```
+
+# Function to fit various models to simulated QL learner data and get table of results.
+```{r}
+
+fit_models <- function(tdat,num_rounds =50) {
+  
+  optim_S_EWA  <- DEoptim(fn=EWA_self, lower = 0.0, upper = 10.0, data=tdat, "-2loglik", control=list(trace = FALSE,parallelType=1))
+
+  optim_EWA    <- DEoptim(fn=EWA_par,lower = c(0,0,0,0), upper = c(20,1,1,20), data=tdat,"-2loglik",control=list(trace = FALSE,parallelType=1))
+  
+  #optim_QL     <- optim(c(1,0.1),fn=Q_learn,gr = NULL, data=tdat,"-2loglik", lower = c(0,0), upper = c(10,0.99), method="L-BFGS-B")
+  
+  optim_QL_states <- DEoptim(fn=Q_learn_states,lower = c(0,0), upper = c(10,1), data=tdat,"-2loglik", gamma = 0, control=list(trace = FALSE,parallelType=1))
+  
+  optim_NB     <- optim(c(0.1,0.1),fn=naive_bayes,gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", opp_mod_transfer = TRUE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
+  
+  dataframe <-  data.frame(
+  
+  # Get condition
+   "condition"  = as.character(tdat$condition[1]),
+  
+  
+  # Get best fit parameters and -2 Log Likelihoods for all models 
+
+  # Self-tuning EWA 
+   "S_EWA_infrd_lambda" = optim_S_EWA$optim$bestmem[1],
+   "S_EWA_2LL"          = optim_S_EWA$optim$bestval,
+  
+  #Parametric EWA
+    "EWA_infrd_phi"    = optim_EWA$optim$bestmem[1],
+    "EWA_infrd_delta"  = optim_EWA$optim$bestmem[2],
+    "EWA_infrd_rho"    = optim_EWA$optim$bestmem[3],
+    "EWA_infrd_lambda" = optim_EWA$optim$bestmem[4],
+    "EWA_2LL"          = optim_EWA$optim$bestval,
+  
+  # Q-Learning with state as prev round
+    "QL_states_infrd_beta"   = optim_QL_states$optim$bestmem[1],
+    "QL_states_infrd_alpha"  = optim_QL_states$optim$bestmem[2],
+    "QL_states_2LL"          = optim_QL_states$optim$bestval,
+  
+  # Naive Bayes (nopts-arm bandit with prior vec transfered across games)
+    "NB_infrd_theta" = optim_NB$par[1],
+    "NB_infrd_eps"   = optim_NB$par[2],
+    "NB_2LL"         = optim_NB$value,
+  
+  # Random
+   "Random_2LL"     = -2*(2*num_rounds*log(1/3) + num_rounds*log(1/5))
+  
+  )
+  
+  return(dataframe) 
+  
+}
+ 
+
+sim_results <- function(beta,alpha,num_rounds,gamma) {
+  #Generate simulated data using Q_learning with previous round as state
+  tdat = gen_data_QL_states(beta,alpha, num_rounds, gamma)
+  # Fit various models to generated data 
+  df <- fit_models(tdat)
+  df$alpha <- alpha
+  df$beta <- beta
+  return(df)
+}
+
+```
+
+## Run simulation to generate datasets and return results of model fits 
+```{r}
+
+betas = runif(100,0,10)
+alphas = runif(100,0,1)
+
+pars <- as.array(mapply(c,betas, alphas, SIMPLIFY = FALSE ))
+
+list_of_dataframes <- mapply(FUN = sim_results, betas, alphas,num_rounds = 50.0, gamma = 0.0, SIMPLIFY = FALSE)
+
+QL_states_mod_recovery <- bind_rows(list_of_dataframes, .id = "column_label")
+
+save(QL_states_mod_recovery,file="QL_states_mod_recovery.RData")
+
+
+```
+
+## Plot infered vs real params, summarise model fitting results and return table of best fitting models
+```{r}
+# PLot real vs infered QL_states parameters
+plot(QL_states_mod_recovery$alpha,QL_states_mod_recovery$QL_states_infrd_alpha, xlab = "True alpha", ylab = " Infered alpha")
+plot(QL_states_mod_recovery$beta,QL_states_mod_recovery$QL_states_infrd_beta, xlab = "True beta", ylab = " Infered beta")
+
+
+# Evaluate the correlation between real and infered alphas/lambdas and test it for significance
+cor.test(QL_states_mod_recovery$alpha,QL_states_mod_recovery$QL_states_infrd_alpha, method= "spearman")
+cor.test(QL_states_mod_recovery$beta,QL_states_mod_recovery$QL_states_infrd_beta, method= "spearman")
+
+# Model recovery: create a table with best fitting models by condition
+QL_states_model_recov <- table(QL_states_mod_recovery[, "condition"],c("random","N_Bayes","QL_states","EWA","S_EWA")[apply(QL_states_mod_recovery[,c("Random_2LL","NB_2LL","QL_states_2LL","EWA_2LL","S_EWA_2LL")],1,which.min)])
+
+ write.csv(QL_states_model_recov,file="QL_states_model_recov.csv",row.names = TRUE)
+ kable(QL_states_model_recov)
+
+```
+
+## What if we increase num rounds to 200, does that improve model recovery? 
+```{r}
+betas = runif(100,0,10)
+alphas = runif(100,0,1)
+
+pars <- as.array(mapply(c,betas, alphas, SIMPLIFY = FALSE ))
+
+list_of_dataframes200 <- mapply(FUN = sim_results, betas, alphas,num_rounds = 200.0, gamma = 0.0, SIMPLIFY = FALSE)
+
+QL_states_recov_200 <- bind_rows(list_of_dataframes200, .id = "column_label")
+
+save(QL_states_recov_200,file="QL_states_recov_200.RData")
+
+# PLot real vs infered QL_states parameters
+plot(QL_states_recov_200$alpha,QL_states_recov_200$QL_states_infrd_alpha, xlab = "True alpha", ylab = " Infered alpha")
+plot(QL_states_recov_200$beta,QL_states_recov_200$QL_states_infrd_beta, xlab = "True beta", ylab = " Infered beta")
+
+
+# Evaluate the correlation between real and infered alphas/lambdas and test it for significance
+cor.test(QL_states_recov_200$alpha,QL_states_recov_200$QL_states_infrd_alpha, method= "spearman")
+cor.test(QL_states_recov_200$beta,QL_states_recov_200$QL_states_infrd_beta, method= "spearman")
+
+# Model recovery: create a table with best fitting models by condition
+QL_recov200_tab <- table(QL_states_recov_200[, "condition"],c("random","N_Bayes","QL_states","EWA","S_EWA")[apply(QL_states_recov_200[,c("Random_2LL","NB_2LL","QL_states_2LL","EWA_2LL","S_EWA_2LL")],1,which.min)])
+
+ write.csv(QL_recov200_tab,file="QL_recov200_tab",row.names = TRUE)
+ kable(QL_recov200_tab)
+```
+
+
+
+### Model and parameter recovery for Self Tuning EWA model
+
+
+
+## Build function that will simulate a self tuning EWA player given parameter Lambda, and generate actions for 50 rounds
+# of each game. 
+```{r}
+
+# NOTE : haven't introduced noise in either human or computer actions. 
+
+gen_data_SEWA <- function(par,num_rounds){
+
+  lambda <- par[1]
+  games <- c("rps","fwg","numbers")
+  condition <- sample(c("level1","level2"),1)
+  data <- data.frame()
+
+  # Define attraction vectors for each game 
+  A_RPS = matrix(0.0,3)
+  names(A_RPS) <- c("R","P","S")
+  A_FWG = matrix(0.0,3)
+  names(A_FWG) <- c("F","W","G")
+  A_NUM = matrix(0.0,5)
+  names(A_NUM) <- c("1","2","3","4","5")
+  
+  # # Define reward matrices from the prospective of the row player (human in our case)
+  reward_RPS <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_RPS) = list(c("R", "P", "S"), c("R", "P", "S"))
+  
+  reward_FWG <- t(matrix(c(0,-1,1,1,0,-1,-1,1,0),nrow=3,ncol=3))
+  dimnames(reward_FWG) = list(c("F", "W", "G"), c("F", "W", "G"))
+  
+  reward_NUM <- t(matrix(c(0,-1,0,0,1,1,0,-1,0,0,0,1,0,-1,0,0,0,1,0,-1,-1,0,0,1,0),nrow=5, ncol=5))
+  dimnames(reward_NUM) = list(c("1", "2", "3", "4", "5"), c("1", "2", "3", "4", "5"))
+  
+  for (t_game in games){
+      # Initiate dataframe
+      game_data <- setNames(data.frame(matrix(ncol = 6, nrow = num_rounds)), c("condition","game", "round", "h_action","a_action","score"))
+      # Initialize attraction vector, rewards + randomly select first actions
+      Att <- switch(as.character(t_game),rps=A_RPS,fwg = A_FWG, numbers = A_NUM)
+      game_actions <- names(Att)
+      reward <- switch(as.character(t_game), rps=reward_RPS, fwg=reward_FWG, numbers=reward_NUM)
+      pred_file_opp <- switch(as.character(t_game),rps = rps_predict_opp,fwg = fwg_predict_opp, numbers = numbers_predict_opp)
+    
+    for(t in 1:num_rounds) {
+      if(t_game == "numbers") nopts <- 5 else nopts <- 3
+      game_data[t,"game"]<- t_game
+      game_data[t,"round"] <- t
+      game_data[t,"condition"] <- condition
+      
+      if(t == 1) {
+
+        game_data[t,"h_action"] <- as.character(sample(game_actions, 1 ))
+        game_data[t,"a_action"] <- as.character(sample(game_actions, 1 ))
+        game_data[t,"score"] <- reward[game_data[t,"h_action"], game_data[t,"a_action"]]
+        lik_hum <- c(1/nopts)
+        N <- 1.0
+        R_t <- rep(0.0,nopts)
+        H_t <- R_t
+      
+      } else {
+        
+        # Get reward and past human action
+        h_act_prev <- as.character(game_data[t-1,"h_action"])
+        a_act_prev <- as.character(game_data[t-1,"a_action"])
+  
+        # Estimate phi(t)
+        R_t <- as.numeric(game_actions == a_act_prev)
+        # cat("This is R(t)",R_t,"\n")
+        
+        H_t <- (H_t*(t-2) + R_t)/(t-1)
+        # cat("this is H(t)",H_t,"\n")
+        
+        Phi_t <- 1 - 0.5*sum((H_t-R_t)^2)
+        # cat("This is Phit(t)",Phi_t,"\t")
+        
+        # Estimate vector Delta(t)
+        delta_t <- as.numeric(reward[,a_act_prev] >= as.numeric(game_data[t-1,"score"]))
+        #cat("this is delta(t)",delta_t,"\n")
+        
+        for (i in 1:length(Att)) {
+          action <- as.character(game_actions[i])
+          # Attraction vector update rule 
+          Att[[i]] <- (Phi_t*N*Att[[i]]  + ( delta_t[[i]] + (1- delta_t[[i]])*(action == h_act_prev))*as.numeric(reward[action,a_act_prev])) / (Phi_t*N + 1)
+        }
+        #Update the value of N 
+        N <- Phi_t*N + 1
+        #cat(Att,'\n')
+        
+        # Assume human chooses action probabilistically using softmax on Attraction values
+        probs <- exp(lambda*Att)/sum(exp(lambda*Att))
+        
+        # Get actual human action and compute likelihood
+        game_data[t,"h_action"] <- sample(game_actions, size=1,prob=probs)
+        act_index <- match(game_data[t,"h_action"], game_actions)
+        lik_hum[t] <- probs[[act_index]]
+        
+        # Simulate opponent action and get score 
+        game_data[t,"a_action"] <- as.character(filter(pred_file_opp,human_previous == as.character(game_data[t-1,"h_action"]) & computer_previous == as.character(game_data[t-1,"a_action"]))[condition][1,])
+        game_data[t,"score"] <- reward[game_data[t,"h_action"], game_data[t,"a_action"]]
+        
+      }
+      
+    }# End for loop over rounds
+    data <- rbind(data,game_data)
+    
+  }# end of game for loop
+  return(data)
+  
+
+  
+}
+  
+```
+
+
+
+## Generate 100 datasets using S_EWA agent, one for each lambda and fit the 4 models to it : NB, QL, EWA and S_EWA 
+```{r}
+## Generate N lambdas in chosen interval, get the corresponding datasets of actions and scores, use Self_EWA to infer Lambda from these datasets. 
+EWA_self_simulation <- data.frame()
+lambdas = runif(100, 0, 10)
+num_rounds <- 50 
+count <- 1 
+
+for(lambda in lambdas) {
+  
+  EWA_self_simulation[count,"real_lambda"] <- lambda
+  tdat <- gen_data_SEWA(par = lambda, num_rounds)
+
+  # Fit various models to generated data (from S_EWA type player)
+  optim_S_EWA  <- DEoptim(fn = EWA_self, lower = 0.0, upper = 10.0, data= tdat, "-2loglik", control = list(trace = FALSE,parallelType =1))
+
+  optim_EWA    <- DEoptim(fn = EWA_par,lower = c(0,0,0,0), upper = c(20,1,1,20), data=tdat,"-2loglik",control= list(trace = FALSE,parallelType=1))
+  
+  # optim_QL     <- optim(c(1,0.1),fn=Q_learn,gr = NULL, data=tdat,"-2loglik", lower = c(0,0), upper = c(10,0.99), method="L-BFGS-B")
+  
+  optim_QL_states <- DEoptim(fn = Q_learn_states,lower = c(0,0), upper = c(10,1), data=tdat,"-2loglik", gamma = 0, control=list(trace = FALSE,parallelType=1))
+  
+
+  optim_NB     <- optim(c(0.1,0.1),fn=naive_bayes, gr = NULL, data=tdat,opp_strategy_vec = c("level0","level1","level2"),return_value = "-2loglik", opp_mod_transfer = TRUE, lower = c(0.01,0.01), upper = c(0.99,0.99), method="L-BFGS-B")
+  
+  # Get condition
+  EWA_self_simulation[count, "condition"]  <- as.character(tdat$condition[1])
+  
+  
+  # Get best fit parameters and -2 Log Likelihoods for all models 
+
+  # Self-tuning EWA 
+  EWA_self_simulation[count, "S_EWA_infrd_lambda"] <- optim_S_EWA$optim$bestmem[1]
+  EWA_self_simulation[count, "S_EWA_2LL"]          <- optim_S_EWA$optim$bestval
+  
+  #Parametric EWA
+  EWA_self_simulation[count, "EWA_infrd_phi"]    <- optim_EWA$optim$bestmem[1]
+  EWA_self_simulation[count, "EWA_infrd_delta"]  <- optim_EWA$optim$bestmem[2]
+  EWA_self_simulation[count, "EWA_infrd_rho"]    <- optim_EWA$optim$bestmem[3]
+  EWA_self_simulation[count, "EWA_infrd_lambda"] <- optim_EWA$optim$bestmem[4]
+  EWA_self_simulation[count, "EWA_2LL"]          <- optim_EWA$optim$bestval
+  
+  # Q-Learning with previous round as state
+  EWA_self_simulation[count, "QL_infrd_beta"]   <- optim_QL_states$optim$bestmem[1]
+  EWA_self_simulation[count, "QL_infrd_alpha"]  <- optim_QL_states$optim$bestmem[2]
+  EWA_self_simulation[count, "QL_2LL"]          <- optim_QL_states$optim$bestval
+  
+
+  
+  # Naive Bayes (nopts-arm bandit with prior vec transfered across games)
+  EWA_self_simulation[count, "NB_infrd_theta"] <- optim_NB$par[1]
+  EWA_self_simulation[count, "NB_infrd_eps"]   <- optim_NB$par[2]
+  EWA_self_simulation[count, "NB_2LL"]         <- optim_NB$value
+  
+  # Random
+  EWA_self_simulation[count, "Random_2LL"]     <- -2*(2*num_rounds*log(1/3) + num_rounds*log(1/5))
+  
+  count <- count + 1
+}
+
+save(EWA_self_simulation,file="SEWA_simulation.RData")
+
+```
+
+
+## Plotting parameter recovery scatter plots and model recovery results
+```{r}
+
+plot(EWA_self_simulation$real_lambda,EWA_self_simulation$S_EWA_infrd_lambda)
+# We can evaluate the correlation between real and infered lambdas and test it for significance
+cor.test(EWA_self_simulation$real_lambda, EWA_self_simulation$S_EWA_infrd_lambda, method=c("spearman"))
+
+# Model recovery: create a table with best fitting models by condition
+SEWA_recov_results <- table(EWA_self_simulation[, "condition"],c("random","N_Bayes","QL","EWA","S_EWA")[apply(EWA_self_simulation[,c("Random_2LL","NB_2LL","QL_2LL","EWA_2LL","S_EWA_2LL")],1,which.min)])
+
+ write.csv(SEWA_recov_results,file="SEWA_recov_results.csv",row.names = TRUE)
+ kable(SEWA_recov_results)
+```
+
+
+```{r}
+  
+```
+
+<!--chapter:end:param_model_recovery.Rmd-->
+
+---
+title: "Score_plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggpubr)
+
+```
+
+
+```{r}
+
+exp1_dat = read.csv("exp1_data.csv")
+exp1_model_comp = read.csv("exp1_model_comp.csv")
+
+datalist = list()
+i = 0
+new_dat <- setNames(data.frame(matrix(ncol = ncol(exp1_dat), nrow = 0)), colnames(exp1_dat))
+for(id in unique(exp1_dat$human_id)) {
+  i <- i+1
+  tdat <- subset(exp1_dat,human_id == id)
+  tdat$part_num <- i
+  tdat <- within(tdat, acc_sum <- cumsum(tdat$score))
+  datalist[[i]] <- tdat
+}
+
+# Merge all datasets into one 
+new_dat <- dplyr::bind_rows(datalist)
+# or new_dat <- data.table::rbindlist(datalist)
+
+# Add column for time t
+new_dat <- new_dat %>% group_by(exp1_dat$human_id) %>% mutate(t = row_number())
+
+# Participant number as a factor 
+# tdat$part_num <- as.factor(tdat$part_num)
+
+# Add best fitting model per participant
+new_dat <- merge(new_dat, exp1_model_comp[, c("human_id", "Best_model")], by="human_id")
+```
+
+
+```{r}
+ggplot(data = new_dat, aes(x = t, y=acc_sum, group = part_num)) + 
+  geom_line(aes(color= Best_model))
+```
+
+
+```{r}
+temp <- new_dat[,c("t","acc_sum","Best_model","condition","part_num")]
+dat_by_model <- temp %>% group_by(Best_model,t) %>% 
+  summarize(model_acc_sum = mean(acc_sum))
+
+ggplot(data = dat_by_model, aes(x = t, y=model_acc_sum, group = Best_model)) + 
+   geom_line(aes(color= Best_model))
+```
+
+<!--chapter:end:score_plots.Rmd-->
+

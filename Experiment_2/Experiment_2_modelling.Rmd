@@ -641,6 +641,8 @@ exp2_STEWA_STATES(1,test_data,"-2loglik", TRUE)
 ```
 ## Fitting ST_EWA_states WITHOUT transfer 
 ```{r, cache=TRUE}
+# Set seed to random number to check you get same results
+set.seed(43)
 
 exp2_STEWA_NT <- list()
 for(id in unique(dat_exp2$human_id)) {
@@ -804,6 +806,16 @@ save(MBM2_modelling, file="MBM2_modelling.RData")
 
 ## Putting all results together 
 ```{r}
+
+load("exp2_QLS_modelling.Rdata")
+load("exp2_QLS_within_Tr.Rdata")
+load("exp2_STEWA_NT.Rdata")
+load("exp2_STEWA_Tr.Rdata")
+load("MBM2_modelling.Rdata")
+
+
+
+
 exp2_results <- data.frame()
 
 for(id in unique(dat_exp2$human_id)) {
@@ -815,21 +827,24 @@ exp2_results <- rbind(exp2_results,
 
                          ########## MS results for Bayesian models
                           # Bayesian updating with between and within game transfer
-                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$optim$bestval + 1*log(180),
+                         "Distinct_game_BIC" = Bayes_distinct_game[[id]]$optim$bestval + 2*log(180),
                          "theta_transfer" = Bayes_distinct_game[[id]]$optim$bestmem[1],
+                         "lambda_transfer" = Bayes_distinct_game[[id]]$optim$bestmem[2],
 
                           # Bayesian updating with within but no btwn game transfer
-                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$optim$bestval + 1*log(180),
+                         "Distinct_stage_BIC" = Bayes_distinct_stage[[id]]$optim$bestval + 2*log(180),
                          "theta_no_btw_tr" = Bayes_distinct_stage[[id]]$optim$bestmem[1],
+                         "lambda_no_btw_tr" = Bayes_distinct_stage[[id]]$optim$bestmem[2],
 
                           #  No within or between game transfer
-                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$optim$bestval + 1*log(180),
+                         "Bayes_distinct_no" = Bayes_distinct_no[[id]]$optim$bestval + 2*log(180),
                          "theta_no_tr" =  Bayes_distinct_no[[id]]$optim$bestmem[1],
+                         "lambda_no_tr" =  Bayes_distinct_no[[id]]$optim$bestmem[2],
 
                           # No distinction between players, transfer within and between
-                         "Bayes_same_game" = Bayes_same_game[[id]]$optim$bestval + 1*log(180),
-                         "theta_naive" = Bayes_same_game[[id]]$optim$bestmem[1],
-                          ###########
+                         # "Bayes_same_game" = Bayes_same_game[[id]]$optim$bestval + 1*log(180),
+                         # "theta_naive" = Bayes_same_game[[id]]$optim$bestmem[1],
+                         #  ###########
 
                          ########### Q-learning with last round states (No within transfer)
                          "QL_states_BIC" = exp2_QLS_modelling[[id]]$optim$bestval + 2*log(180),
@@ -878,19 +893,14 @@ write.csv(exp2_results,file="exp2_results.csv",row.names = FALSE)
 
 ```
 
-```{r}
 
-# WIth MS results for Bayesian models
-exp2_table_results <- table(exp2_results[, "condition"],c("random","TOM_BT","TOM_NBT", "TOM_NT", "QL_states","QLS_within","STEWA_NT","STEWA_Tr")[apply(exp2_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")],1,which.min)])
-
-
-
- write.csv(exp2_table_results,file="exp2_table_results.csv",row.names = TRUE)
- kable(exp2_table_results)
-```
 
 ```{r}
-
+# WITH MS results for bayesian models 
+# exp2_table_results <- table(exp2_results[, "condition"],c("random","TOM_BT","TOM_NBT", "TOM_NT","ToM_Naive", "QL_states","QLS_within","S_EWA","MBM")[apply(exp2_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","Bayes_same_game","QL_states_BIC","QLS_within_Tr_BIC","EWA_self_BIC","MBM2_BIC")],1,which.min)])
+# 
+#  write.csv(exp2_table_results,file="exp2_table_results.csv",row.names = TRUE)
+#  kable(exp2_table_results)
 ```
 
 ```{r}
@@ -898,14 +908,16 @@ exp2_model_comp <- data.frame()
 for(id in unique(dat_exp2$human_id)) {
   tdat <- subset(dat_exp2,human_id == id)
   tot_score <- sum(tdat$score)
-  early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg" | game =="numbers") )
+  tot_time <- sum(tdat$human_rt)
+  early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg"))
+  #early_dat <- subset(tdat,between(tdat$round,2,6) & (game =="fwg" | game =="numbers") )
   tr_score <- sum(early_dat$score)
   id_results <- subset(exp2_results, ID == id)
-  
+
   # MS BAYES MODELS
-  min_BIC <- apply(id_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")],1,min)
+  min_BIC <- apply(id_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no", "QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")],1,min)
   
-  best_model <- c("random","TOM_BT","TOM_NBT", "TOM_NT", "QL_states","QLS_within","STEWA_NT","STEWA_Tr")[apply(id_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")],1,which.min)]
+  best_model <- c("random","ToM_BT","ToM_NBT", "ToM_NT","QL_states_NT","QLS_within_Tr","STEWA_NT","STEWA_Tr")[apply(id_results[,c("Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no","QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")],1,which.min)]
   
   exp2_model_comp <- rbind(exp2_model_comp ,
                        data.frame(
@@ -923,6 +935,29 @@ for(id in unique(dat_exp2$human_id)) {
 }
 
 write.csv(exp2_model_comp,file="exp2_model_comp.csv",row.names = FALSE)
+
+
+```
+
+## Calucalting BIC weights 
+```{r}
+
+exp2_comp_BICs <- exp2_results[c("ID","Random_BIC","Distinct_game_BIC","Distinct_stage_BIC","Bayes_distinct_no", "QL_states_BIC","QLS_within_Tr_BIC","STEWA_NT_BIC","STEWA_Tr_BIC")]
+
+exp2_BIC_weights <- exp2_comp_BICs["ID"]
+exp2_BIC_weights[,2:ncol(exp2_comp_BICs)] <- t(apply(exp2_comp_BICs[,2:ncol(exp2_comp_BICs)], 1, function(i) exp(-0.5*(i-min(i)) )))
+
+exp2_BIC_weights[,-1] <- t(apply(exp2_BIC_weights[,-1], 1, function(i) round(i/sum(i),2)))
+colnames(exp2_BIC_weights) <- c("ID", "random","ToM_BT","ToM_NBT", "ToM_NT","QL_states_NT","QLS_within_Tr","STEWA_NT","STEWA_Tr")
+
+BIC_comp_table <- as.data.frame(t(colMeans(exp2_BIC_weights[,2:ncol(exp2_BIC_weights)])))
+
+colnames(BIC_comp_table) <- c("random","ToM_BT","ToM_NBT", "ToM_NT","QL_states_NT","QLS_within_Tr","STEWA_NT","STEWA_Tr")
+# 
+BIC_comp_table
+
+table(exp2_model_comp$Best_model_2)
+
 ```
 
 # Correlate difference between BICs of Bayes transfer and no transfer with early rounds score (evidence for transfer) 

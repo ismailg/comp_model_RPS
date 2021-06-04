@@ -19,7 +19,7 @@ dat <- read.csv("data_exp2.csv")
 # dat <- subset(dat,human_id == "bZg1T3MNoItL6b7qAAAj")
 # dat <- subset(dat,human_id == "J3SqvTcFUwXtSC6wAAB0")
 # dat <- subset(dat,human_id == "gRRZ0rUagyVejWTOAAFl")
-dat <- subset(dat,human_id == "vGnDPRowetREQVmwAADL")
+#dat <- subset(dat,human_id == "vGnDPRowetREQVmwAADL")
 # dat <- subset(dat,human_id == "wi_zWhftr9MdqTmCAAHs")
 
 
@@ -110,17 +110,19 @@ dat$human_action_num <- recode(dat$human_action,"rock" = 1, "paper" = 2, "scisso
 # if human generalizes over rounds but not games, we need to reset the prior at the start of a game
 # if human does not generalize, we need to reset the prior at the start of each ?stage?
 
-Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("game","stage","no"), return = "-2loglik"){
+Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, softmax = TRUE, generalize = c("game","stage","no"), return = "-2loglik"){
   
   # data is a subset for a single participant
+
   generalize <- match.arg(generalize)
   alpha <- par[1] # probability that ai opponent plays according to strategy
-  if(length(par) > 1) {
-    beta <- par[2] # probability that human plays according to best response 
-  } else{
-    beta <- 1 # probability that human plays according to best response 
-  }
+  beta <- 1 # probability that human plays according to best response 
   
+  if(softmax) {
+    lambda <- par[2] # inverse temperature parameter in softmax function
+  } 
+
+
   prior <- c(1,1,1) # prior alpha for dirichlet on p(level)
   prior <- prior/sum(prior)
   
@@ -202,13 +204,33 @@ Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("ga
         )
   
   # now finally compute the likelihood of human actions 
-  dat <- dat %>% 
+  
+    # now finally compute the likelihood of human actions 
+  if (softmax) {
+    
+    dat <- dat %>% 
+    mutate(sumexp = exp(lambda*p_self_a1) + exp(lambda*p_self_a2) + exp(lambda*p_self_a3)) %>%
+             mutate(
+               loglik = case_when(
+                 human_action_num == 1 ~ log(exp(lambda*p_self_a1)/sumexp),
+                 human_action_num == 2 ~ log(exp(lambda*p_self_a2)/sumexp),
+                 human_action_num == 3 ~ log(exp(lambda*p_self_a3)/sumexp)
+      )
+    )
+    
+  } else {
+    dat <- dat %>% 
     mutate(
       loglik = case_when(
         human_action_num == 1 ~ log(p_self_a1),
         human_action_num == 2 ~ log(p_self_a2),
-        human_action_num == 3 ~ log(p_self_a3))
-    )
+        human_action_num == 3 ~ log(p_self_a3)
+      )
+    )  
+    
+  }
+  
+  
   
   #cat(as.character(exp(dat$loglik)), "\n", "\n")
   if (return == "-2loglik") {
@@ -226,7 +248,7 @@ Bayes_model_LL <- function(par,data,distinct_opponent = TRUE, generalize = c("ga
 ```
 
 ```{r}
-Bayes_model_LL(0.5,data = dat,distinct_opponent = TRUE, generalize = "game", return = "likelihood_by_trial")
+Bayes_model_LL(c(0.5,1),data = dat,distinct_opponent = TRUE, generalize = "game", softmax = TRUE, return = "likelihood_by_trial")
 
 #PLot likelihood for first participant as function of parameter 
 # likelihoods <- list()
@@ -249,26 +271,45 @@ Bayes_same_game <- Bayes_same_stage <- Bayes_same_no <-
   Bayes_distinct_game <- Bayes_distinct_stage <- Bayes_distinct_no <- 
     list()
 
-# USing DEOptim 
+# Using DEOptim 
 
 for(id in levels(dat$human_id)) {
   tdat <- subset(dat,human_id == id)
-  ctrl <- DEoptim.control(NP = 20, itermax=50)
-  Bayes_same_game[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
-                                   distinct_opponent = FALSE, generalize = "game",control=ctrl)
-  Bayes_same_stage[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
-                                   distinct_opponent = FALSE, generalize = "stage",control=ctrl)
-  Bayes_same_no[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
-                                   distinct_opponent = FALSE, generalize = "no",control=ctrl)
-  Bayes_distinct_game[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+  ctrl <- DEoptim.control(NP = 20, itermax=50,parallelType = 1, packages = c("dplyr"))
+
+  
+  # Here, optimisation implies softmax = TRUE as it was omitted as input and default is true 
+  # Bayes_same_game[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
+  #                                  distinct_opponent = FALSE, generalize = "game", control=ctrl)
+  # 
+  # Bayes_same_stage[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
+  #                                  distinct_opponent = FALSE, generalize = "stage",control=ctrl)
+  # 
+  # Bayes_same_no[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
+  #                                  distinct_opponent = FALSE, generalize = "no",control=ctrl)
+  
+  Bayes_distinct_game[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
                                    distinct_opponent = TRUE, generalize = "game",control=ctrl)
-  Bayes_distinct_stage[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+  
+  Bayes_distinct_stage[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
                                         distinct_opponent = TRUE, generalize = "stage",control=ctrl)
-  Bayes_distinct_no[[id]] <- DEoptim(Bayes_model_LL, lower=c(0), upper = c(1), data = tdat,
+  
+  Bayes_distinct_no[[id]] <- DEoptim(Bayes_model_LL, lower=c(0,0), upper = c(1,1000), data = tdat,
                                  distinct_opponent = TRUE, generalize = "no",control=ctrl)
 }
 
 
+#save(prob_match_tr,file="BCH_prob_match_tr.RData")
+
+# All these below use softmax for choice function rather than prob matching. For prob matching, choose softmax = FALSE above.
+save(Bayes_distinct_game,file="Bayes_distinct_game.RData")
+save(Bayes_distinct_stage,file="Bayes_distinct_stage.RData")
+save(Bayes_distinct_no,file="Bayes_distinct_no.RData")
+
+
+```
+
+```{r}
 # using optim
 
 

@@ -23,6 +23,15 @@ affiliation:
 abstract: |
   Enter abstract here. Each new line herein must be indented, like this line.
   
+  Human learning transfer abilities take advantage of important cognitive building blocks such as an abstract representation of concepts underlying tasks and 
+  causal models of the environment. One way to build abstract representations of the environment when the task involves interactions with others is to build 
+  a model of the opponent that may inform what actions they are likely to take next. In this study, we propose to explore opponent modelling and its transfer with the use of
+  computer agents possessing human-like theory of mind abilities with limited degrees of iterated reasoning. Through two differentiated experiments, we find that participants can
+  deviate from Nash equilibrium play and learn to adapt to the opponent strategy and exploit it. Moreover, we showed that participants transfer their learning to new games and that
+  the transfer is moderated by the level of  sophistication of the opponent. Computational modelling shows that it is likely that players start each game using a model-based
+  learning strategy that facilitates generalisation and opponent model transfer, but then switch to behaviour that is consistent with a  model-free learning strategy in the latter
+  stages of the interaction.
+  
 # keywords          : "keywords"
 # wordcount         : "X"
 
@@ -66,7 +75,7 @@ library(multcompView)
 library(lsmeans)
 library(magick)
 library(depmixS4)
-library(rmdfiltr)
+
 ```
 
 ```{r analysis-preferences}
