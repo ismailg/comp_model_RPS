@@ -384,28 +384,22 @@ ggerrorplot(dat2_6, x = "game.f", y = "early_score", group = 1, color="game.f", 
 ```
 
 ```{r}
-
-
 # testing differences between early scores across games 
 library(afex)
 
 aov_early <- aov_car(early_score ~ game.f*opp_type*condition.f + Error(human_id/(game.f*opp_type)),data=dat2_6)
 summary(aov_early)
 
-aov_ear_nice <- nice(aov_early, es = attr(aov_early$anova_table, "es"),
+(aov_ear_nice <- nice(aov_early, es = attr(aov_early$anova_table, "es"),
   observed = attr(aov_early$anova_table, "observed"),
   correction = attr(aov_early$anova_table, "correction"), MSE = NULL,
   intercept = NULL, p_adjust_method = attr(aov_early$anova_table,
-  "p_adjust_method"), sig_symbols = attr(aov_early$anova_table, "sig_symbols"))
+  "p_adjust_method"), sig_symbols = attr(aov_early$anova_table, "sig_symbols")))
+
 
 write.table(aov_ear_nice,file = "aov_ear.txt", sep = ",", quote = FALSE, row.names = F)
 
-
-# including confidence 
-#ov_conf_26 <- aov_car(early_score ~ game.f*condition*difficulty + Error(human_id/(game.f)),data=dat2_6)
-#summary(aov_conf_26)
-
-# Here we can change the null to 0.33 to check for whether early shoot higher scores are due to random play.
+# Post hoc analyses : Checking early score by opponent and game 
 (ls4 <- lsmeans(aov_early, "game.f", by="opp_type"))
 (summary(ls4, infer = c(TRUE,TRUE), null = 0,level = 0.95, adjust = "bon"))
 
