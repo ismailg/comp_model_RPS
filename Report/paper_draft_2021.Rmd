@@ -101,7 +101,7 @@ Instead of thinking of their opponents as drawing random actions from a (non-uni
 
 In Level-$k$ theory, a level-0 player uses a fixed strategy without explicitly considering the strategy of their opponent. A level-1 player assumes their opponent is a level-0 player, and chooses actions to best respond to the strategy of their opponent, without considering what their opponent might believe that they will play. A level-2 player, on the other hand, takes their opponent's belief about their actions into account, assuming they face a level-1 player, and choosing actions to best respond to the actions of that player. Cognitive Hierarchy theory is based on similar principles, but rather than assuming an opponent always adopts a particular level-$k$ strategy, they are assumed to adopt each of the level-$k$ strategies with a particular probability (i.e., the opponent's strategy is a mixture over pure level-$k$ strategies).
 
-Iterative reasoning strategies can explain non-equilibrium play in a range of games, such as the $p$-beauty contest game [@nagel1995unraveling], dominance solvable games [@camerer2004cognitive], and various standard normal form games [@costa2001cognition]. In the present study, we endow our computer opponents with limited ability for iterative reasoning and assess whether (1) human players adapt their strategy to exploit this limited reasoning of their opponent, and (2) whether they are able to generalize a learned opponent model to other games. In two experiments, participants face the same opponent (Experiment 1) or the same two opponents (Experiment 2) in three consecutive games: the well-known Rock-Paper-Scissors game, the structurally similar Fire-Water-Grass game, and a less similar Numbers (Experiment 1) or Shootout (Experiment 2) game. To foreshadow our results, we find evidence that participants transfer the learned strategy of their opponent to other games, but that this transfer is moderated by the sophistication of their opponent and the similarity of the games. Moreover, using computational modelling, we find evidence that participants switch from relying on an opponent model in the early stages of the games, to a more habitual and cognitively less demanding strategy in the later stages of the games.
+Iterative reasoning strategies can explain non-equilibrium play in a range of games, such as the $p$-beauty contest game [@nagel1995unraveling], dominance solvable games [@camerer2004cognitive], and various standard normal form games [@costa2001cognition]. In the present study, we endow our computer opponents with limited ability for iterative reasoning and assess whether (1) human players adapt their strategy to exploit this limited reasoning of their opponent, and (2) whether they are able to generalize a learned opponent model to other games. In two experiments, participants face the same opponent (Experiment 1) or the same two opponents (Experiment 2) in three consecutive games: the well-known Rock-Paper-Scissors game, the structurally similar Fire-Water-Grass game, and a less similar Numbers (Experiment 1) or Shootout (Experiment 2) game. To foreshadow our results, **we find evidence that participants transfer the learned strategy of their opponent to other games, but that this transfer is moderated by the sophistication of their opponent and the similarity of the games** **IG: I guess we can still say that given findings of exp 2...** . Moreover, using computational modelling, we find evidence that participants switch from relying on an opponent model in the early stages of the games, to a more habitual and cognitively less demanding strategy in the later stages of the games.
 
 # Experiment 1
 
@@ -141,7 +141,7 @@ The computer opponent was programmed to use either a level-1 or level-2 strategy
 
 ### Procedure
 
-Participants were informed they would play three different games against the same computer opponent. Participants were told that the opponent cannot cheat and will choose its actions simultaneously with them, without prior knowledge of the participant's choice. After providing informed consent and reading the instructions, participants answered a number of comprehension questions. They then played the three games against their opponent in the order RPS, FGW, and Numbers. An example of the interface for the RPS game is provided in Figure\ \@ref(fig:feedback-rps-exp2). On each round, the human player chooses an action, and after a random delay (between 0.5 and 3 seconds) is shown the action chosen by the computer opponent and the outcome of that round. <!-- A history of the chosen actions over all rounds is available in the centre panel. **MS: was this not only the case for Experiment 2? ** --> A total of 50 rounds of each game was played with the player's score displayed at the end of each game. The score was calculated as the number of wins minus the number of losses. Ties did not affect the score. In order to incentivise the participants to maximise the number of wins against their opponent, players were paid a bonus at the end of the experiment proportional to their final score (each point was worth £0.02). After playing all the games, participants were asked questions about their beliefs about the computer opponent, related to whether they thought they learned their opponent's strategy, and how difficult they found playing against their opponent. They were then debriefed and thanked for their participation.
+Participants were informed they would play three different games against the same computer opponent. Participants were told that the opponent cannot cheat and will choose its actions simultaneously with them, without prior knowledge of the participant's choice. After providing informed consent and reading the instructions, participants answered a number of comprehension questions. They then played the three games against their opponent in the order RPS, FGW, and Numbers. An example of the interface for the RPS game is provided in Figure\ \@ref(fig:feedback-rps-exp2). On each round, the human player chooses an action, and after a random delay (between 0.5 and 3 seconds) is shown the action chosen by the computer opponent and the outcome of that round.A total of 50 rounds of each game was played with the player's score displayed at the end of each game. The score was calculated as the number of wins minus the number of losses. Ties did not affect the score. In order to incentivise the participants to maximise the number of wins against their opponent, players were paid a bonus at the end of the experiment proportional to their final score (each point was worth £0.02). After playing all the games, participants were asked questions about their beliefs about the computer opponent, related to whether they thought they learned their opponent's strategy, and how difficult they found playing against their opponent. They were then debriefed and thanked for their participation.
 
 ```{r feedback-rps-exp2, fig.cap = "Screenshot of the Rock-Paper-Scissors game in Experiment 2. Shown here is the feedback stage, after both the human (left) and computer (right) players have chosen their action. The interface was similar in Experiment 1, but excluded the history of game play in the center panel.", fig.align='center'}
 
@@ -268,11 +268,13 @@ exp1_dat2_6 %>%
 
 ```
 
-Next, we explore whether learning transfer is moderated by the type of opponent and game similarity. We expected better transfer between more similar games (i.e. better transfer from RPS to FWG than from RPS/FWG to Numbers), and worse transfer for the more sophisticated level-2 agent. Figure \ref{fig:exp1-early-score-by-opp} indicates that the pattern over the games is indeed dissimilar between level-1 and level-2 opponents. To explore this, we used a 2 (Condition: Level 1, Level 2) by 3 (Game: RPS, FWG, Numbers) repeated measures ANOVA with the first factor varying between participants. There was a main effect of Game ($F(1.84,91.77) = 3.35$, $\eta^{2}  = 0.04$,  $p = .043$, Greenhouse-Geisser correction applied to the degrees of freedom to correct for non-sphericity). **MS: was this the only significant effect? If so, people might wonder why we next run analyses for each combination of player and game** We then ran statistical tests on early round scores by game and opponent, against the null hypothesis of 0 (no transfer).  For level-1 facing players, there is evidence of learning transfer from RPS to both FWG ($t(150) = 3.96$, $p < .001$) and Numbers ($t(150) = 3.74$, $p < .001$). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player ($t(150) = 2.48$, $p = .01$) but not to the dissimilar game of Numbers. 
+Next, we explore whether learning transfer is moderated by the type of opponent and game similarity. We expected better transfer between more similar games (i.e. better transfer from RPS to FWG than from RPS/FWG to Numbers), and worse transfer for the more sophisticated level-2 agent. Figure \ref{fig:exp1-early-score-by-opp} indicates that the pattern over the games is indeed dissimilar between level-1 and level-2 opponents. To explore this, we used a 2 (Condition: Level 1, Level 2) by 3 (Game: RPS, FWG, Numbers) repeated measures ANOVA with the first factor varying between participants. There was a main effect of Game ($F(1.84,91.77) = 3.35$, $\eta^{2}  = 0.04$,  $p = .043$, Greenhouse-Geisser correction applied to the degrees of freedom to correct for non-sphericity).
+
+To test for transfer by type of opponent faced, we ran statistical tests on early round scores by game and opponent, against the null hypothesis of 0 (no transfer).  For level-1 facing players, there is evidence of learning transfer from RPS to both FWG ($t(150) = 3.96$, $p < .001$) and Numbers ($t(150) = 3.74$, $p < .001$). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player ($t(150) = 2.48$, $p = .01$) but not to the dissimilar game of Numbers. 
 
 ### Discussion
 
-The results of Experiment 1 indicate that participants were able to learn successful strategies which exploited the deviation from Nash-optimal play of their opponents. Moreover, they were able to transfer knowledge about their opponent to other games, but this was moderated by the type of game and opponent. There was evidence of transfer from the RPS game to the similar FWG game for both opponents. However, transfer to the dissimilar Numbers game was only evident for participants facing a level-1 opponent. 
+The results of Experiment 1 indicate that participants were able to learn successful strategies which exploited the deviation from Nash-optimal play of their opponents. Moreover, they were able to transfer knowledge about their opponent to other games, but this was moderated by the type of game. There was evidence of transfer from the RPS game to the similar FWG game for both opponents. However, transfer to the dissimilar Numbers game was only evident for participants facing a level-1 opponent. 
 
 ```{r ANOVA early exp1, include = FALSE, warning=FALSE}
 
@@ -423,13 +425,16 @@ exp2_dat2_6 %>%
 ```
 
 
-To measure transfer between games, we again focus on participants’ scores in the initial 5 rounds after the first round (rounds 2-6) of each game and only during the first time they interact with an opponent in a game (see Figure \ref{fig:exp2-early-score-by-opp}). We performed a two (Condition: level-1 first, level-2 first) by two (Opponent type: level-1 or level-2) by three (Game: RPS, FWG, Shootout) repeated-measures ANOVA, with the first factor varying between participants. This showed a main effect of Game ($F(1.94,92.98) = 7.67$, $\eta^{2} = 0.04$,  $p < .001$). **MS: Again, if there is no interaction, there might not be justification for running tests per opponent and game **
+**To measure transfer between games, we again focus on participants’ scores in the initial 5 rounds after the first round (rounds 2-6) of each game and only during the first time they interact with an opponent in a game (see Figure \ref{fig:exp2-early-score-by-opp}). We estimate a linear mixed effects model with the early round scores as the dependent variable, and Condition (level-1 first, level-2 first), Opponent type (level-1 or level-2) and Game (RPS, FWG, Shootout) as independent variables. Random model intercepts are assumed for participants. We found a main effect of Game($F(2,240) = 6.57$, $p = .002$) and an interaction effect between Game and Opponent type ( $F(2,240) = 3.34$,  $p = .037$).**
+
+<!-- We performed a two (Condition: level-1 first, level-2 first) by two (Opponent type: level-1 or level-2) by three (Game: RPS, FWG, Shootout) repeated-measures ANOVA, with the first factor varying between participants. This showed a main effect of Game ($F(1.94,92.98) = 7.67$, $\eta^{2} = 0.04$,  $p < .001$). **MS: Again, if there is no interaction, there might not be justification for running tests per opponent and game ** --> 
+
 We then ran statistical tests on early round scores by game and opponent against the null hypothesis of 0 (no transfer). For level-1 facing players, there is evidence of learning transfer from RPS to both FWG ($t(271) = 4.99$, $p < .001$) and Shootout ($t(271) = 6.66$, $p < .001$). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player ($t(271) = 4.41$, $p < .001$). Unlike in Experiment 1, there is also evidence of transfer to the dissimilar Shootout game ($t(271) = 3.22$, $p = .004$).  The early round scores in the similar FWG games for level-1 and level-2 facing players are not significantly different from each other. However, the score of the players facing the level-1 opponent in Shootout is higher than that of players facing level-2 opponents ( $t(144) = 2.45$, $p = 0.01$).
 
 
 ### Discussion
 
-The results of Experiment 2 confirm the earlier results of Experiment 1 in a situation where participants need to learn about two distinct opponents. As in Experiment 1, participants adapted their strategies to both level-1 and level-2 opponents to exploit deviations from Nash-optimal play. Knowledge about both types of opponents were transferred to both the similar and dissimilar game. However, transfer to the dissimilar game was easier when facing the less sophisticated agent. 
+**The results of Experiment 2 confirm earlier results from Experiment 1 on learning transfer in a situation where participants need to learn about two distinct opponents. As in Experiment 1, participants adapted their strategies to both level-1 and level-2 opponents to exploit deviations from Nash-optimal play. Knowledge about both types of opponents were transferred to both the similar and dissimilar game. This transfer was moderated by the degree of similarity between games. The interaction effect showed that transfer to the dissimilar game was easier when facing the less sophisticated agent. **
 
 # Computational modelling
 
@@ -451,11 +456,33 @@ The RL model has two free parameters: the learning rate ($\alpha$) and the inver
 ## Experience-weighted attraction (EWA) model
 
 The self-tuning Experience Weighted Attraction (EWA) model [@ho2004economics] combines two seemingly different approaches, namely reinforcement learning and belief learning. Belief learning models are based on the assumption that players keep track of their opponent's frequency of past actions, and best respond to that. By contrast, reinforcement learning does not explicitly take into account beliefs about other players, but simply increases the probability of repeating a more rewarding action. The self-tuning EWA model has been shown to perform better than either RL or belief learning alone in various repeated games and has the advantage of having only one free parameter, the inverse temperature of the softmax choice function. The EWA model is based on updating ``Attractions'' for each action over time given a particular state. The attraction of action $a$ at time $t$ given state $s$ is denoted as $A_{t}(a, s)$ and updated as 
-$$ A_{t+1}(a,s) =  \frac{\phi \ N(t) \ A_{t}(a,s) + [ \delta + (1-\delta) \ I(a_t = a )] \ R(a,o_t) } {\phi \ N(t) + 1} $$
-where $I(x)$ is an indicator function which takes the value 1 is its argument is true and 0 otherwise, and $R(a,o_t)$ is the reward that would be obtained from playing action $a$ against opponent action $o_t$. $R(a,o_t)$ equals the actual obtained reward when $a = a_t$, and otherwise is a counterfactual reward that would have been obtained if a different action were taken. Unlike reinforcement learning, this uses knowledge of the rules of the game to allow reinforcing actions that were not actually taken by the rewards they would have provided. The parameter $\delta$ reflects the weight given to such counterfactual rewards. Setting $\delta = 0$ leads to reinforcement only of actions taken, while positive values of $\delta$ makes the update rule take into account foregone payoffs, which is similar to weighted fictitious play [@cheung1994learning]. $N(t)$ represents an experience weight and can be interpreted as the number of "observation-equivalents" of past experience. We initialise it to 1 so initial attractions and reinforcement from payoffs are weighted equally. **MS: need to better describe what $\phi$ is, and how $N(t)$ is determined.** In the earlier version of the EWA model [@camerer1997experience], $\phi$ and $\delta$ were free parameters. In the self-tuning EWA model [@ho2004economics], the values of $\delta$ and $\phi$ are learnt from experience. For details on how this is done, we refer the reader to [@ho2004economics]. **MS: Should describe how the parameters are self-tuned with equations. IG: There are many equations for each of the parameters update, phi, delta and N...I'm concerned it would make for cumbersome reading, especially since EWA doesn't really fit well anyway. I've added that details of updates can be found in original camerer paper. MS: If it's three additional equations, that's not a big deal really. **
+$$ A_{t+1}(a,s) =  \frac{\phi(t) \ N(t) \ A_{t}(a,s) + [ \delta_{a}(t) + (1-\delta_{a}(t)) \ I(a_t = a )] \ R(a,o_t) } {\phi(t)N(t) + 1} $$
+where $I(x)$ is an indicator function which takes the value 1 is its argument is true and 0 otherwise, and $R(a,o_t)$ is the reward that would be obtained from playing action $a$ against opponent action $o_t$. $R(a,o_t)$ equals the actual obtained reward when $a = a_t$, and otherwise is a counterfactual reward that would have been obtained if a different action were taken. Unlike reinforcement learning, this uses knowledge of the rules of the game to allow reinforcing actions that were not actually taken by the rewards they would have provided. The parameter $\delta$ reflects the weight given to such counterfactual rewards. Setting $\delta = 0$ leads to reinforcement only of actions taken, while positive values of $\delta$ makes the update rule take into account foregone payoffs, which is similar to weighted fictitious play [@cheung1994learning]. $N(t)$ represents an experience weight and can be interpreted as the number of "observation-equivalents" of past experience. We initialise it to 1 so initial attractions and reinforcement from payoffs are weighted equally. **MS: need to better describe what $\phi$ is, and how $N(t)$ is determined. IG: done** In the earlier version of the EWA model [@camerer1997experience], $\phi$ and $\delta$ were free parameters. In the self-tuning EWA model [@ho2004economics], the values of $\delta$ and $\phi$ are learnt from experience. $\delta$ is updated using the 
 
-As in the models above, actions are chosen based on a softmax decision rule:
-$$P_t(a,s) = \frac{\exp \{\lambda  A_{t}(a,s) \} }{\sum_{a' \in \mathcal{A}_t} \exp \{ \lambda A_{t}(a',s) \} }$$
+$$ \delta_{a}(t)  = 1  \text{  if  }  R(a,o_{t}) \geq r_{t}  \text{  and }  0 \text{  otherwise } $$ 
+
+
+**$\phi_{t}$ can be interpreted as the discount on prior experiences, modelling either limited agent memory or changes in the game conditions. At the core, $\phi_{t}$ depends on the surprise index $ S_{p}(t)$**: 
+
+$$ \phi(t) = 1 - \frac{1}{2}S_{p}(t) $$
+
+**$S_{p}(t)$ quantifies how the opponent deviates from past play. It is calculated in turn through the cumulative history of play $ h_{k}(t)$**:
+
+$$  h^{k}(t)= \frac{\sum_{\tau =1}^t I(o^k,o_{\tau})}{t} $$ 
+
+
+As well as an indicator vector of the most recent opponent play:
+
+$$r^k(t) = I(o^k,o_{t})$$ 
+
+**Where $I$ is the indicator function as defined above.  To get the surprise index, we simply sum all the squared deviations between the cumulative history vector $ h^{k}(t) $ and the immediate history $r^k(t)$**:
+
+$$S_{p}(t) = \sum_{k=1}^{|\mathcal{A}_g|} (h^{k}(t) - r^k(t))^2 $$ 
+
+
+For more details on the self-tuning EWA model, we refer the reader to [@ho2004economics].As in the models above, actions are chosen based on a softmax decision rule:
+
+$$P_t(a,s) = \frac{\exp \{\lambda  A_{t}(a,s) \} }{\sum_{a' \in \mathcal{A}_t} \exp \{ \lambda A_{t}(a',s) \} } $$
 The self-tuning EWA has one free parameter: the inverse temperature of the softmax decision rule ($\lambda$). 
 
 \subsection{Bayesian Cognitive Hierarchy (BCH) model}
@@ -473,7 +500,9 @@ Unlike the models above, the BCH model allows for between-game transfer, as know
 
 ## Estimation and model comparison
 
-For both experiments, we fitted all models to individual participant data by maximum likelihood estimation. **MS: need to mention the use of e.g. DEoptim** We use the Bayesian Information Criterion (BIC) to determine the best fitting model for each participant. <!--, the best fitting model for each participant was chosen and we compared the number of participants whose behavior was best explained by each model. -->
+
+ 
+For both experiments, we fitted all models to individual participant data by maximum likelihood estimation using the DEoptim R package [@R-DEoptim]. We use the Bayesian Information Criterion (BIC) to determine the best fitting model for each participant. <!--, the best fitting model for each participant was chosen and we compared the number of participants whose behavior was best explained by each model. -->
 
 For Experiment 1, we fitted a total of 5 models: a baseline model assuming random play (Nash), the Bayesian Cognitive Hierarchy model allowing transfer between games (BCH\_BT) and without transfer between games (BCH\_NBT), as well as a reinforcement learning (RL), and finally a self-tuning EWA model with the same state space (EWA).
 
@@ -483,10 +512,10 @@ In Experiment 2, because participants were interacting with each opponent twice 
 ```{r load-comp-mod-distrib, include=FALSE}
 
 exp1_comp_results <- read.csv(file="../exp1_all_results.csv")
-exp1_comp_table <- table(exp1_comp_results[, "condition"],c("Nash","BCH_BT","BCH_WT", "RL","EWA")[apply(exp1_comp_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_states_BIC","ST_EWA_STATES_BIC")],1,which.min)])
+exp1_comp_table <- table(exp1_comp_results[, "condition"],c("Nash","BCH_BT","BCH_NBT", "RL","EWA")[apply(exp1_comp_results[,c("Random_BIC","Bayes_Tr_BIC","Bayes_No_Tr_BIC","QL_states_BIC","ST_EWA_STATES_BIC")],1,which.min)])
 
  #write.csv(exp1_comp_table ,file="exp1_comp_table ",row.names = TRUE)
- kable(exp1_comp_table)
+
 ```
 
 
@@ -547,9 +576,9 @@ temp <- new_dat[,c("t","acc_sum","Best_model","condition","part_num")]
 dat_by_model <- temp %>% group_by(Best_model,t) %>% summarize(model_acc_sum = mean(acc_sum))
 ```
 
-**MS: Please present the models in the figures in the order mentioned in text (i.e., Nash, RL, EWA, BCH), and when providing versions of each, do so in the same order as well, i.e. x_NT, x_WT, x_BT**
+**MS: Please present the models in the figures in the order mentioned in text (i.e., Nash, RL, EWA, BCH), and when providing versions of each, do so in the same order as well, i.e. x_NT, x_WT, x_BT.  IG : DONE **
 
-Figure\ \@ref(fig:exp1-comp-models)  shows the results for Experiment 1. We can see that the RL model clearly described most participants' behaviour best, followed by the random (Nash) model. Only a few participants were best described by one of the BCH models or the EWA model. Looking at BIC weights (Figure \ \@ref(fig:xp1-BIC-weigths)), we confirm this. RL models have high BIC weights when they best fit the participants, and very few instances have high BIC weights for models other then RL, which fits the picture drawn by the histogram. **MS: The BIC weight don't add much information, so maybe we could leave them out **
+Figure\ \@ref(fig:exp1-comp-models)  shows the results for Experiment 1. We can see that the RL model clearly described most participants' behaviour best, followed by the random (Nash) model. Only a few participants were best described by one of the BCH models or the EWA model. We have also estimated BIC weights for each model and we confirm that <!-- (Figure \ \@ref(fig:xp1-BIC-weigths)), we confirm this -->. RL models have high BIC weights when they best fit the participants, and very few instances have high BIC weights for models other then RL, which fits the picture drawn by the histogram.  **IG: mentioned we looked at BIC weights and removed BIC wgt plot **
 
 ```{r, include=FALSE}
 
@@ -565,23 +594,32 @@ exp1_BIC_weights[,-1] <- t(apply(exp1_BIC_weights[,-1], 1, function(i) round(i/s
 
 ```{r exp1-comp-models, fig.cap = "Experiment 1 - Histogram of best fitting computational models by condition", out.width="\\textwidth", fig.align='center'}
 
-#knitr::include_graphics("../Report/images/exp1_comp_models.png", dpi = 108)
-par(las=2) # make label text perpendicular to axis
-par(mar=c(5,8,4,2)) # increase y-axis margin.
-barplot(exp1_comp_table,
-        horiz =TRUE, # rotate barplot for better visibility 
-        las=1, # change orientation x axis labels 
-        cex.names=0.8, # text label size
-        legend = rownames(exp1_comp_table),
-        beside =TRUE,
-        xlab="Number of participants",
-        args.legend=list( # positioning of legend box 
-        x  = 15,
-        y  = 10,
-        #x=ncol(exp1_comp_table) -3 ,
-        #y=max(colSums(exp1_comp_table)) ,
-        bty = "n")
- )
+
+exp1_comp_df <- as.data.frame(exp1_comp_table)
+colnames(exp1_comp_df) <- c("Opponent","model","Freq")
+
+
+exp1_comp_df$model.f <- factor(exp1_comp_df$model, levels = c("Nash","RL","EWA", "BCH_NBT", "BCH_BT"), ordered =TRUE)
+
+ggplot(data = exp1_comp_df,aes(x = model.f, y = Freq, fill = Opponent)) +geom_bar(stat = "identity") + xlab("Best fitting model") + ylab("Number of participants") + theme_apa()  + coord_flip()
+
+# #knitr::include_graphics("../Report/images/exp1_comp_models.png", dpi = 108)
+# par(las=2) # make label text perpendicular to axis
+# par(mar=c(5,8,4,2)) # increase y-axis margin.
+# barplot(exp1_comp_table,
+#         horiz =TRUE, # rotate barplot for better visibility 
+#         las=1, # change orientation x axis labels 
+#         cex.names=0.8, # text label size
+#         legend = rownames(exp1_comp_table),
+#         beside =TRUE,
+#         xlab="Number of participants",
+#         args.legend=list( # positioning of legend box 
+#         x  = 15,
+#         y  = 10,
+#         #x=ncol(exp1_comp_table) -3 ,
+#         #y=max(colSums(exp1_comp_table)) ,
+#         bty = "n")
+#  )
 
 ```
 
@@ -591,7 +629,7 @@ d <- melt(exp1_BIC_weights, id.vars="ID", variable.name = "Model",value.name = "
 ```
 
 (ref:figure9-caption) Model BIC weights for participants in Experiment 1.
-```{r, xp1-BIC-weigths, fig.cap="(ref:figure9-caption)", fig.align="center"}
+```{r, include = FALSE, xp1-BIC-weigths, fig.cap="(ref:figure9-caption)", fig.align="center"}
 ggplot(d, aes(y = BIC_weight, x = 1)) + 
   geom_violin() +
   geom_jitter(width=.2, alpha=.6) + 
@@ -653,7 +691,9 @@ ggplot(d, aes(y = BIC_weight, x = 1)) +
 ```
 
 
-In Experiment 2, we can see from Figure\ \@ref(fig:exp2-comp-models) that the RL model was again more successful than the Bayesian Cognitive Hierarchy models (with or without transfer) and the EWA model in fitting participants' action choices. <!--  In Experiment 2 when participants faced both level-1 and level-2 agents sequentially, the Bayesian models (with or without transfer) did not fit players observed data as well. --> This is also reflected in BIC weights in Figure \@ref(fig:xp2-BIC-weigths). 
+In Experiment 2, we can see from Figure\ \@ref(fig:exp2-comp-models) that the RL model was again more successful than the Bayesian Cognitive Hierarchy models (with or without transfer) and the EWA model in fitting participants' action choices. <!--  In Experiment 2 when participants faced both level-1 and level-2 agents sequentially, the Bayesian models (with or without transfer) did not fit players observed data as well. --> 
+
+<!-- This is also reflected in BIC weights in Figure \@ref(fig:xp2-BIC-weigths). -->
 
 ```{r, include = FALSE}
 
@@ -667,23 +707,35 @@ exp2_comp_table
 
 ```{r exp2-comp-models, fig.cap = "Experiment 2 Histogram of best fitting computational models by condition", out.width="\\textwidth", fig.align='center'}
 
-par(las=2) # make label text perpendicular to axis
-par(mar=c(5,8,4,2)) # increase y-axis margin.
-barplot(exp2_comp_table,
-        horiz =TRUE, # rotate barplot for better visibility 
-        las=1, # change orientation x axis labels 
-        cex.names=0.8, # text label size
-        beside =TRUE,
-        xlab="Number of participants",
-        #legend = c("level-1 opp first","level-2 opp first"),
-        legend = paste0(rownames(exp2_comp_table) , " faced first"),
-        args.legend=list( # positioning of legend box 
-        x  = 12,
-        y  = 10,
-        # x=ncol(exp2_comp_table) + 6,
-        # y=max(colSums(exp2_comp_table)) +1,
-        bty = "n")
- )
+
+exp2_comp_df <- as.data.frame(exp2_comp_table)
+colnames(exp2_comp_df) <- c("condition","model","Freq")
+
+
+exp2_comp_df$model.f <- factor(exp2_comp_df$model, levels = c("Nash","RL_NT","RL_WT","EWA_NT","EWA_WT","BCH_NT", "BCH_WT","BCH_BT"), ordered =TRUE)
+
+ggplot(data = exp2_comp_df,aes(x = model.f, y = Freq, fill = condition)) +geom_bar(stat = "identity") + xlab("Best fitting model") + ylab("Number of participants") + theme_apa() +coord_flip() + labs(fill = "Opponent faced first")
+
+
+# 
+# 
+# par(las=2) # make label text perpendicular to axis
+# par(mar=c(5,8,4,2)) # increase y-axis margin.
+# barplot(exp2_comp_table,
+#         horiz =TRUE, # rotate barplot for better visibility 
+#         las=1, # change orientation x axis labels 
+#         cex.names=0.8, # text label size
+#         beside =TRUE,
+#         xlab="Number of participants",
+#         #legend = c("level-1 opp first","level-2 opp first"),
+#         legend = paste0(rownames(exp2_comp_table) , " faced first"),
+#         args.legend=list( # positioning of legend box 
+#         x  = 12,
+#         y  = 10,
+#         # x=ncol(exp2_comp_table) + 6,
+#         # y=max(colSums(exp2_comp_table)) +1,
+#         bty = "n")
+#  )
 
 ```
 
@@ -812,7 +864,7 @@ d <- melt(exp2_BIC_weights, id.vars="ID", variable.name = "Model",value.name = "
 ```
 
 (ref:figure11-caption) BIC weights for each model and participant in Experiment 2.
-```{r, xp2-BIC-weigths, fig.cap="(ref:figure11-caption)", fig.align="center", out.width="\\textwidth"}
+```{r, include = FALSE, xp2-BIC-weigths, fig.cap="(ref:figure11-caption)", fig.align="center", out.width="\\textwidth"}
 ggplot(d, aes(y = BIC_weight, x = 1)) + 
   geom_violin() +
   geom_jitter(width=.2, alpha=.6) + 
@@ -1176,7 +1228,7 @@ In Experiment 2, the switching model (AIC = `r round(-2*as.numeric(logLik(fmod2)
 
 In this study, we investigated human learning transfer across games by making human participants play against computer agents with limited levels of iterated reasoning. We were interested in whether participants learn about the strategy of their opponent and transfer such knowledge between games, and whether this is modulated by the similarity between games and the sophistication of the agent.
 
-The results of our first experiment show that the majority of participants learnt to adapt to their opponent's strategy over multiple interactions, and generalised this learning to a similar game. Performance in early rounds indicated that transfer to the more dissimilar game was moderated by the degree of sophistication of the opponent, with evidence for transfer when players face the less sophisticated agent but not the more sophisticated one. **MS: there was stronger evidence of moderation by game!** In the second experiment, participants faced both types of opponents, allowing for a stronger test of opponent modelling, as participants would need to learn a different strategy for each opponent. In Experiment 1, participants could learn a single strategy for each game, making opponent modelling possibly less pertinent. Experiment 2 also offers more opportunities to test transfer of a learnt opponent model, as we could assess both within and between game transfer. The results on learning transfer confirmed the findings from the first experiment. Again, there was clear evidence of transfer in the early rounds of the later games. We also found that learning transfer is moderated by the type of opponent faced: Evidence of transfer was weaker for the level-2 opponent as compared to the level-1 opponent. That transfer was less evident for the more sophisticated level-2 opponent in both experiments may be due to a higher difficulty of learning that opponent's strategy. If it is more difficult to establish a model of the level-2 opponent, there is likely less knowledge to transfer to the new game. A player cannot transfer what they have not learnt. **MS: again, there was stronger evidence of moderation by game!**
+The results of our first experiment show that the majority of participants learnt to adapt to their opponent's strategy over multiple interactions, and generalised this learning to a similar game. **Performance in early rounds indicated that learning transfer was moderated by the degree of similarity between games. There was not enough evidence for a difference in learning transfer between the two opponents.** In the second experiment, participants faced both types of opponents, allowing for a stronger test of opponent modelling, as participants would need to learn a different strategy for each opponent. In Experiment 1, participants could learn a single strategy for each game, making opponent modelling possibly less pertinent. **There was clear evidence of transfer in the early rounds of the later games. On top of the moderation of the transfer by degree of similarity between games, we also found that learning transfer is moderated by the type of opponent faced: Transfer was harder when facing the level-2 opponent as compared to the level-1 opponent.** That evidence for transfer was weaker when facing the more sophisticated level-2 opponent may be due to a higher difficulty of learning that opponent's strategy. If it is more difficult to establish a model of the level-2 opponent, there is likely less knowledge to transfer to the new game. A player cannot transfer what they have not learnt.
 
 What exactly did the players learn in the first game (RPS) that allowed them to beat their opponent in the later games (FWG, and Numbers or Shootout)? what did the players learn specifically about their opponent's strategy and what form did this learning take? 
 One possible answer is that participants learned simple rules based on last round play. For instance, "play scissors whenever my opponent played rock in last round", or "play paper whenever the last round play was either rock or scissors". These are the type of strategies that are learned by the model-free reinforcement learning we used in our computational modelling. While this strategy fitted participants' actions the best overall, there are at least two reasons why this account is not satisfactory as a complete description of participants' behaviour. Firstly, the learned strategies are not transferable to new games. There is no simple way to map "play scissors whenever my opponent played rock in last round" in the RPS game to "play grass whenever my opponent played fire in last round". Such a mapping may be possible by translating the rules and structure from RPS to FWG, but model-free reinforcement learning lacks the tools to do this: Model-free reinforcement learning would need to start from scratch in each new game, yet we found evidence that participants could successfully exploit their opponent's strategy in early rounds of new games. Secondly, a reinforcement learning strategy would fare equally well against the level-1 and level-2 opponent. Whilst choosing different actions, the contingency between the state (last round play) and actions is the same for both opponents. Yet, we found that participants performed better against the level-1 opponent compared to the level-2 opponent. The difference in performance between the two types of opponent indicates that the actions of the more sophisticated level-2 opponent, or the best response to these, were somehow more difficult to predict.
@@ -1203,15 +1255,12 @@ Having said that, there remains a high degree of heterogeneity between players. 
 
 # References
 
-
 ```{r create_r-references}
-r_refs(file = "Mendeley2.bib")
-
+#r_refs(file = "Mendeley2.bib")
 ```
 
-\begingroup
-\setlength{\parindent}{-0.5in}
-\setlength{\leftskip}{0.5in}
-
-<div id = "refs"></div>
-\endgroup
+<!-- \begingroup -->
+<!-- \setlength{\parindent}{-0.5in} -->
+<!-- \setlength{\leftskip}{0.5in} -->
+<!-- <div id = "refs"></div> -->
+<!-- \endgroup -->

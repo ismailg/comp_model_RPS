@@ -266,7 +266,7 @@ summary(con4, adjust ="holm")
 
 
 
-
+#### EARLY TRIALS - LEARNING TRANSFER !!!! 
 ```{r}
 
 #looking at TRIALS 2 to 6 to test robustness of evidence for transfer of learning of opponent strategy #########
@@ -295,10 +295,25 @@ group_by(dat2_6, game.f,condition) %>%
 ggerrorplot(dat2_6, x = "game.f", y = "early_score", group = 1, color="game.f", desc_stat = "mean_ci",palette = c("#00AFBB", "#E7B800", "#FC4E07"), order = c("RPS", "FWG","NUM"), ylab = "Score", xlab = "Games") 
 
 
+# set contrasts for factors in dataset for condition and game 
+
+# setting contrast to compare early score between games across levels 
+contrasts(dat2_6$game.f) <- cbind(c(1,-1,0),c(0,-1,1))
+contrasts(dat2_6$condition) <- c(1,-1)
+
 # testing differences between early scores across games 
 library(afex)
-aov_early <- aov_car(early_score ~ game.f*condition + Error(human_id/(game.f)),data=dat2_6)
+aov_early <- aov_car(early_score ~ game.f*condition + Error(human_id/(game.f)),data=dat2_6,check_contrasts = FALSE)
 summary(aov_early)
+
+# Random intercecprt for participants
+lme_early <- mixed(early_score ~ game.f*condition + (1 | human_id),data=dat2_6,check_contrasts = FALSE, type = 3, method = "KR")
+summary(lme_early)
+
+lme_early
+
+
+
 
 aov_ear_nice <- nice(aov_early, es = attr(aov_early$anova_table, "es"),
   observed = attr(aov_early$anova_table, "observed"),
@@ -330,9 +345,16 @@ write.table(format(trans26, digits=2),file = "trans26.txt", sep = ",", quote = F
 
 # compare early scores in FWG for lvl 1 and lvl2 / same for NUM
 
-contrast(means.int2, list(G1vG2for26 = c(0,1,0,0,-1,0), G2vG3for26=c(0,0,1,0,0,-1)))
+contrast(means.int2, list(L1vL2forG2 = c(0,1,0,0,-1,0), L1vL2forG3=c(0,0,1,0,0,-1)))
+                                 # levels      c(1,-1,0,1,-1,0)
+                                 # games       c(1,1,1,-1,-1,-1)
+
+# Interaction contrast
+
+contrast(means.int2, list(G1vG2byLevel = c(1,-1,0,-1,1,0), G2vG3byLevel6=c(0,1,-1,0,-1,1)))
+
          
-# Plot interactions for early rouns, condition by game
+# Plot interactions for early rounds, condition by game
 
 lsmip(aov_early, ~ game.f | condition )
 

@@ -387,8 +387,26 @@ ggerrorplot(dat2_6, x = "game.f", y = "early_score", group = 1, color="game.f", 
 # testing differences between early scores across games 
 library(afex)
 
+# Set contrasts
+contrasts(dat2_6$game.f) <- cbind(c(1,-1,0),c(0,-1,1))
+contrasts(dat2_6$opp_type) <- c(1,-1)
+contrasts(dat2_6$condition.f) <- c(1,-1)
+
+
+
 aov_early <- aov_car(early_score ~ game.f*opp_type*condition.f + Error(human_id/(game.f*opp_type)),data=dat2_6)
 summary(aov_early)
+
+
+# Random intercecprt for participants
+lme_early <- mixed(early_score ~ game.f*opp_type*condition.f + (1 | human_id),data=dat2_6,check_contrasts = FALSE, type = 3, method = "KR")
+summary(lme_early)
+
+lme_early
+
+
+
+
 
 (aov_ear_nice <- nice(aov_early, es = attr(aov_early$anova_table, "es"),
   observed = attr(aov_early$anova_table, "observed"),
