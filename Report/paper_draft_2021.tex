@@ -2,7 +2,7 @@
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
 %
-\documentclass[man,floatsintext]{apa6}
+\documentclass[english,man,floatsintext]{apa6}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -32,7 +32,7 @@
 \usepackage{hyperref}
 \hypersetup{
             pdftitle={Transfer of Learned Opponent Models in Zero Sum Games},
-            pdfauthor={Ismail Guennouni~\& Maarten Speekenbrink},
+            pdfauthor={Ismail Guennouni1 \& Maarten Speekenbrink1},
             colorlinks=true,
             linkcolor=blue,
             filecolor=Maroon,
@@ -53,52 +53,70 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{0}
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
 
 % set default figure placement to htbp
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
 
-\shorttitle{Upgrade Report}
-\affiliation{
-\vspace{0.5cm}
-\textsuperscript{1} Department of Experimental Psychology, University College London}
-\usepackage{csquotes}
+% Manuscript styling
 \usepackage{upgreek}
 \captionsetup{font=singlespacing,justification=justified}
 
+% Table formatting
 \usepackage{longtable}
 \usepackage{lscape}
-\usepackage{multirow}
-\usepackage{tabularx}
-\usepackage[flushleft]{threeparttable}
-\usepackage{threeparttablex}
+% \usepackage[counterclockwise]{rotating}   % Landscape page setup for large tables
+\usepackage{multirow}		% Table styling
+\usepackage{tabularx}		% Control Column width
+\usepackage[flushleft]{threeparttable}	% Allows for three part tables with a specified notes section
+\usepackage{threeparttablex}            % Lets threeparttable work with longtable
 
-\newenvironment{lltable}{\begin{landscape}\begin{center}\begin{ThreePartTable}}{\end{ThreePartTable}\end{center}\end{landscape}}
+% Create new environments so endfloat can handle them
+% \newenvironment{ltable}
+%   {\begin{landscape}\centering\begin{threeparttable}}
+%   {\end{threeparttable}\end{landscape}}
+\newenvironment{lltable}{\begin{landscape}\centering\begin{ThreePartTable}}{\end{ThreePartTable}\end{landscape}}
 
+% Enables adjusting longtable caption width to table width
+% Solution found at http://golatex.de/longtable-mit-caption-so-breit-wie-die-tabelle-t15767.html
 \makeatletter
 \newcommand\LastLTentrywidth{1em}
 \newlength\longtablewidth
 \setlength{\longtablewidth}{1in}
 \newcommand{\getlongtablewidth}{\begingroup \ifcsname LT@\roman{LT@tables}\endcsname \global\longtablewidth=0pt \renewcommand{\LT@entry}[2]{\global\advance\longtablewidth by ##2\relax\gdef\LastLTentrywidth{##2}}\@nameuse{LT@\roman{LT@tables}} \fi \endgroup}
+
+% \setlength{\parindent}{0.5in}
+% \setlength{\parskip}{0pt plus 0pt minus 0pt}
+
+% \usepackage{etoolbox}
+\makeatletter
+\patchcmd{\HyOrg@maketitle}
+  {\section{\normalfont\normalsize\abstractname}}
+  {\section*{\normalfont\normalsize\abstractname}}
+  {}{\typeout{Failed to patch abstract.}}
+\patchcmd{\HyOrg@maketitle}
+  {\section{\protect\normalfont{\@title}}}
+  {\section*{\protect\normalfont{\@title}}}
+  {}{\typeout{Failed to patch title.}}
+\makeatother
+\shorttitle{Upgrade Report}
+\usepackage{csquotes}
 \shorttitle{}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[shorthands=off,main=english]{babel}
+\else
+  % load polyglossia as late as possible as it *could* call bidi if RTL lang (e.g. Hebrew or Arabic)
+  \usepackage{polyglossia}
+  \setmainlanguage[]{english}
+\fi
 
 \title{Transfer of Learned Opponent Models in Zero Sum Games}
-\author{Ismail Guennouni\textsuperscript{1}~\& Maarten Speekenbrink\textsuperscript{1}}
+\author{Ismail Guennouni\textsuperscript{1} \& Maarten Speekenbrink\textsuperscript{1}}
 \date{}
 
-\authornote{
 
-Correspondence concerning this article should be addressed to Ismail Guennouni, Department of Experimental Psychology, University College London, 26 Bedford Way, London WC1H 0AP, United Kingdom. E-mail: \href{mailto:i.guennouni.17@ucl.ac.uk}{\nolinkurl{i.guennouni.17@ucl.ac.uk}}}
+\affiliation{\vspace{0.5cm}\textsuperscript{1} Department of Experimental Psychology, University College London}
 
 \abstract{
 Human learning transfer abilities take advantage of important cognitive building blocks such as an abstract representation of concepts underlying tasks and
@@ -108,9 +126,9 @@ computer agents with human-like limited degrees of iterated reasoning. In two ex
 deviate from Nash equilibrium play and learn to adapt to their opponent's strategy to exploit it. Moreover, we show that participants transfer their learning to new games and that
 this transfer is moderated by the level of sophistication of the opponent, as well as the similarity between games. Computational modelling shows that players start each game with a model-based
 learning strategy that facilitates between-game transfer of their opponent's strategy, but then switch to behaviour that is consistent with a model-free learning strategy in the latter stages of the interaction.
-
-
 }
+
+
 
 \begin{document}
 \maketitle
@@ -195,9 +213,9 @@ Participants were informed they would play three different games against the sam
 \caption{Performance per game and block across conditions in Experiment 1. Points are scores of individual participants and boxes reflect the 95\% confidence intervals of the mean (center line equals the mean).}\label{fig:exp1-avg-scores-game}
 \end{figure}
 
-On average, participants obtained the lowest score in the RPS game (\(M = 0.289\), \(SD = 0.348\)), followed by Numbers (\(M = 0.31\), \(SD = 0.347\)). Participants' performance was highest in the FWG game (\(M = 0.454\), \(SD = 0.354\)). Scores in each game were significantly different from 0, the expected score of uniformly random play (RPS: \(t(51) = 7.26\), \(p < .001\); FWG: \(t(51) = 10.04\) , \(p < .001\); Numbers: \(t(51) = 7.17\), \(p < .001\)). As uniformly random play is the Nash equilibrium, this indicates successful deviation from a Nash-optimal strategy.
+First,we focus on participants scores oin each game (see Figure \ref{fig:exp1-avg-scores-game}). On average, participants obtained the lowest score in the RPS game (\(M = 0.289\), \(SD = 0.348\)), followed by Numbers (\(M = 0.31\), \(SD = 0.347\)). Participants' performance was highest in the FWG game (\(M = 0.454\), \(SD = 0.354\)). Scores in each game were significantly different from 0, the expected score of uniformly random play (RPS: \(t(51) = 7.26\), \(p < .001\); FWG: \(t(51) = 10.04\) , \(p < .001\); Numbers: \(t(51) = 7.17\), \(p < .001\)). As uniformly random play is the Nash equilibrium, this indicates successful deviation from a Nash-optimal strategy.
 
-To assess learning within and between games, we used a 2 (condition: Level 1, Level 2) by 3 (game: RPS, FWG, Numbers) by 2 (block: first half, second half) repeated-measures ANOVA, with the first factor varying between participants. This showed a main effect of Game (\(F(2,100) = 8.54\), \(\eta^{2} = 0.05\), \(p < .001\)), indicating that average scores varied significantly over the games. Post-hoc pairwise comparisons showed that performance in the FWG game was significantly higher than in the RPS game (\(t(100) =3.78\), \(p < .001\)) and the Numbers game (\(t(100) = 3.32\) , \(p = .002\)). The score in RPS was not significantly different from the score in Numbers (\(t(100) = 0.45\) , \(p = .65\)). The main effect of Block (\(F(1,50) = 22.51\) , \(\eta^{2} = 0.03\), \(p < .001\)) shows that the score in the first half of each game (\(M = 0.29\)) was significantly lower than in the second half (\(M = 0.40\)), which indicates within-game learning. The main effect of Condition (\(F(1,50) = 5.44\), \(\eta^{2} = 0.05\), \(p = .024\)) indicates that scores were higher against the level-1 player (\(M = 0.43\)) than against the level-2 player (\(M = 0.27\)). Thus, it appears that is was harder for participants to exploit the strategy of the more sophisticated level-2 opponent than the comparatively less sophisticated level-1 opponent.
+\textbf{To assess learning within and between games, we estimate a linear mixed effects model with the scores as the dependent variable, and Condition (Level 1 or Level 2), Game (RPS, FWG, Numbers) and Block ( first-half , second-half) as independent variables. Random model intercepts are assumed for participants.This showed a main effect of Game (\(F(2,250) = 12.90\), \(\eta^{2} = 0.09\), \(p < .001\)) indicating that average scores varied significantly over the games}. Post-hoc pairwise comparisons showed that performance in the FWG game was significantly higher than in the RPS game (\(t(100) =3.78\), \(p < .001\)) and the Numbers game (\(t(100) = 3.32\) , \(p = .002\)). The score in RPS was not significantly different from the score in Numbers (\(t(100) = 0.45\) , \(p = .65\)). The main effect of Block (\(F(2,250) = 15.16\) , \(\eta^{2} = 0.06\), \(p < .001\)) shows that the score in the first half of each game (\(M = 0.29\)) was significantly lower than in the second half (\(M = 0.40\)), which indicates within-game learning. The main effect of Condition (\(F(1,50) = 5.44\), \(\eta^{2} = 0.10\), \(p = .024\)) indicates that scores were higher against the level-1 player (\(M = 0.43\)) than against the level-2 player (\(M = 0.27\)). Thus, it appears that is was harder for participants to exploit the strategy of the more sophisticated level-2 opponent than the comparatively less sophisticated level-1 opponent. \textbf{There was also an interaction effect of game by condition (\(F(2,250) = 4.52\) , \(\eta^{2} = 0.03\), \(p = .01\))}
 
 \hypertarget{learning-transfer}{%
 \subsubsection{Learning transfer}\label{learning-transfer}}
@@ -213,9 +231,9 @@ As a measure for learning transfer, we focus on participants' scores in the init
 \caption{\label{ref:figure4-caption}Performance in early rounds (2-6) per game and block across conditions in Experiment 1. Points are scores of individual participants and boxes reflect the 95\% confidence intervals of the mean (center line equals the mean).}\label{fig:exp1-early-score-by-opp}
 \end{figure}
 
-Next, we explore whether learning transfer is moderated by the type of opponent and game similarity. We expected better transfer between more similar games (i.e.~better transfer from RPS to FWG than from RPS/FWG to Numbers), and worse transfer for the more sophisticated level-2 agent. Figure \ref{fig:exp1-early-score-by-opp} indicates that the pattern over the games is indeed dissimilar between level-1 and level-2 opponents. To explore this, we used a 2 (Condition: Level 1, Level 2) by 3 (Game: RPS, FWG, Numbers) repeated measures ANOVA with the first factor varying between participants. There was a main effect of Game (\(F(1.84,91.77) = 3.35\), \(\eta^{2} = 0.04\), \(p = .043\), Greenhouse-Geisser correction applied to the degrees of freedom to correct for non-sphericity).
+Next, we explore whether learning transfer is moderated by the type of opponent and game similarity. We expected better transfer between more similar games (i.e.~better transfer from RPS to FWG than from RPS/FWG to Numbers), and worse transfer for the more sophisticated level-2 agent. Figure \ref{fig:exp1-early-score-by-opp} indicates that the pattern over the games is indeed dissimilar between level-1 and level-2 opponents. We estimate a linear mixed effects model with the early round scores as the dependent variable, and Condition (Level 1 or Level 2) and Game (RPS, FWG, Numbers) as independent variables. Random model intercepts are assumed for participants. We found a main effect of Game (\(F(2,100) = 3.35\), \(p = .04\)), and no main effect for condition. Further investigation of the effects of game on early score using planned contrasts revealed that early scores in the FWG games are significantly higher than in the RPS ( \(t(99.99) = -2.32\), \(p = 0.02\)).
 
-To test for transfer by type of opponent faced, we ran statistical tests on early round scores by game and opponent, against the null hypothesis of 0 (no transfer). For level-1 facing players, there is evidence of learning transfer from RPS to both FWG (\(t(150) = 3.96\), \(p < .001\)) and Numbers (\(t(150) = 3.74\), \(p < .001\)). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player (\(t(150) = 2.48\), \(p = .01\)) but not to the dissimilar game of Numbers.
+To delve deeper into the differences between participants learning transfer by opponent, we ran statistical tests on early round scores by game and opponent, against the null hypothesis of 0 (no transfer). For level-1 facing players, there is evidence of learning transfer from RPS to both FWG (\(t(150) = 3.96\), \(p < .001\)) and Numbers (\(t(150) = 3.74\), \(p < .001\)). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player (\(t(150) = 2.48\), \(p = .01\)) but not to the dissimilar game of Numbers.
 
 \hypertarget{discussion}{%
 \subsubsection{Discussion}\label{discussion}}
@@ -270,7 +288,7 @@ Participants' scores are depicted in Figure \ref{fig:exp2-score-by-opp}. The RPS
 \caption{\label{fig:exp2-score-by-opp}Performance per game and interaction across opponents in Experiment 2. Points are scores of individual participants and boxes reflect the 95\% confidence intervals of the mean (center line equals the mean).}\label{fig:exp2-score-by-opp}
 \end{figure}
 
-To explore whether learning occurred within and between games, we performed a two (Condition: level-1 first, level-2 first) by two (Opponent type: level-1 or level-2) by three (Game: RPS, FWG, Shootout) by two (Encounter: first or second) repeated-measures ANOVA, with the first factor varying between participants. This showed a main effect of Game (\(F(1.85,88.7) = 11.81\), \(\eta^{2} = 0.04\), \(p < .001\)). Post-hoc pairwise comparisons between games (\(p\)-values adjusted using Holm method for multiple comparisons) indicate performance in the games increased steadily throughout the experiment, with FWG performance significantly higher than RPS (\(t(96) =2.53\), \(p = .025\)), and performance in the Shootout game significantly higher than in FWG (\(t(96) = 2.32\), \(p = .025\)). Whilst the ANOVA shows no main effect of Condition, Opponent type, or Encounter, there was a significant interaction between Game and Opponent type (\(F(1.7, 81.82) = 5.31\) ,\(\eta^{2} = 0.02\), \(p = .01\)). Follow-up analysis shows that when facing level-1 agents, scores increased steadily after each game, with FWG score significantly higher than RPS (\(t(191) = 2.70\), \(p = .03\)) and Shootout scores in turn significantly higher than FWG (\(t(191) = 3.05\), \(p = .01\)). There was no significant difference between average scores on any two games when facing level-2 agents however.
+\textbf{To explore whether learning occurred within and between game, we estimated a mixed effect model, with the participants scores as the dependent variable and Condition (level-1 first, level-2 first), Opponent type (level-1 or level-2), Game (RPS, FWG, Shootout) and Encounter (first or second) as the independent variables. Random model intercepts are assumed for participants. We found a main effect of Game (\(F(2,528) = 15.32\), \(\eta^{2} = 0.04\), \(p < .001\)). Post-hoc pairwise comparisons between games (\(p\)-values adjusted using Holm method for multiple comparisons) indicate performance in the games increased steadily throughout the experiment, with FWG performance significantly higher than RPS (\(t(96) =2.53\), \(p = .025\)), and performance in the Shootout game significantly higher than in FWG (\(t(96) = 2.32\), \(p = .025\)). Whilst the mixed effect model shows no main effect of Condition, Opponent type, or Encounter, there was a significant interaction between Game and Opponent type (\(F(2, 528) = 5.78\) ,\(\eta^{2} = 0.02\), \(p = .003\)). Follow-up analysis differentiating performance by type of opponent faced shows that when facing level-1 agents, scores increased steadily after each game, with FWG score significantly higher than RPS (\(t(191) = 2.70\), \(p = .03\)) and Shootout scores in turn significantly higher than FWG (\(t(191) = 3.05\), \(p = .01\)). There was no significant difference between average scores on any two games when facing level-2 agents however.}
 
 \hypertarget{learning-transfer-1}{%
 \subsubsection{Learning transfer}\label{learning-transfer-1}}
@@ -286,12 +304,12 @@ To explore whether learning occurred within and between games, we performed a tw
 
 \textbf{To measure transfer between games, we again focus on participants' scores in the initial 5 rounds after the first round (rounds 2-6) of each game and only during the first time they interact with an opponent in a game (see Figure \ref{fig:exp2-early-score-by-opp}). We estimate a linear mixed effects model with the early round scores as the dependent variable, and Condition (level-1 first, level-2 first), Opponent type (level-1 or level-2) and Game (RPS, FWG, Shootout) as independent variables. Random model intercepts are assumed for participants. We found a main effect of Game(\(F(2,240) = 6.57\), \(p = .002\)) and an interaction effect between Game and Opponent type ( \(F(2,240) = 3.34\), \(p = .037\)).}
 
-We then ran statistical tests on early round scores by game and opponent against the null hypothesis of 0 (no transfer). For level-1 facing players, there is evidence of learning transfer from RPS to both FWG (\(t(271) = 4.99\), \(p < .001\)) and Shootout (\(t(271) = 6.66\), \(p < .001\)). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player (\(t(271) = 4.41\), \(p < .001\)). Unlike in Experiment 1, there is also evidence of transfer to the dissimilar Shootout game (\(t(271) = 3.22\), \(p = .004\)). The early round scores in the similar FWG games for level-1 and level-2 facing players are not significantly different from each other. However, the score of the players facing the level-1 opponent in Shootout is higher than that of players facing level-2 opponents ( \(t(144) = 2.45\), \(p = 0.01\)).
+We then ran statistical tests on early round scores by game and opponent against the null hypothesis of 0 (no transfer). For level-1 facing players, there is evidence of learning transfer from RPS to both FWG (\(t(271) = 4.99\), \(p < .001\)) and Shootout (\(t(271) = 6.66\), \(p < .001\)). For level-2 facing players, there is evidence for transfer from RPS to the similar game FWG, albeit scores are lower than for level-1 player (\(t(271) = 4.41\), \(p < .001\)). Unlike in Experiment 1, there is also evidence of transfer to the dissimilar Shootout game (\(t(271) = 3.22\), \(p = .004\)). The early round scores in the similar FWG games for level-1 and level-2 facing players are not significantly different from each other. However, the score of the players facing the level-1 opponent in Shootout is higher than that of players facing level-2 opponents (\(t(144) = 2.45\), \(p = 0.01\)).
 
 \hypertarget{discussion-1}{%
 \subsubsection{Discussion}\label{discussion-1}}
 
-\textbf{The results of Experiment 2 confirm some earlier results from Experiment 1 in a situation where participants need to learn about two distinct opponents. As in Experiment 1, participants adapted their strategies to both level-1 and level-2 opponents to exploit deviations from Nash-optimal play. Knowledge about both types of opponents were transferred to both the similar and dissimilar game. This transfer was moderated by the degree of similarity between games. The interqaction effect showed that transfer to the dissimilar game was easier when facing the less sophisticated agent. }
+\textbf{The results of Experiment 2 confirm earlier results from Experiment 1 on learning transfer in a situation where participants need to learn about two distinct opponents. As in Experiment 1, participants adapted their strategies to both level-1 and level-2 opponents to exploit deviations from Nash-optimal play. Knowledge about both types of opponents were transferred to both the similar and dissimilar game. This transfer was moderated by the degree of similarity between games. The interaction effect showed that transfer to the dissimilar game was easier when facing the less sophisticated agent.}
 
 \hypertarget{computational-modelling}{%
 \section{Computational modelling}\label{computational-modelling}}
@@ -320,11 +338,11 @@ where \(I(x)\) is an indicator function which takes the value 1 is its argument 
 
 \[ \delta_{a}(t)  = 1  \text{  if  }  R(a,o_{t}) \geq r_{t}  \text{  and }  0 \text{  otherwise } \]
 
-\(\phi_{t}\) can be interpreted as the discount on prior experiences, modelling either limited agent memory or changes in the game conditions. At the core, \(\phi_{t}\) depends on the surprise index \$ S\_\{p\}(t)\$ :
+\textbf{\(\phi_{t}\) can be interpreted as the discount on prior experiences, modelling either limited agent memory or changes in the game conditions. At the core, \(\phi_{t}\) depends on the surprise index \(S_{p}(t)\) }:
 
 \[ \phi(t) = 1 - \frac{1}{2}S_{p}(t) \]
 
-\$ S\_\{p\}(t)\$ quantifies how the opponent deviates from past play. It is calculated in turn through the cumulative history of play \$ h\_\{k\}(t)\$ :
+\textbf{\(S_{p}(t)\) quantifies how the opponent deviates from past play. It is calculated in turn through the cumulative history of play \(h_{k}(t)\)}:
 
 \[  h^{k}(t)= \frac{\sum_{\tau =1}^t I(o^k,o_{\tau})}{t} \]
 
@@ -332,7 +350,7 @@ As well as an indicator vector of the most recent opponent play:
 
 \[r^k(t) = I(o^k,o_{t})\]
 
-Where \(I\) is the indicator function as defined above. To get the surprise index, we simply sum all the squared deviations between the cumulative history vector \$ h\^{}\{k\}(t) \$ and the immediate history \(r^k(t)\):
+\textbf{Where \(I\) is the indicator function as defined above. To get the surprise index, we simply sum all the squared deviations between the cumulative history vector \(h^{k}(t)\) and the immediate history \(r^k(t)\)}:
 
 \[S_{p}(t) = \sum_{k=1}^{|\mathcal{A}_g|} (h^{k}(t) - r^k(t))^2 \]
 
@@ -448,7 +466,7 @@ In Experiment 2, the switching model (AIC = 16,879.97, BIC = 16,936.81) again fi
 
 In this study, we investigated human learning transfer across games by making human participants play against computer agents with limited levels of iterated reasoning. We were interested in whether participants learn about the strategy of their opponent and transfer such knowledge between games, and whether this is modulated by the similarity between games and the sophistication of the agent.
 
-The results of our first experiment show that the majority of participants learnt to adapt to their opponent's strategy over multiple interactions, and generalised this learning to a similar game. Performance in early rounds indicated that transfer to the more dissimilar game was moderated by the degree of similarity between games. There was not enough evidence for a difference in learning transfer between the two opponents. In the second experiment, participants faced both types of opponents, allowing for a stronger test of opponent modelling, as participants would need to learn a different strategy for each opponent. In Experiment 1, participants could learn a single strategy for each game, making opponent modelling possibly less pertinent. Experiment 2 also offers more opportunities to test transfer of a learnt opponent model, as we could assess both within and between game transfer. There was clear evidence of transfer in the early rounds of the later games. On top of the moderation of the transfer by degree of similarity between games, we also found that learning transfer is moderated by the type of opponent faced: Evidence of transfer was weaker for the level-2 opponent as compared to the level-1 opponent. That evidence for transfer was weaker when facing the more sophisticated level-2 opponent may be due to a higher difficulty of learning that opponent's strategy. If it is more difficult to establish a model of the level-2 opponent, there is likely less knowledge to transfer to the new game. A player cannot transfer what they have not learnt.
+The results of our first experiment show that the majority of participants learnt to adapt to their opponent's strategy over multiple interactions, and generalised this learning to a similar game. \textbf{Performance in early rounds indicated that learning transfer was moderated by the degree of similarity between games. There was not enough evidence for a difference in learning transfer between the two opponents.} In the second experiment, participants faced both types of opponents, allowing for a stronger test of opponent modelling, as participants would need to learn a different strategy for each opponent. In Experiment 1, participants could learn a single strategy for each game, making opponent modelling possibly less pertinent. \textbf{There was clear evidence of transfer in the early rounds of the later games. On top of the moderation of the transfer by degree of similarity between games, we also found that learning transfer is moderated by the type of opponent faced: Transfer was harder when facing the level-2 opponent as compared to the level-1 opponent.} That evidence for transfer was weaker when facing the more sophisticated level-2 opponent may be due to a higher difficulty of learning that opponent's strategy. If it is more difficult to establish a model of the level-2 opponent, there is likely less knowledge to transfer to the new game. A player cannot transfer what they have not learnt.
 
 What exactly did the players learn in the first game (RPS) that allowed them to beat their opponent in the later games (FWG, and Numbers or Shootout)? what did the players learn specifically about their opponent's strategy and what form did this learning take?
 One possible answer is that participants learned simple rules based on last round play. For instance, \enquote{play scissors whenever my opponent played rock in last round}, or \enquote{play paper whenever the last round play was either rock or scissors}. These are the type of strategies that are learned by the model-free reinforcement learning we used in our computational modelling. While this strategy fitted participants' actions the best overall, there are at least two reasons why this account is not satisfactory as a complete description of participants' behaviour. Firstly, the learned strategies are not transferable to new games. There is no simple way to map \enquote{play scissors whenever my opponent played rock in last round} in the RPS game to \enquote{play grass whenever my opponent played fire in last round}. Such a mapping may be possible by translating the rules and structure from RPS to FWG, but model-free reinforcement learning lacks the tools to do this: Model-free reinforcement learning would need to start from scratch in each new game, yet we found evidence that participants could successfully exploit their opponent's strategy in early rounds of new games. Secondly, a reinforcement learning strategy would fare equally well against the level-1 and level-2 opponent. Whilst choosing different actions, the contingency between the state (last round play) and actions is the same for both opponents. Yet, we found that participants performed better against the level-1 opponent compared to the level-2 opponent. The difference in performance between the two types of opponent indicates that the actions of the more sophisticated level-2 opponent, or the best response to these, were somehow more difficult to predict.
@@ -547,82 +565,5 @@ Watkins, C. J. C. H., \& Dayan, P. (1992). Q-learning. \emph{Machine Learning}, 
 \leavevmode\hypertarget{ref-Kool_2011}{}%
 Wouter Kool, Joseph T. McGuire, Zev B. Rosen, Matthew M. Bovinick. (2011). Decision Making and the Avoidance of Cognitive Demand. \emph{Experimental Psychology}. \url{https://doi.org/10.2996/kmj/1138846322}
 
-\leavevmode\hypertarget{ref-batzilis}{}%
-Batzilis, D., Jaffe, S., Levitt, S., List, J. A., \& Picel, J. (2016). \emph{How facebook can deepen our understanding of behavior in strategic settings: Evidence from a million rock-paper-scissors games}. working paper.
-
-\leavevmode\hypertarget{ref-camerer2003behavioural}{}%
-Camerer, C. F. (2003). Behavioural studies of strategic thinking in games. \emph{Trends in Cognitive Sciences}, \emph{7}(5), 225--231.
-
-\leavevmode\hypertarget{ref-camerer2004cognitive}{}%
-Camerer, C. F., Ho, T.-H., \& Chong, J.-K. (2004). A cognitive hierarchy model of games. \emph{The Quarterly Journal of Economics}, \emph{119}(3), 861--898.
-
-\leavevmode\hypertarget{ref-camerer1997experience}{}%
-Camerer, C., Ho, T.-H., \& Others. (1997). \emph{Experience-weighted attraction learning in games: A unifying approach}.
-
-\leavevmode\hypertarget{ref-knez2000}{}%
-Camerer, C., \& Knez, M. (2000). \emph{Increasing Cooperation in Prisoner's Dilemmas by Establishing a Precedent of Efficiency in Coordination Games}.
-
-\leavevmode\hypertarget{ref-cheung1994learning}{}%
-Cheung, Y.-W., \& Friedman, D. (1994). \emph{Learning in evolutionary games: some laboratory results}. University of California, Santa Cruz.
-
-\leavevmode\hypertarget{ref-costa2001cognition}{}%
-Costa-Gomes, M., Crawford, V. P., \& Broseta, B. (2001). Cognition and behavior in normal-form games: An experimental study. \emph{Econometrica}, \emph{69}(5), 1193--1235.
-
-\leavevmode\hypertarget{ref-daw2005uncertainty}{}%
-Daw, N. D., Niv, Y., \& Dayan, P. (2005). Uncertainty-based competition between prefrontal and dorsolateral striatal systems for behavioral control. \emph{Nature Neuroscience}, \emph{8}(12), 1704--1711.
-
-\leavevmode\hypertarget{ref-ho2004economics}{}%
-Ho, T. H., Camerer, C. F., \& Chong, J.-K. (2004). \emph{The economics of learning models: A self-tuning theory of learning in games}.
-
-\leavevmode\hypertarget{ref-ho1998iterated}{}%
-Ho, T.-H., Camerer, C., \& Weigelt, K. (1998). Iterated dominance and iterated best response in experimental" p-beauty contests". \emph{The American Economic Review}, \emph{88}(4), 947--969.
-
-\leavevmode\hypertarget{ref-Lake2017}{}%
-Lake, B. M., Ullman, T. D., Tenenbaum, J. B., \& Gershman, S. J. (2017). Building machines that learn and think like people. \emph{Behavioral and Brain Sciences}, \emph{40}. \url{https://doi.org/10.1017/S0140525X16001837}
-
-\leavevmode\hypertarget{ref-lieder2020resource}{}%
-Lieder, F., \& Griffiths, T. L. (2020). Resource-rational analysis: Understanding human cognition as the optimal use of limited computational resources. \emph{Behavioral and Brain Sciences}, \emph{43}.
-
-\leavevmode\hypertarget{ref-mandler2004foundations}{}%
-Mandler, J. M. (2004). \emph{The foundations of mind: Origins of conceptual thought}. Oxford University Press.
-
-\leavevmode\hypertarget{ref-mertens1990repeated}{}%
-Mertens, J.-F. (1990). Repeated games. In \emph{Game theory and applications} (pp. 77--130). Elsevier.
-
-\leavevmode\hypertarget{ref-R-DEoptim}{}%
-Mullen, K., Ardia, D., Gil, D., Windover, D., \& Cline, J. (2011). DEoptim: An R package for global optimization by Differential Evolution. \emph{Journal of Statistical Software}, \emph{40}(6), 1--26. \url{https://doi.org/10.18637/jss.v040.i06}
-
-\leavevmode\hypertarget{ref-nagel1995unraveling}{}%
-Nagel, R. (1995). Unraveling in guessing games: An experimental study. \emph{The American Economic Review}, \emph{85}(5), 1313--1326.
-
-\leavevmode\hypertarget{ref-shachat2004we}{}%
-Shachat, J., \& Swarthout, J. T. (2004). Do we detect and exploit mixed strategy play by opponents? \emph{Mathematical Methods of Operations Research}, \emph{59}(3), 359--373.
-
-\leavevmode\hypertarget{ref-Simon_Daw_11}{}%
-Simon, D. A., \& Daw, N. D. (2011). Environmental statistics and the trade-off between model-based and TD learning in humans. \emph{Advances in Neural Information Processing Systems 24: 25th Annual Conference on Neural Information Processing Systems 2011, NIPS 2011}, 1--9.
-
-\leavevmode\hypertarget{ref-spiliopoulos2013strategic}{}%
-Spiliopoulos, L. (2013). Strategic adaptation of humans playing computer algorithms in a repeated constant-sum game. \emph{Autonomous Agents and Multi-Agent Systems}, \emph{27}(1), 131--160.
-
-\leavevmode\hypertarget{ref-stahl2000rule}{}%
-Stahl, D. O. (2000). Rule learning in symmetric normal-form games: Theory and evidence. \emph{Games and Economic Behavior}, \emph{32}(1), 105--138.
-
-\leavevmode\hypertarget{ref-stahl2003sophisticated}{}%
-Stahl, D. O. (2003). Sophisticated learning and learning sophistication. \emph{Available at SSRN 410921}.
-
-\leavevmode\hypertarget{ref-stahl1995players}{}%
-Stahl, D. O., \& Wilson, P. W. (1995). On players models of other players: Theory and experimental evidence. \emph{Games and Economic Behavior}, \emph{10}(1), 218--254.
-
-\leavevmode\hypertarget{ref-R-depmixS4}{}%
-Visser, I., \& Speekenbrink, M. (2010). depmixS4: An R package for hidden markov models. \emph{Journal of Statistical Software}, \emph{36}(7), 1--21. Retrieved from \url{http://www.jstatsoft.org/v36/i07/}
-
-\leavevmode\hypertarget{ref-wang2014social}{}%
-Wang, Z., Xu, B., \& Zhou, H.-J. (2014). Social cycling and conditional responses in the rock-paper-scissors game. \emph{Scientific Reports}, \emph{4}(1), 1--7.
-
-\leavevmode\hypertarget{ref-watkins1992q}{}%
-Watkins, C. J. C. H., \& Dayan, P. (1992). Q-learning. \emph{Machine Learning}, \emph{8}(3-4), 279--292.
-
-\leavevmode\hypertarget{ref-Kool_2011}{}%
-Wouter Kool, Joseph T. McGuire, Zev B. Rosen, Matthew M. Bovinick. (2011). Decision Making and the Avoidance of Cognitive Demand. \emph{Experimental Psychology}. \url{https://doi.org/10.2996/kmj/1138846322}
 
 \end{document}
